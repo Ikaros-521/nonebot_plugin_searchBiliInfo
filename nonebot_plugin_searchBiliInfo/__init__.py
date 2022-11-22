@@ -24,7 +24,7 @@ from .data import DATA
 插件依赖：requests，nonebot_plugin_htmlrender
 
 插件功能：
-/查 昵称关键词或uid
+/查 昵称关键词或uid(uid需要以:或：或uid:或UID:打头)
 /查直播 昵称关键词或uid 场次数（默认不写为全部）
 /查舰团 昵称关键词或uid
 /查昵称 昵称关键词或uid
@@ -32,8 +32,6 @@ from .data import DATA
 /查成分 观看 昵称关键词或uid
 /查成分 弹幕 查询的目标人昵称关键词或uid 查询的主播昵称关键词或uid 页数 条数
 '''
-
-catch_str = on_keyword({'/查 '})
 
 # 请求头贴入你的b站cookie
 header1 = {
@@ -49,6 +47,8 @@ header1 = {
               'Hm_lpvt_8a6e55dbd2870f0f5bc9194cddf32a02=1663937476 '
 }
 
+
+catch_str = on_keyword({'/查 '})
 @catch_str.handle()
 async def send_msg(bot: Bot, event: Event, state: T_State):
     get_msg = str(event.get_message())
@@ -56,36 +56,33 @@ async def send_msg(bot: Bot, event: Event, state: T_State):
     # nonebot.logger.info(get_msg)
     content = get_msg[3:]
 
-    # 由于逻辑问题 查uid时需要追加uid在命令后
-    if not content.startswith("uid"):
-        # uid检索完成的标志位
-        flag = 0
+    content = data_preprocess(content)
+    # uid检索完成的标志位
+    flag = 0
 
-        # 遍历本地DATA
-        for i in range(len(DATA)):
-            # 本地匹配到结果 就直接使用本地的(由于DATA源自https://api.vtbs.moe/v1/short，可能有空数据，需要异常处理下）
-            try:
-                if content == DATA[i]["uname"]:
-                    content = str(DATA[i]["mid"])
-                    flag = 1
-                    break
-            except (KeyError, TypeError, IndexError) as e:
-                continue
+    # 遍历本地DATA
+    for i in range(len(DATA)):
+        # 本地匹配到结果 就直接使用本地的(由于DATA源自https://api.vtbs.moe/v1/short，可能有空数据，需要异常处理下）
+        try:
+            if content == DATA[i]["uname"]:
+                content = str(DATA[i]["mid"])
+                flag = 1
+                break
+        except (KeyError, TypeError, IndexError) as e:
+            continue
 
-        # 本地没有匹配到，则从b站搜索
-        if flag != 1:
-            # 通过昵称查询uid，默认只查搜索到的第一个用户
-            info_json = await use_name_get_uid(content)
-            # nonebot.logger.info(info_json)
+    # 本地没有匹配到，则从b站搜索
+    if flag != 1:
+        # 通过昵称查询uid，默认只查搜索到的第一个用户
+        info_json = await use_name_get_uid(content)
+        # nonebot.logger.info(info_json)
 
-            try:
-                result = info_json['data']['result']
-                # 只获取第一个搜索结果的数据
-                content = str(result[0]["mid"])
-            except (KeyError, TypeError, IndexError) as e:
-                nonebot.logger.info("查询不到用户名为：" + content + " 的相关信息")
-    else:
-        content = content[3:]
+        try:
+            result = info_json['data']['result']
+            # 只获取第一个搜索结果的数据
+            content = str(result[0]["mid"])
+        except (KeyError, TypeError, IndexError) as e:
+            nonebot.logger.info("查询不到用户名为：" + content + " 的相关信息")
 
     # 传入uid获取用户基本信息
     base_info_json = await get_base_info(content)
@@ -133,36 +130,33 @@ async def send_msg(bot: Bot, event: Event, state: T_State):
     if len(content) == 3:
         page = content[2]
 
-    # 由于逻辑问题 查uid时需要追加uid在命令后
-    if not src_uid.startswith("uid"):
-        # uid检索完成的标志位
-        flag = 0
+    content = data_preprocess(content)
+    # uid检索完成的标志位
+    flag = 0
 
-        # 遍历本地DATA
-        for i in range(len(DATA)):
-            # 本地匹配到结果 就直接使用本地的(由于DATA源自https://api.vtbs.moe/v1/short，可能有空数据，需要异常处理下）
-            try:
-                if src_uid == DATA[i]["uname"]:
-                    src_uid = str(DATA[i]["mid"])
-                    flag = 1
-                    break
-            except (KeyError, TypeError, IndexError) as e:
-                continue
+    # 遍历本地DATA
+    for i in range(len(DATA)):
+        # 本地匹配到结果 就直接使用本地的(由于DATA源自https://api.vtbs.moe/v1/short，可能有空数据，需要异常处理下）
+        try:
+            if src_uid == DATA[i]["uname"]:
+                src_uid = str(DATA[i]["mid"])
+                flag = 1
+                break
+        except (KeyError, TypeError, IndexError) as e:
+            continue
 
-        # 本地没有匹配到，则从b站搜索
-        if flag != 1:
-            # 通过昵称查询uid，默认只查搜索到的第一个用户
-            info_json = await use_name_get_uid(src_uid)
-            # nonebot.logger.info(info_json)
+    # 本地没有匹配到，则从b站搜索
+    if flag != 1:
+        # 通过昵称查询uid，默认只查搜索到的第一个用户
+        info_json = await use_name_get_uid(src_uid)
+        # nonebot.logger.info(info_json)
 
-            try:
-                result = info_json['data']['result']
-                # 只获取第一个搜索结果的数据
-                src_uid = str(result[0]["mid"])
-            except (KeyError, TypeError, IndexError) as e:
-                nonebot.logger.info("查询不到用户名为：" + src_uid + " 的相关信息")
-    else:
-        src_uid = src_uid[3:]
+        try:
+            result = info_json['data']['result']
+            # 只获取第一个搜索结果的数据
+            src_uid = str(result[0]["mid"])
+        except (KeyError, TypeError, IndexError) as e:
+            nonebot.logger.info("查询不到用户名为：" + src_uid + " 的相关信息")
 
     # 由于逻辑问题 查uid时需要追加uid在命令后
     if not tgt_uid.startswith("uid"):
@@ -240,36 +234,33 @@ async def send_msg2(bot: Bot, event: Event, state: T_State):
     content = get_msg[8:]
     id = event.get_user_id()
 
-    # 由于逻辑问题 查uid时需要追加uid在命令后
-    if not content.startswith("uid"):
-        # uid检索完成的标志位
-        flag = 0
+    content = data_preprocess(content)
+    # uid检索完成的标志位
+    flag = 0
 
-        # 遍历本地DATA
-        for i in range(len(DATA)):
-            # 本地匹配到结果 就直接使用本地的(由于DATA源自https://api.vtbs.moe/v1/short，可能有空数据，需要异常处理下）
-            try:
-                if content == DATA[i]["uname"]:
-                    content = str(DATA[i]["mid"])
-                    flag = 1
-                    break
-            except (KeyError, TypeError, IndexError) as e:
-                continue
+    # 遍历本地DATA
+    for i in range(len(DATA)):
+        # 本地匹配到结果 就直接使用本地的(由于DATA源自https://api.vtbs.moe/v1/short，可能有空数据，需要异常处理下）
+        try:
+            if content == DATA[i]["uname"]:
+                content = str(DATA[i]["mid"])
+                flag = 1
+                break
+        except (KeyError, TypeError, IndexError) as e:
+            continue
 
-        # 本地没有匹配到，则从b站搜索
-        if flag != 1:
-            # 通过昵称查询uid，默认只查搜索到的第一个用户
-            info_json = await use_name_get_uid(content)
-            # nonebot.logger.info(info_json)
+    # 本地没有匹配到，则从b站搜索
+    if flag != 1:
+        # 通过昵称查询uid，默认只查搜索到的第一个用户
+        info_json = await use_name_get_uid(content)
+        # nonebot.logger.info(info_json)
 
-            try:
-                result = info_json['data']['result']
-                # 只获取第一个搜索结果的数据
-                content = str(result[0]["mid"])
-            except (KeyError, TypeError, IndexError) as e:
-                nonebot.logger.info("查询不到用户名为：" + content + " 的相关信息")
-    else:
-        content = content[3:]
+        try:
+            result = info_json['data']['result']
+            # 只获取第一个搜索结果的数据
+            content = str(result[0]["mid"])
+        except (KeyError, TypeError, IndexError) as e:
+            nonebot.logger.info("查询不到用户名为：" + content + " 的相关信息")
 
     user_info_json = await get_user_info(content)
 
@@ -342,36 +333,33 @@ async def send_msg3(bot: Bot, event: Event, state: T_State):
         await catch_str3.finish(Message(f'{msg}'))
         return
 
-    # 由于逻辑问题 查uid时需要追加uid在命令后
-    if not src_uid.startswith("uid"):
-        # uid检索完成的标志位
-        flag = 0
+    src_uid = data_preprocess(src_uid)
+    # uid检索完成的标志位
+    flag = 0
 
-        # 遍历本地DATA
-        for i in range(len(DATA)):
-            # 本地匹配到结果 就直接使用本地的(由于DATA源自https://api.vtbs.moe/v1/short，可能有空数据，需要异常处理下）
-            try:
-                if src_uid == DATA[i]["uname"]:
-                    src_uid = str(DATA[i]["mid"])
-                    flag = 1
-                    break
-            except (KeyError, TypeError, IndexError) as e:
-                continue
+    # 遍历本地DATA
+    for i in range(len(DATA)):
+        # 本地匹配到结果 就直接使用本地的(由于DATA源自https://api.vtbs.moe/v1/short，可能有空数据，需要异常处理下）
+        try:
+            if src_uid == DATA[i]["uname"]:
+                src_uid = str(DATA[i]["mid"])
+                flag = 1
+                break
+        except (KeyError, TypeError, IndexError) as e:
+            continue
 
-        # 本地没有匹配到，则从b站搜索
-        if flag != 1:
-            # 通过昵称查询uid，默认只查搜索到的第一个用户
-            info_json = await use_name_get_uid(src_uid)
-            # nonebot.logger.info(info_json)
+    # 本地没有匹配到，则从b站搜索
+    if flag != 1:
+        # 通过昵称查询uid，默认只查搜索到的第一个用户
+        info_json = await use_name_get_uid(src_uid)
+        # nonebot.logger.info(info_json)
 
-            try:
-                result = info_json['data']['result']
-                # 只获取第一个搜索结果的数据
-                src_uid = str(result[0]["mid"])
-            except (KeyError, TypeError, IndexError) as e:
-                nonebot.logger.info("查询不到用户名为：" + src_uid + " 的相关信息")
-    else:
-        src_uid = src_uid[3:]
+        try:
+            result = info_json['data']['result']
+            # 只获取第一个搜索结果的数据
+            src_uid = str(result[0]["mid"])
+        except (KeyError, TypeError, IndexError) as e:
+            nonebot.logger.info("查询不到用户名为：" + src_uid + " 的相关信息")
 
     info_json = await get_info(src_uid)
 
@@ -463,36 +451,33 @@ async def send_msg4(bot: Bot, event: Event, state: T_State):
         await catch_str4.finish(Message(f'{msg}'))
         return
 
-    # 由于逻辑问题 查uid时需要追加uid在命令后
-    if not src_uid.startswith("uid"):
-        # uid检索完成的标志位
-        flag = 0
+    src_uid = data_preprocess(src_uid)
+    # uid检索完成的标志位
+    flag = 0
 
-        # 遍历本地DATA
-        for i in range(len(DATA)):
-            # 本地匹配到结果 就直接使用本地的(由于DATA源自https://api.vtbs.moe/v1/short，可能有空数据，需要异常处理下）
-            try:
-                if src_uid == DATA[i]["uname"]:
-                    src_uid = str(DATA[i]["mid"])
-                    flag = 1
-                    break
-            except (KeyError, TypeError, IndexError) as e:
-                continue
+    # 遍历本地DATA
+    for i in range(len(DATA)):
+        # 本地匹配到结果 就直接使用本地的(由于DATA源自https://api.vtbs.moe/v1/short，可能有空数据，需要异常处理下）
+        try:
+            if src_uid == DATA[i]["uname"]:
+                src_uid = str(DATA[i]["mid"])
+                flag = 1
+                break
+        except (KeyError, TypeError, IndexError) as e:
+            continue
 
-        # 本地没有匹配到，则从b站搜索
-        if flag != 1:
-            # 通过昵称查询uid，默认只查搜索到的第一个用户
-            info_json = await use_name_get_uid(src_uid)
-            # nonebot.logger.info(info_json)
+    # 本地没有匹配到，则从b站搜索
+    if flag != 1:
+        # 通过昵称查询uid，默认只查搜索到的第一个用户
+        info_json = await use_name_get_uid(src_uid)
+        # nonebot.logger.info(info_json)
 
-            try:
-                result = info_json['data']['result']
-                # 只获取第一个搜索结果的数据
-                src_uid = str(result[0]["mid"])
-            except (KeyError, TypeError, IndexError) as e:
-                nonebot.logger.info("查询不到用户名为：" + src_uid + " 的相关信息")
-    else:
-        src_uid = src_uid[3:]
+        try:
+            result = info_json['data']['result']
+            # 只获取第一个搜索结果的数据
+            src_uid = str(result[0]["mid"])
+        except (KeyError, TypeError, IndexError) as e:
+            nonebot.logger.info("查询不到用户名为：" + src_uid + " 的相关信息")
 
     live_json = await get_info(src_uid)
 
@@ -572,38 +557,35 @@ async def send_img(bot: Bot, event: Event, state: T_State):
 
     username = ""
 
-    # 由于逻辑问题 查uid时需要追加uid在命令后
-    if not content.startswith("uid"):
-        # uid检索完成的标志位
-        flag = 0
+    content = data_preprocess(content)
+    # uid检索完成的标志位
+    flag = 0
 
-        # 遍历本地DATA
-        for i in range(len(DATA)):
-            # 本地匹配到结果 就直接使用本地的(由于DATA源自https://api.vtbs.moe/v1/short，可能有空数据，需要异常处理下）
-            try:
-                if content == DATA[i]["uname"]:
-                    username = DATA[i]["uname"]
-                    content = str(DATA[i]["mid"])
-                    flag = 1
-                    break
-            except (KeyError, TypeError, IndexError) as e:
-                continue
+    # 遍历本地DATA
+    for i in range(len(DATA)):
+        # 本地匹配到结果 就直接使用本地的(由于DATA源自https://api.vtbs.moe/v1/short，可能有空数据，需要异常处理下）
+        try:
+            if content == DATA[i]["uname"]:
+                username = DATA[i]["uname"]
+                content = str(DATA[i]["mid"])
+                flag = 1
+                break
+        except (KeyError, TypeError, IndexError) as e:
+            continue
 
-        # 本地没有匹配到，则从b站搜索
-        if flag != 1:
-            # 通过昵称查询uid，默认只查搜索到的第一个用户
-            info_json = await use_name_get_uid(content)
-            # nonebot.logger.info(info_json)
+    # 本地没有匹配到，则从b站搜索
+    if flag != 1:
+        # 通过昵称查询uid，默认只查搜索到的第一个用户
+        info_json = await use_name_get_uid(content)
+        # nonebot.logger.info(info_json)
 
-            try:
-                result = info_json['data']['result']
-                # 只获取第一个搜索结果的数据
-                content = str(result[0]["mid"])
-                username = result[i]["uname"]
-            except (KeyError, TypeError, IndexError) as e:
-                nonebot.logger.info("查询不到用户名为：" + content + " 的相关信息")
-    else:
-        content = content[3:]
+        try:
+            result = info_json['data']['result']
+            # 只获取第一个搜索结果的数据
+            content = str(result[0]["mid"])
+            username = result[i]["uname"]
+        except (KeyError, TypeError, IndexError) as e:
+            nonebot.logger.info("查询不到用户名为：" + content + " 的相关信息")
 
     guard_info_json = await get_user_guard(content)
 
@@ -650,6 +632,18 @@ async def send_msg(bot: Bot, event: Event, state: T_State):
     for i in range(len(result)):
         msg += " 【 " + str(result[i]["mid"]) + "  " + result[i]["uname"] + "  " + str(result[i]["fans"]) + ' 】\n'
     await catch_str6.finish(Message(f'{msg}'))
+
+
+# 数据预处理
+def data_preprocess(content):
+    # 由于逻辑问题 查uid时需要追加(以:或：或uid:或UID:打头)在命令后
+    if content.startswith("uid:") or content.startswith("UID:"):
+        content = content[4:]
+    elif content.startswith(":") or content.startswith("："):
+        content = content[1:]
+    else:
+        return content
+    return content
 
 
 # 传入uid获取用户基本信息
