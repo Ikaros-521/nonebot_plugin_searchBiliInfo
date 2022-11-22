@@ -1,0 +1,190 @@
+<div align="center">
+
+# nonebot_plugin_searchBiliInfo
+  
+_✨ NoneBot b站用户信息查询插件 ✨_
+  
+
+<a href="./LICENSE">
+    <img src="https://img.shields.io/github/license/tkgs0/nonebot-plugin-antiinsult.svg" alt="license">
+</a>
+<a href="https://pypi.python.org/pypi/nonebot_plugin_searchBiliInfo">
+    <img src="https://img.shields.io/pypi/v/nonebot_plugin_searchBiliInfo.svg" alt="pypi">
+</a>
+<a href="https://www.python.org">
+    <img src="https://img.shields.io/badge/python-3.8+-blue.svg" alt="python">
+</a>
+
+</div>
+
+适用于nonebot2 v11的b站用户信息查询插件【粉丝、舰团信息；直播收益数据；直播观看信息；关键词搜昵称、UID等】  
+（ps：微调源码可以兼容其他版本）   
+调用的相关API源自b站官方接口和danmaku.suki.club
+
+## 🔧 开发环境
+Nonebot2：2.0.0b5  
+python：3.8.13  
+操作系统：Windows10（CentOS7下正常运行，Linux兼容性问题不大）  
+编辑器：pycharm  
+
+## 💿 安装
+环境依赖`requests`和`nonebot_plugin_htmlrender`库   
+部分功能需要修改`__init__.py`的`header1`的`cookie`，获取自己的cookie，填入才能正常使用！  
+
+### nb-cli安装（推荐）
+在你bot工程的文件夹下，运行cmd（运行路径要对啊），执行nb命令安装插件，插件配置会自动添加至配置文件
+```nb plugin install nonebot_plugin_searchBiliInfo```
+
+### 本地安装
+先安装下 `pip install requests` 和 `pip install nonebot_plugin_htmlrender`  
+将文件夹clone到你的机器人插件下的对应插件目录内（一般为机器人文件夹下的src/plugins），然后把nonebot_plugin_searchBiliInfo文件夹里的内容拷贝至上一级目录即可。  
+也可以直接下载压缩包到插件目录解压，然后同样提取nonebot_plugin_searchBiliInfo至上一级目录。  
+目录结构： ```你的bot/src/plugins/nonebot_plugin_searchBiliInfo/__init__.py```  
+```git clone https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo.git```  
+
+### pip安装
+```pip install nonebot_plugin_searchBiliInfo```  
+打开 nonebot2 项目的 ```bot.py``` 文件, 在其中写入  
+```nonebot.load_plugin('nonebot_plugin_antiinsult')```  
+当然，如果是默认配置的nonebot2的话，在bot路径```pyproject.toml```的```[tool.nonebot]```的```plugins```中添加```nonebot_plugin_searchBiliInfo```即可
+
+## 🎉 功能
+通过uid 或 设定好的短语 或 b站接口搜索查询指定b站用户的粉丝、舰团信息；直播收益数据；直播观看信息；关键词搜昵称、UID等信息。
+
+## 👉 命令
+
+### /查
+命令结构：```/查 uid+用户uid或昵称关键词```  
+例如：```/查 uid3709626``` 或 ```/查 bishi```  
+bot返回内容：  
+![](docs/search.png)
+
+### /查直播
+命令结构：```/查直播 uid+用户uid或昵称关键词 场次数（默认不写为全部）```  
+例如：```/查直播 uid3709626 1``` 或 ```/查直播 bishi```  
+bot返回内容（图片）：  
+![](docs/live_info.png)
+
+### /查舰团
+命令结构：```/查舰团 uid+用户uid或昵称关键词```  
+例如：```/查舰团 uid3709626``` 或 ```/查舰团 bishi```  
+bot返回内容(图片)：  
+![](docs/guard.png)
+
+### /查昵称
+命令结构：```/查昵称 昵称关键词```  
+例如：```/查昵称 伊卡洛斯```
+bot返回内容(图片)：  
+![](docs/search_name.png)
+
+### /查收益
+命令结构：```/查收益 uid+用户uid或昵称关键词 收益类型(默认1: 礼物，2: 上舰，3: SC) 倒叙第n场(从0开始)```  
+例如：```/查收益 uid3709626 礼物 1``` 或 ```/查收益 bishi 2 0```  
+bot返回内容(图片)：  
+![](docs/income.png)
+
+### /查成分 观看
+命令结构：```/查成分 观看 uid+用户uid或昵称关键词```  
+例如：```/查成分 观看 uid666666``` 或 ```/查成分 观看 bishi```  
+bot返回内容(图片)：  
+![](docs/watch.png)
+
+### /查成分 弹幕
+命令结构：```/查成分 弹幕 uid+用户uid或昵称关键词 查询的主播昵称关键词或uid+ 页数 条数（不填默认3）```  
+例如：```/查成分 弹幕 uid3709626 Love丶伊卡洛斯 1```   
+bot返回内容(图片)：  
+![](docs/danmu.png)
+
+
+## ⚙ 拓展
+启用关键词搜索，需要修改__init__.py的header1的cookie，获取自己的cookie，填入。
+
+命令修改：修改data.py，在文件头部追加你需要定义的用户的json串，注意json格式！！！
+
+返回内容格式修改对应的msg、out_str变量的内容  
+
+## 📝 更新日志
+
+<details>
+<summary>展开/收起</summary>
+
+### 0.0.1
+
+- 插件初次发布
+
+### 0.1.0
+
+- 更新基于vtbs.moe的主播数据，添加关键词搜索功能
+
+### 1.0.0
+
+新增以下功能（其实是LX_Bot的相关命令融进来了）
+- /查 昵称关键词
+- /查直播 昵称关键词 场次数
+- /查舰团 昵称关键词
+- /查昵称 昵称关键词
+- /查直播 收益类型(默认1: 礼物，2: 上舰，3: SC) 用户uid或昵称关键词 倒叙第n场(从0开始)
+- /查成分 观看 昵称关键词
+- /查成分 弹幕 查询的目标人 查询的主播 页数 条数
+
+</details>
+
+## 致谢
+- [nonebot-plugin-htmlrender](https://github.com/kexue-z/nonebot-plugin-htmlrender) - 图片合成的好手
+- [danmaku.suki.club](https://danmaku.suki.club/) - b站主播、用户弹幕直播信息等来源（开放API接口很赞！）
+- [vtbs.moe](https://vtbs.moe) - VTB本地数据信息来源（还有数据提供，TQL）  
+
+## 项目打包上传至pypi
+
+官网：https://pypi.org，注册账号，在系统用户根目录下创建`.pypirc`，配置  
+``` 
+[distutils] 
+index-servers=pypi 
+ 
+[pypi] repository = https://upload.pypi.org/legacy/ 
+username = 用户名 
+password = 密码
+```
+
+### poetry
+
+```
+# 参考 https://www.freesion.com/article/58051228882/
+
+# 1、安装poetry
+pip install poetry
+
+# 2、初始化配置文件（根据提示填写）
+poetry init
+
+# 3、微调配置文件pyproject.toml
+
+# 4、运行 poetry install, 可生成 “poetry.lock” 文件（可跳过）
+poetry install
+
+# 5、编译，生成dist
+poetry build
+
+# 6、发布
+poetry publish
+
+```
+
+### twine
+
+```
+# 参考 https://www.cnblogs.com/danhuai/p/14915042.html
+#创建setup.py文件 填写相关信息
+
+# 1、可以先升级打包工具
+pip install --upgrade setuptools wheel twine
+
+# 2、打包
+python setup.py sdist bdist_wheel
+
+# 3、可以先检查一下包
+twine check dist/*
+
+# 4、上传包到pypi（需输入用户名、密码）
+twine upload dist/*
+```

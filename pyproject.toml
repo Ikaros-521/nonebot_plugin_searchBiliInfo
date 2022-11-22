@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "nonebot-plugin-searchbiliinfo"
+version = "1.0.2"
+description = "A plugin for nonebot2. Query Bilibili user information（一个Nonebot2的插件，b站用户信息查询插件【粉丝、舰团信息；直播收益数据；直播观看信息；关键词搜昵称、UID等】）"
+authors = ["Ikaros <327209194@qq.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "nonebot_plugin_searchbiliinfo"}]
+homepage = "https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo"
+repository = "https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo"
+documentation = "https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo/blob/master/README.md"
+
+# 添加清华镜像
+[[tool.poetry.source]]
+name = "tsinghua"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/"
+default = true  # 设置清华镜像为默认回调, 以避免 poetry 在某些缺省操作里又回调到 pypi 仓库.
+
+[tool.poetry.dependencies]
+python = "^3.8"
+nonebot2 = "^2.0.0b5"
+nonebot-adapter-onebot = "^2.1.3"
+nonebot-plugin-htmlrender = "^0.2.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
