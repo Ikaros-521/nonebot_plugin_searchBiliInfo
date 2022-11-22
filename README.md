@@ -4,9 +4,17 @@
   
 _✨ NoneBot b站用户信息查询插件 ✨_
   
-
+<a href="https://github.com/ayanamiblhx/nonebot_plugin_setu/stargazers">
+    <img alt="GitHub stars" src="https://img.shields.io/github/stars/Ikaros-521/nonebot_plugin_searchBiliInfo?color=%09%2300BFFF&style=flat-square">
+</a>
+<a href="https://github.com/ayanamiblhx/nonebot_plugin_setu/issues">
+    <img alt="GitHub issues" src="https://img.shields.io/github/issues/Ikaros-521/nonebot_plugin_searchBiliInfo?color=Emerald%20green&style=flat-square">
+</a>
+<a href="https://github.com/ayanamiblhx/nonebot_plugin_setu/network">
+    <img alt="GitHub forks" src="https://img.shields.io/github/forks/Ikaros-521/nonebot_plugin_searchBiliInfo?color=%2300BFFF&style=flat-square">
+</a>
 <a href="./LICENSE">
-    <img src="https://img.shields.io/github/license/tkgs0/nonebot-plugin-antiinsult.svg" alt="license">
+    <img src="https://img.shields.io/github/license/Ikaros-521/nonebot_plugin_searchBiliInfo.svg" alt="license">
 </a>
 <a href="https://pypi.python.org/pypi/nonebot_plugin_searchBiliInfo">
     <img src="https://img.shields.io/pypi/v/nonebot_plugin_searchBiliInfo.svg" alt="pypi">

@@ -4,9 +4,17 @@
   
 _✨ NoneBot b站用户信息查询插件 ✨_
   
-
+<a href="https://github.com/ayanamiblhx/nonebot_plugin_setu/stargazers">
+    <img alt="GitHub stars" src="https://img.shields.io/github/stars/Ikaros-521/nonebot_plugin_searchBiliInfo?color=%09%2300BFFF&style=flat-square">
+</a>
+<a href="https://github.com/ayanamiblhx/nonebot_plugin_setu/issues">
+    <img alt="GitHub issues" src="https://img.shields.io/github/issues/Ikaros-521/nonebot_plugin_searchBiliInfo?color=Emerald%20green&style=flat-square">
+</a>
+<a href="https://github.com/ayanamiblhx/nonebot_plugin_setu/network">
+    <img alt="GitHub forks" src="https://img.shields.io/github/forks/Ikaros-521/nonebot_plugin_searchBiliInfo?color=%2300BFFF&style=flat-square">
+</a>
 <a href="./LICENSE">
-    <img src="https://img.shields.io/github/license/tkgs0/nonebot-plugin-antiinsult.svg" alt="license">
+    <img src="https://img.shields.io/github/license/Ikaros-521/nonebot_plugin_searchBiliInfo.svg" alt="license">
 </a>
 <a href="https://pypi.python.org/pypi/nonebot_plugin_searchBiliInfo">
     <img src="https://img.shields.io/pypi/v/nonebot_plugin_searchBiliInfo.svg" alt="pypi">
@@ -28,23 +36,25 @@ python：3.8.13
 编辑器：pycharm  
 
 ## 💿 安装
-环境依赖requests和nonebot_plugin_htmlrender库，记得安装下 `pip install requests` 和 `pip install nonebot_plugin_htmlrender`   
-部分功能需要修改__init__.py的header1的cookie，获取自己的cookie，填入才能正常使用！  
+环境依赖`requests`和`nonebot_plugin_htmlrender`库   
+部分功能需要修改`__init__.py`的`header1`的`cookie`，获取自己的cookie，填入才能正常使用！  
 
-### nb-cli安装
+### nb-cli安装（推荐）
 在你bot工程的文件夹下，运行cmd（运行路径要对啊），执行nb命令安装插件，插件配置会自动添加至配置文件
 ```nb plugin install nonebot_plugin_searchBiliInfo```
 
 ### 本地安装
-将文件夹clone到你的机器人插件下的对应插件目录内（一般为机器人文件夹下的src/plugins）即可，也可以直接下载压缩包到插件目录解压。  
-目录结构： ```你的bot/src/plugins/nonebot_plugin_searchBiliInfo```  
+先安装下 `pip install requests` 和 `pip install nonebot_plugin_htmlrender`  
+将文件夹clone到你的机器人插件下的对应插件目录内（一般为机器人文件夹下的src/plugins），然后把nonebot_plugin_searchBiliInfo文件夹里的内容拷贝至上一级目录即可。  
+也可以直接下载压缩包到插件目录解压，然后同样提取nonebot_plugin_searchBiliInfo至上一级目录。  
+目录结构： ```你的bot/src/plugins/nonebot_plugin_searchBiliInfo/__init__.py```  
 ```git clone https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo.git```  
+
 ### pip安装
 ```pip install nonebot_plugin_searchBiliInfo```  
 打开 nonebot2 项目的 ```bot.py``` 文件, 在其中写入  
 ```nonebot.load_plugin('nonebot_plugin_antiinsult')```  
 当然，如果是默认配置的nonebot2的话，在bot路径```pyproject.toml```的```[tool.nonebot]```的```plugins```中添加```nonebot_plugin_searchBiliInfo```即可
-
 
 ## 🎉 功能
 通过uid 或 设定好的短语 或 b站接口搜索查询指定b站用户的粉丝、舰团信息；直播收益数据；直播观看信息；关键词搜昵称、UID等信息。
@@ -132,23 +142,57 @@ bot返回内容(图片)：
 - [danmaku.suki.club](https://danmaku.suki.club/) - b站主播、用户弹幕直播信息等来源（开放API接口很赞！）
 - [vtbs.moe](https://vtbs.moe) - VTB本地数据信息来源（还有数据提供，TQL）  
 
-## 项目打包
+## 项目打包上传至pypi
+
+官网：https://pypi.org，注册账号，在系统用户根目录下创建`.pypirc`，配置  
+``` 
+[distutils] 
+index-servers=pypi 
+ 
+[pypi] repository = https://upload.pypi.org/legacy/ 
+username = 用户名 
+password = 密码
+```
+
+### poetry
+
+```
+# 参考 https://www.freesion.com/article/58051228882/
+
+# 1、安装poetry
+pip install poetry
+
+# 2、初始化配置文件（根据提示填写）
+poetry init
+
+# 3、微调配置文件pyproject.toml
+
+# 4、运行 poetry install, 可生成 “poetry.lock” 文件（可跳过）
+poetry install
+
+# 5、编译，生成dist
+poetry build
+
+# 6、发布
+poetry publish
+
+```
 
 ### twine
 
 ```
-参考 https://www.cnblogs.com/danhuai/p/14915042.html
-创建setup.py文件 填写相关信息
+# 参考 https://www.cnblogs.com/danhuai/p/14915042.html
+#创建setup.py文件 填写相关信息
 
-# 4.1、可以先升级打包工具
+# 1、可以先升级打包工具
 pip install --upgrade setuptools wheel twine
 
-# 4.2、打包
+# 2、打包
 python setup.py sdist bdist_wheel
 
-# 4.3、可以先检查一下包
+# 3、可以先检查一下包
 twine check dist/*
 
-# 4.4、上传包到pypi（需输入用户名、密码）
+# 4、上传包到pypi（需输入用户名、密码）
 twine upload dist/*
 ```
