@@ -73,6 +73,11 @@ searchBiliInfo_cookie="buvid3=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXXXXXXXinfoc;"
 ```nonebot.load_plugin('nonebot_plugin_antiinsult')```  
 当然，如果是默认配置的nonebot2的话，在bot路径```pyproject.toml```的```[tool.nonebot]```的```plugins```中添加```nonebot_plugin_searchBiliInfo```即可
 
+### 更新版本
+```
+nb plugin update nonebot_plugin_searchBiliInfo
+```
+
 ## 🎉 功能
 通过uid 或 设定好的短语 或 b站接口搜索查询指定b站用户的粉丝、舰团信息；直播收益数据；直播观看信息；关键词搜昵称、UID等信息。
 
