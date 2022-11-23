@@ -31,6 +31,7 @@ from .data import DATA
 /查收益 昵称关键词或uid 收益类型(默认1: 礼物，2: 上舰，3: SC) 倒叙第n场(从0开始)
 /查成分 观看 昵称关键词或uid
 /查成分 弹幕 查询的目标人昵称关键词或uid 查询的主播昵称关键词或uid 页数 条数
+/营收 日/周/月榜 人数（不填默认100）
 '''
 
 # 请求头贴入你的b站cookie
@@ -49,8 +50,10 @@ except:
 nonebot.logger.debug("cookie=" + header1["cookie"])
 
 catch_str = on_keyword({'/查 '})
+
+
 @catch_str.handle()
-async def send_msg(bot: Bot, event: Event, state: T_State):
+async def _(bot: Bot, event: Event, state: T_State):
     get_msg = str(event.get_message())
     id = event.get_user_id()
     # nonebot.logger.info(get_msg)
@@ -100,13 +103,16 @@ async def send_msg(bot: Bot, event: Event, state: T_State):
         guard_info_json = await get_guard_info(content, room_id)
 
     msg = '\n用户名：' + base_info_json['card']['name'] + '\nUID：' + str(base_info_json['card']['mid']) + \
-          '\n房间号：' + str(room_id) + '\n粉丝数：' + str(base_info_json['card']['fans']) + '\n舰团数：' + str(guard_info_json['data']['info']['num'])
+          '\n房间号：' + str(room_id) + '\n粉丝数：' + str(base_info_json['card']['fans']) + '\n舰团数：' + str(
+        guard_info_json['data']['info']['num'])
     await catch_str.finish(Message(f'{msg}'), at_sender=True)
 
 
 catch_str1 = on_keyword({'/查成分 弹幕 '})
+
+
 @catch_str1.handle()
-async def send_msg(bot: Bot, event: Event, state: T_State):
+async def _(bot: Bot, event: Event, state: T_State):
     get_msg = str(event.get_message())
     # nonebot.logger.info(get_msg)
     content = get_msg[8:]
@@ -212,6 +218,7 @@ async def send_msg(bot: Bot, event: Event, state: T_State):
                 out_str += '| ' + str(date) + '| ' + message + '|\n'
                 data_len += 1
             out_str += '| -- | -- |\n'
+        out_str += '\n数据源自：danmaku.suki.club\n'
     # nonebot.logger.info("\n" + out_str)
     except (KeyError, TypeError, IndexError) as e:
         msg = '返回数据解析异常，寄~'
@@ -228,8 +235,10 @@ async def send_msg(bot: Bot, event: Event, state: T_State):
 
 
 catch_str2 = on_keyword({'/查成分 观看 '})
+
+
 @catch_str2.handle()
-async def send_msg2(bot: Bot, event: Event, state: T_State):
+async def _(bot: Bot, event: Event, state: T_State):
     get_msg = str(event.get_message())
     # nonebot.logger.info(get_msg)
     content = get_msg[8:]
@@ -276,7 +285,7 @@ async def send_msg2(bot: Bot, event: Event, state: T_State):
         await catch_str2.finish(Message(f'{msg}'), at_sender=True)
 
     out_str = "#查观看\n\n查询用户UID：" + content + "\n\n" + \
-              "| 昵称 | UID | 房间号 |\n"\
+              "| 昵称 | UID | 房间号 |\n" \
               "| :-----| :-----| :-----|\n"
     # 数据集合
     name_set = set()
@@ -301,6 +310,7 @@ async def send_msg2(bot: Bot, event: Event, state: T_State):
     for i in range(len(uId_set)):
         out_str += "| {:<s} | {:<d} | {:<d} |".format(name_list[i], uId_list[i], roomId_list[i])
         out_str += '\n'
+    out_str += '\n数据源自：danmaku.suki.club\n'
     # nonebot.logger.info("\n" + out_str)
 
     if len(uId_set) < 1000:
@@ -312,8 +322,10 @@ async def send_msg2(bot: Bot, event: Event, state: T_State):
 
 
 catch_str3 = on_keyword({'/查直播 '})
+
+
 @catch_str3.handle()
-async def send_msg3(bot: Bot, event: Event, state: T_State):
+async def _(bot: Bot, event: Event, state: T_State):
     get_msg = str(event.get_message())
     id = event.get_user_id()
     # nonebot.logger.info(get_msg)
@@ -400,7 +412,8 @@ async def send_msg3(bot: Bot, event: Event, state: T_State):
             else:
                 out_str += "| {:<s} | {:<.2f}h | {:<s} | {:<d} | {:<d} | {:<d} | ￥{:<.1f} |".format(
                     await timestamp_to_date(info_json["data"]["lives"][i]["startDate"]),
-                    (info_json["data"]["lives"][i]["stopDate"] - info_json["data"]["lives"][i]["startDate"]) / 1000 / 3600,
+                    (info_json["data"]["lives"][i]["stopDate"] - info_json["data"]["lives"][i][
+                        "startDate"]) / 1000 / 3600,
                     info_json["data"]["lives"][i]["title"],
                     info_json["data"]["lives"][i]["danmakusCount"],
                     info_json["data"]["lives"][i]["watchCount"],
@@ -418,6 +431,7 @@ async def send_msg3(bot: Bot, event: Event, state: T_State):
         # 2000场就算了吧，太多了
         if i >= 2000:
             break
+    out_str += '\n数据源自：danmaku.suki.club\n'
     # nonebot.logger.info("\n" + out_str)
 
     if len(info_json["data"]["lives"]) < 2000:
@@ -430,8 +444,10 @@ async def send_msg3(bot: Bot, event: Event, state: T_State):
 
 
 catch_str4 = on_keyword({'/查收益 '})
+
+
 @catch_str4.handle()
-async def send_msg4(bot: Bot, event: Event, state: T_State):
+async def _(bot: Bot, event: Event, state: T_State):
     get_msg = str(event.get_message())
     id = event.get_user_id()
     # nonebot.logger.info(get_msg)
@@ -548,6 +564,7 @@ async def send_msg4(bot: Bot, event: Event, state: T_State):
         # 2000条就算了吧，太多了
         if i >= 2000:
             break
+    out_str += '\n数据源自：danmaku.suki.club\n'
     # nonebot.logger.info("\n" + out_str)
 
     if len(info_json["data"]["danmakus"]) < 2000:
@@ -559,8 +576,10 @@ async def send_msg4(bot: Bot, event: Event, state: T_State):
 
 
 catch_str5 = on_keyword({'/查舰团 '})
+
+
 @catch_str5.handle()
-async def send_img(bot: Bot, event: Event, state: T_State):
+async def _(bot: Bot, event: Event, state: T_State):
     get_msg = str(event.get_message())
     # nonebot.logger.info(get_msg)
     content = get_msg[5:]
@@ -613,6 +632,7 @@ async def send_img(bot: Bot, event: Event, state: T_State):
             level = '舰长'
         out_str += "| {:<s} | {:<d} | {:<s} |".format(uname, mid, level)
         out_str += '\n'
+    out_str += '\n数据源自：vtbs.moe\n'
     # nonebot.logger.info("\n" + out_str)
 
     output = await md_to_pic(md=out_str, width=500)
@@ -620,8 +640,10 @@ async def send_img(bot: Bot, event: Event, state: T_State):
 
 
 catch_str6 = on_keyword({'/查昵称 '})
+
+
 @catch_str6.handle()
-async def send_msg(bot: Bot, event: Event, state: T_State):
+async def _(bot: Bot, event: Event, state: T_State):
     get_msg = str(event.get_message())
     # nonebot.logger.info(get_msg)
     content = get_msg[5:]
@@ -642,6 +664,99 @@ async def send_msg(bot: Bot, event: Event, state: T_State):
     for i in range(len(result)):
         msg += " 【 " + str(result[i]["mid"]) + "  " + result[i]["uname"] + "  " + str(result[i]["fans"]) + ' 】\n'
     await catch_str6.finish(Message(f'{msg}'), at_sender=True)
+
+
+catch_str7 = on_keyword({'/营收 '})
+
+
+@catch_str7.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    get_msg = str(event.get_message())
+    content = get_msg[4:]
+
+    # 分别传入 日/周/月榜 和 数量
+    content = content.split()
+    date_range = ''
+    size = '100'
+
+    if len(content) == 1:
+        date_range = content[0]
+    elif len(content) >= 2:
+        date_range = content[0]
+        size = content[1]
+
+    date_ranges = ['月榜', '周榜', '日榜']
+    if date_range in date_ranges:
+        json1 = await get_revenue(date_range, size)
+    else:
+        msg = '\n命令错误，例如：【/营收 月榜】【/营收 周榜 10】【/营收 日榜 3】'
+        await catch_str7.finish(Message(f'{msg}'), at_sender=True)
+        return
+
+    try:
+        if json1["code"] != 200:
+            msg = '\n请求失败，寄了喵'
+            await catch_str7.finish(Message(f'{msg}'), at_sender=True)
+            return
+    except (KeyError, TypeError, IndexError) as e:
+        msg = '\n请求失败，寄了喵'
+        await catch_str7.finish(Message(f'{msg}'), at_sender=True)
+        return
+
+    try:
+        out_str = "#VTB营收" + date_range + "\n" + \
+                  "| 用户名 | uid | 营收 | 付费人数 | 弹幕总数 | 直播时长 |\n" \
+                  "| :-----| :-----| :-----| :-----| :-----| :-----|\n"
+        for i in range(len(json1['data'])):
+            name = json1['data'][i]['name']
+            danmaku = json1['data'][i]['danmaku']
+            gold_user = json1['data'][i]['goldUser']
+            income = json1['data'][i]['income']
+            mid = json1['data'][i]['mid']
+            live_time = json1['data'][i]['liveTime']
+
+            out_str += '| ' + name + ' | ' + str(mid) + ' | '
+            if income > 1000000:
+                income = round(income / 1000000, 2)
+                out_str += str(income) + '万 | '
+            else:
+                income = round(income / 100, 2)
+                out_str += str(income) + '元 | '
+            out_str += str(gold_user) + '人 | ' + str(danmaku) + '条 | '
+            live_time = round(live_time / 60 / 60, 2)
+            out_str += str(live_time) + 'h |' + '\n'
+
+        out_str += "\n\n数据源自：vtbs.fun"
+        # nonebot.logger.info("\n" + out_str)
+
+        output = await md_to_pic(md=out_str, width=800)
+        # 如果需要保存到本地则去除下面2行注释
+        # output = Image.open(BytesIO(img))
+        # output.save("md2pic.png", format="PNG")
+        await catch_str7.send(MessageSegment.image(output))
+    except (KeyError, TypeError, IndexError) as e:
+        msg = '\n数据解析失败，寄了喵'
+        await catch_str7.finish(Message(f'{msg}'), at_sender=True)
+        return
+
+
+# 获取营收榜单信息 传入 日/周/月榜 和 数量
+async def get_revenue(date_range, size):
+    if date_range == '日榜':
+        date_range = '%E6%97%A5%E6%A6%9C'
+    elif date_range == '周榜':
+        date_range = '%E5%91%A8%E6%A6%9C'
+    elif date_range == '月榜':
+        date_range = '%E6%9C%88%E6%A6%9C'
+    else:
+        date_range = '%E6%9C%88%E6%A6%9C'
+
+    API_URL = 'http://www.vtbs.fun:8050/rank/income?dateRange=' + date_range + '&current=1&size=' + size
+    # nonebot.logger.info("API_URL=" + API_URL)
+    ret = requests.get(API_URL)
+    ret = ret.json()
+    # nonebot.logger.info(ret)
+    return ret
 
 
 # 数据预处理
@@ -679,7 +794,8 @@ async def get_room_id(uid):
 
 # 获取舰团信息
 async def get_guard_info(uid, room_id):
-    API_URL = 'https://api.live.bilibili.com/xlive/app-room/v2/guardTab/topList?roomid=' + str(room_id) + '&page=1&ruid=' + uid + '&page_size=0'
+    API_URL = 'https://api.live.bilibili.com/xlive/app-room/v2/guardTab/topList?roomid=' + str(
+        room_id) + '&page=1&ruid=' + uid + '&page_size=0'
     ret = requests.get(API_URL)
     ret = ret.json()
     return ret
@@ -700,6 +816,7 @@ async def get_user_guard(uid):
     ret = ret.json()
     # nonebot.logger.info(ret)
     return ret
+
 
 async def get_user_info(uid):
     API_URL = 'https://danmaku.suki.club/api/search/user/channel?uid=' + uid
@@ -750,4 +867,3 @@ async def timestamp_to_date(timestamp):
     # 转换成新的时间格式(精确到秒)
     dt = time.strftime("%Y-%m-%d %H:%M:%S", time_local)
     return dt  # 2021-11-09 09:46:48
-
