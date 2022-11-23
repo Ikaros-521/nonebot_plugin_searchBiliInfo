@@ -1,6 +1,8 @@
 # import datetime
 import nonebot
-import requests
+# import requests
+# import asyncio
+import aiohttp
 import time
 # from io import BytesIO
 from nonebot import on_keyword
@@ -55,7 +57,6 @@ catch_str = on_keyword({'/查 '})
 @catch_str.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     get_msg = str(event.get_message())
-    id = event.get_user_id()
     # nonebot.logger.info(get_msg)
     content = get_msg[3:]
 
@@ -606,7 +607,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     if flag != 1:
         # 通过昵称查询uid，默认只查搜索到的第一个用户
         info_json = await use_name_get_uid(content)
-        # nonebot.logger.info(info_json)
+        nonebot.logger.info(info_json)
 
         try:
             result = info_json['data']['result']
@@ -753,8 +754,9 @@ async def get_revenue(date_range, size):
 
     API_URL = 'http://www.vtbs.fun:8050/rank/income?dateRange=' + date_range + '&current=1&size=' + size
     # nonebot.logger.info("API_URL=" + API_URL)
-    ret = requests.get(API_URL)
-    ret = ret.json()
+    async with aiohttp.ClientSession(headers=header1) as session:
+        async with session.get(url=API_URL, headers=header1) as response:
+            ret = await response.json()
     # nonebot.logger.info(ret)
     return ret
 
@@ -774,8 +776,9 @@ def data_preprocess(content):
 # 传入uid获取用户基本信息
 async def get_base_info(uid):
     API_URL = 'https://account.bilibili.com/api/member/getCardByMid?mid=' + uid
-    ret = requests.get(API_URL)
-    ret = ret.json()
+    async with aiohttp.ClientSession(headers=header1) as session:
+        async with session.get(url=API_URL, headers=header1) as response:
+            ret = await response.json()
     # nonebot.logger.info(ret)
     return ret
 
@@ -783,8 +786,9 @@ async def get_base_info(uid):
 # 传入uid获取用户直播间房间号
 async def get_room_id(uid):
     API_URL = 'https://api.live.bilibili.com/room/v2/Room/room_id_by_uid?uid=' + uid
-    ret = requests.get(API_URL)
-    ret = ret.json()
+    async with aiohttp.ClientSession(headers=header1) as session:
+        async with session.get(url=API_URL, headers=header1) as response:
+            ret = await response.json()
     try:
         room_id = ret['data']['room_id']
     except TypeError:
@@ -796,32 +800,36 @@ async def get_room_id(uid):
 async def get_guard_info(uid, room_id):
     API_URL = 'https://api.live.bilibili.com/xlive/app-room/v2/guardTab/topList?roomid=' + str(
         room_id) + '&page=1&ruid=' + uid + '&page_size=0'
-    ret = requests.get(API_URL)
-    ret = ret.json()
+    async with aiohttp.ClientSession(headers=header1) as session:
+        async with session.get(url=API_URL, headers=header1) as response:
+            ret = await response.json()
     return ret
 
 
 async def get_user_keyword_info(name):
     API_URL = 'https://api.bilibili.com/x/web-interface/search/type?page_size=10&keyword=' + name + \
               '&search_type=bili_user'
-    ret = requests.get(API_URL, headers=header1)
-    ret = ret.json()
+    async with aiohttp.ClientSession(headers=header1) as session:
+        async with session.get(url=API_URL, headers=header1) as response:
+            ret = await response.json()
     # nonebot.logger.info(ret)
     return ret
 
 
 async def get_user_guard(uid):
     API_URL = 'https://api.tokyo.vtbs.moe/v1/guard/' + uid
-    ret = requests.get(API_URL)
-    ret = ret.json()
+    async with aiohttp.ClientSession(headers=header1) as session:
+        async with session.get(url=API_URL, headers=header1) as response:
+            ret = await response.json()
     # nonebot.logger.info(ret)
     return ret
 
 
 async def get_user_info(uid):
     API_URL = 'https://danmaku.suki.club/api/search/user/channel?uid=' + uid
-    ret = requests.get(API_URL, verify=False)
-    ret = ret.json()
+    async with aiohttp.ClientSession(headers=header1) as session:
+        async with session.get(url=API_URL, headers=header1) as response:
+            ret = await response.json()
     # nonebot.logger.info(ret)
     return ret
 
@@ -829,24 +837,38 @@ async def get_user_info(uid):
 async def get_detail_info(src_uid, tgt_uid, page, page_size):
     API_URL = 'https://danmaku.suki.club/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
               '&pagenum=' + page + '&pagesize=' + page_size
-    ret = requests.get(API_URL, verify=False)
-    ret = ret.json()
+    async with aiohttp.ClientSession(headers=header1) as session:
+        async with session.get(url=API_URL, headers=header1) as response:
+            ret = await response.json()
     # nonebot.logger.info(ret)
     return ret
 
 
 async def get_info(uid):
     API_URL = 'https://danmaku.suki.club/api/info/channel?cid=' + uid
-    ret = requests.get(API_URL, verify=False)
-    ret = ret.json()
+    async with aiohttp.ClientSession(headers=header1) as session:
+        async with session.get(url=API_URL, headers=header1) as response:
+            ret = await response.json()
     # nonebot.logger.info(ret)
     return ret
 
 
 async def get_live_info(live_id, income_type):
     API_URL = 'https://danmaku.suki.club/api/info/live?liveid=' + live_id + '&type=' + income_type + '&uid='
-    ret = requests.get(API_URL, verify=False)
-    ret = ret.json()
+    async with aiohttp.ClientSession(headers=header1) as session:
+        async with session.get(url=API_URL, headers=header1) as response:
+            ret = await response.json()
+    # nonebot.logger.info(ret)
+    return ret
+
+
+# 通过昵称查询信息
+async def use_name_get_uid2(name):
+    API_URL = 'https://api.bilibili.com/x/web-interface/search/type?page_size=10&keyword=' + name + \
+              '&search_type=bili_user'
+    async with aiohttp.ClientSession(headers=header1) as session:
+        async with session.get(url=API_URL, headers=header1) as response:
+            ret = await response.json()
     # nonebot.logger.info(ret)
     return ret
 
@@ -855,8 +877,9 @@ async def get_live_info(live_id, income_type):
 async def use_name_get_uid(name):
     API_URL = 'https://api.bilibili.com/x/web-interface/search/type?page_size=10&keyword=' + name + \
               '&search_type=bili_user'
-    ret = requests.get(API_URL, headers=header1)
-    ret = ret.json()
+    async with aiohttp.ClientSession(headers=header1) as session:
+        async with session.get(url=API_URL, headers=header1) as response:
+            ret = await response.json()
     # nonebot.logger.info(ret)
     return ret
 
