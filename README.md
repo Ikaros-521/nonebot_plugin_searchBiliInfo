@@ -37,7 +37,24 @@ python：3.8.13
 
 ## 💿 安装
 环境依赖`requests`和`nonebot_plugin_htmlrender`库   
-部分功能需要修改`__init__.py`的`header1`的`cookie`，获取自己的cookie，填入才能正常使用！  
+部分功能需要获取自己的cookie，配置env后才能正常使用！  
+
+### cookie获取方式
+浏览器进入b站官网并登录: `https://www.bilibili.com/`  
+edge（或其他浏览器）按f12（或鼠标右键“检查” “开发者工具”等）, 然后点击右上角那个">>"符号, 进入"网络"  
+再按ctrl+r（或f5）刷新元素  
+随便点击一个请求, 在“请求标头”里面找到cookie（没有就换一个）  
+cookie冒号后面的就是cookie，复制一下, 可以把ta添加到env里  
+如果不想放太多cookie信息，只需要buvid3字段即可。  
+
+### env配置
+```
+# 在你的env文件中添加如下配置（我的是.env.prod） 仅需要buvid3字段即可
+searchBiliInfo_cookie="buvid3=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXXXXXXXinfoc;"
+```
+|       配置项        | 必填 | 默认值  |                      说明                      |
+|:----------------:|:----:|:----:|:----------------------------:|
+| `searchBiliInfo_cookie` | 否 | `""` | b站cookie，仅需要buvid3字段即可 |
 
 ### nb-cli安装（推荐）
 在你bot工程的文件夹下，运行cmd（运行路径要对啊），执行nb命令安装插件，插件配置会自动添加至配置文件
@@ -139,6 +156,9 @@ bot返回内容(图片)：
 
 优化针对uid解析方式
 
+### 1.0.5
+
+修改cookie配置从env获取，方便用户配置
 
 </details>
 
