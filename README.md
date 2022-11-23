@@ -188,6 +188,9 @@ bot返回内容(图片)：
 ### 1.2.0
 弃用requests库，改为aiohttp  
 
+### 1.2.1
+修复查命令aiohttp适配性bug  
+
 </details>
 
 ## 致谢

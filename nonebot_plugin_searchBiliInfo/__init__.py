@@ -1,4 +1,6 @@
 # import datetime
+import json
+
 import nonebot
 # import requests
 # import asyncio
@@ -38,7 +40,9 @@ from .data import DATA
 
 # 请求头贴入你的b站cookie
 header1 = {
-    'cookie': ''
+    'content-type': 'text/plain; charset=utf-8',
+    'cookie': '',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36 Core/1.94.186.400 QQBrowser/11.3.5195.400'
 }
 
 # 获取env配置
@@ -778,7 +782,8 @@ async def get_base_info(uid):
     API_URL = 'https://account.bilibili.com/api/member/getCardByMid?mid=' + uid
     async with aiohttp.ClientSession(headers=header1) as session:
         async with session.get(url=API_URL, headers=header1) as response:
-            ret = await response.json()
+            result = await response.read()
+            ret = json.loads(result)
     # nonebot.logger.info(ret)
     return ret
 
