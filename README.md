@@ -42,7 +42,7 @@ python：3.8.13
 编辑器：pycharm  
 
 ## 💿 安装
-环境依赖`requests`和`nonebot_plugin_htmlrender`库   
+环境依赖`aiohttp`和`nonebot_plugin_htmlrender`库   
 部分功能需要获取自己的cookie，配置env后才能正常使用！  
 
 ### cookie获取方式
