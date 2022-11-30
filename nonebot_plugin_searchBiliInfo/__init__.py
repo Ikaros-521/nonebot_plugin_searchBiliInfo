@@ -113,19 +113,22 @@ async def _(bot: Bot, event: Event, state: T_State):
         src_uid = content[0]
         tgt_uid = content[1]
     else:
-        msg = '传参错误，命令格式【/查弹幕 用户uid 目标uid 页数】'
+        msg = '传参错误，命令格式【/查弹幕 用户uid 目标uid 页数(可不填，默认0) 条数(可不填，默认3)】'
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
         return
 
     if len(content) == 3:
         page = content[2]
+    elif len(content) > 3:
+        page = content[2]
+        page_size = content[3]
 
     temp = await data_preprocess(src_uid)
     if 0 == temp["code"]:
         src_uid = temp["uid"]
     else:
         msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息'
-        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str1.finish(Message(f'{msg}'), at_sender=True)
         return
     
     temp = await data_preprocess(tgt_uid)
@@ -133,7 +136,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         tgt_uid = temp["uid"]
     else:
         msg = '\n查询不到用户名为：' + tgt_uid + ' 的相关信息'
-        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str1.finish(Message(f'{msg}'), at_sender=True)
         return
 
     nonebot.logger.debug("src_uid:" + src_uid + " tgt_uid:" + tgt_uid)
@@ -151,7 +154,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
 
     data_len = 0
-    out_str = "#查弹幕\n\n查询用户UID:" + src_uid + ", 目标UID:" + tgt_uid + ", 页数:" + page + ", 条数:" + page_size + "\n\n" + \
+    out_str = "#查弹幕\n\n查询用户UID:" + src_uid + " , 目标UID:" + tgt_uid + " , 页数:" + page + " , 条数:" + page_size + "\n\n" + \
               "| 时间 | 内容 |\n" \
               "| :-----| :-----|\n"
 
@@ -185,6 +188,94 @@ async def _(bot: Bot, event: Event, state: T_State):
         id = event.get_user_id()
         msg = '果咩，弹幕数大于1000，发不出去喵~'
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
+
+
+catch_str11 = on_keyword({'/查弹幕2 '})
+
+
+@catch_str11.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    get_msg = str(event.get_message())
+    # nonebot.logger.info(get_msg)
+    content = get_msg[6:]
+
+    # 以空格分割 用户uid 页数 条数
+    content = content.split()
+    src_uid = ""
+    tgt_uid = ""
+    page = "0"
+    page_size = "3"
+
+    if len(content) >= 1:
+        src_uid = content[0]
+    else:
+        msg = '传参错误，命令格式【/查弹幕2 用户uid 页数(可不填，默认0) 条数(可不填，默认3)】'
+        await catch_str11.finish(Message(f'{msg}'), at_sender=True)
+        return
+
+    if len(content) == 2:
+        page = content[1]
+    elif len(content) > 2:
+        page = content[1]
+        page_size = content[2]
+
+    temp = await data_preprocess(src_uid)
+    if 0 == temp["code"]:
+        src_uid = temp["uid"]
+    else:
+        msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息'
+        await catch_str11.finish(Message(f'{msg}'), at_sender=True)
+        return
+
+    nonebot.logger.debug("src_uid:" + src_uid + " tgt_uid:" + tgt_uid)
+
+    info_json = await get_detail_info(src_uid, tgt_uid, page, page_size)
+
+    try:
+        # 判断返回代码
+        if info_json['code'] != 200:
+            msg = '查询出错'
+            await catch_str11.finish(Message(f'{msg}'), at_sender=True)
+            return
+    except (KeyError, TypeError, IndexError) as e:
+        msg = '果咩，查询信息失败喵~请检查拼写'
+        await catch_str11.finish(Message(f'{msg}'), at_sender=True)
+
+    data_len = 0
+    out_str = "#查弹幕2\n\n查询用户UID:" + src_uid + " , 目标UID:" + tgt_uid + " , 页数:" + page + " , 条数:" + page_size + "\n\n" + \
+              "| 时间 | 内容 |\n" \
+              "| :-----| :-----|\n"
+
+    try:
+        for i in range(len(info_json['data']['data'])):
+            title = info_json['data']['data'][i]['live']['title']
+            out_str += '| 标题 | ' + title + ' |\n'
+            for j in range(len(info_json['data']['data'][i]['danmakus'])):
+                date = await timestamp_to_date(info_json['data']['data'][i]['danmakus'][j]['sendDate'])
+                if info_json['data']['data'][i]['danmakus'][j]['type'] in [0, 1, 2, 3]:
+                    message = info_json['data']['data'][i]['danmakus'][j]['message']
+                elif info_json['data']['data'][i]['danmakus'][j]['type'] == 4:
+                    message = "【进入直播间】"
+                else:
+                    message = "【其他消息】"
+                out_str += '| ' + str(date) + '| ' + message + '|\n'
+                data_len += 1
+            out_str += '| -- | -- |\n'
+        out_str += '\n数据源自：danmaku.suki.club\n'
+    # nonebot.logger.info("\n" + out_str)
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.error(e)
+        msg = '返回数据解析异常，寄~'
+        await catch_str11.finish(Message(f'{msg}'), at_sender=True)
+        return
+
+    if data_len < 1000:
+        output = await md_to_pic(md=out_str, width=1000)
+        await catch_str11.send(MessageSegment.image(output))
+    else:
+        id = event.get_user_id()
+        msg = '果咩，弹幕数大于1000，发不出去喵~'
+        await catch_str11.finish(Message(f'{msg}'), at_sender=True)
 
 
 catch_str2 = on_keyword({'/查观看 '})
