@@ -58,18 +58,13 @@ pip install aiohttp
 pip install nonebot_plugin_htmlrender
 ```
 将项目clone到你的机器人插件下的对应插件目录内（一般为机器人文件夹下的`src/plugins`），然后把`nonebot_plugin_searchBiliInfo`文件夹里的内容拷贝至上一级目录即可。  
-也可以直接下载压缩包到插件目录解压，然后同样提取`nonebot_plugin_searchBiliInfo`至上一级目录。  
-目录结构： ```你的bot/src/plugins/nonebot_plugin_searchBiliInfo/__init__.py```  
 clone命令参考（得先装`git`，懂的都懂）：
 ```
 git clone https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo.git
 ``` 
-例如：  
-``` 
-[tool.nonebot]
-plugin_dirs = ["src/plugins"]
-plugins = ["nonebot_plugin_searchBiliInfo"]
-``` 
+也可以直接下载压缩包到插件目录解压，然后同样提取`nonebot_plugin_searchBiliInfo`至上一级目录。  
+目录结构： ```你的bot/src/plugins/nonebot_plugin_searchBiliInfo/__init__.py```  
+
 
 ### 3. pip安装
 ```
@@ -77,7 +72,13 @@ pip install nonebot_plugin_searchBiliInfo
 ```  
 打开 nonebot2 项目的 ```bot.py``` 文件, 在其中写入  
 ```nonebot.load_plugin('nonebot_plugin_searchBiliInfo')```  
-当然，如果是默认nb-cli创建的nonebot2的话，在bot路径```pyproject.toml```的```[tool.nonebot]```的```plugins```中添加```nonebot_plugin_searchBiliInfo```即可
+当然，如果是默认nb-cli创建的nonebot2的话，在bot路径```pyproject.toml```的```[tool.nonebot]```的```plugins```中添加```nonebot_plugin_searchBiliInfo```即可  
+pyproject.toml配置例如：  
+``` 
+[tool.nonebot]
+plugin_dirs = ["src/plugins"]
+plugins = ["nonebot_plugin_searchBiliInfo"]
+``` 
 
 ### 更新版本
 ```
