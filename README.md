@@ -10,13 +10,13 @@
   
 _✨ NoneBot b站用户信息查询插件 ✨_
   
-<a href="https://github.com/ayanamiblhx/nonebot_plugin_setu/stargazers">
+<a href="https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo/stargazers">
     <img alt="GitHub stars" src="https://img.shields.io/github/stars/Ikaros-521/nonebot_plugin_searchBiliInfo?color=%09%2300BFFF&style=flat-square">
 </a>
-<a href="https://github.com/ayanamiblhx/nonebot_plugin_setu/issues">
+<a href="https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo/issues">
     <img alt="GitHub issues" src="https://img.shields.io/github/issues/Ikaros-521/nonebot_plugin_searchBiliInfo?color=Emerald%20green&style=flat-square">
 </a>
-<a href="https://github.com/ayanamiblhx/nonebot_plugin_setu/network">
+<a href="https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo/network">
     <img alt="GitHub forks" src="https://img.shields.io/github/forks/Ikaros-521/nonebot_plugin_searchBiliInfo?color=%2300BFFF&style=flat-square">
 </a>
 <a href="./LICENSE">
@@ -63,12 +63,13 @@ searchBiliInfo_cookie="buvid3=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXXXXXXXinfoc;"
 | `searchBiliInfo_cookie` | 否 | `""` | b站cookie，仅需要buvid3字段即可 |
 
 ### nb-cli安装（推荐）
-在你bot工程的文件夹下，运行cmd（运行路径要对啊），执行nb命令安装插件，插件配置会自动添加至配置文件
+在你bot工程的文件夹下，运行cmd（运行路径要对啊），执行nb命令安装插件，插件配置会自动添加至配置文件  
 ```nb plugin install nonebot_plugin_searchBiliInfo```
 
 ### 本地安装
 先安装下 `pip install aiohttp` 和 `pip install nonebot_plugin_htmlrender`  
 将文件夹clone到你的机器人插件下的对应插件目录内（一般为机器人文件夹下的src/plugins），然后把nonebot_plugin_searchBiliInfo文件夹里的内容拷贝至上一级目录即可。  
+
 也可以直接下载压缩包到插件目录解压，然后同样提取nonebot_plugin_searchBiliInfo至上一级目录。  
 目录结构： ```你的bot/src/plugins/nonebot_plugin_searchBiliInfo/__init__.py```  
 ```git clone https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo.git```  
