@@ -45,6 +45,47 @@ python：3.8.13
 环境依赖`aiohttp`和`nonebot_plugin_htmlrender`库   
 部分功能需要获取自己的cookie，配置env后才能正常使用！  
 
+### 1. nb-cli安装（推荐）
+在你bot工程的文件夹下，运行cmd（运行路径要对啊），执行nb命令安装插件，插件配置会自动添加至配置文件  
+```
+nb plugin install nonebot_plugin_searchBiliInfo
+```
+
+### 2. 本地安装
+先安装下 `aiohttp` 和 `htmlrender`  
+```
+pip install aiohttp
+pip install nonebot_plugin_htmlrender
+```
+将项目clone到你的机器人插件下的对应插件目录内（一般为机器人文件夹下的`src/plugins`），然后把`nonebot_plugin_searchBiliInfo`文件夹里的内容拷贝至上一级目录即可。  
+也可以直接下载压缩包到插件目录解压，然后同样提取`nonebot_plugin_searchBiliInfo`至上一级目录。  
+目录结构： ```你的bot/src/plugins/nonebot_plugin_searchBiliInfo/__init__.py```  
+clone命令参考（得先装`git`，懂的都懂）：
+```
+git clone https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo.git
+``` 
+例如：  
+``` 
+[tool.nonebot]
+plugin_dirs = ["src/plugins"]
+plugins = ["nonebot_plugin_searchBiliInfo"]
+``` 
+
+### 3. pip安装
+```
+pip install nonebot_plugin_searchBiliInfo
+```  
+打开 nonebot2 项目的 ```bot.py``` 文件, 在其中写入  
+```nonebot.load_plugin('nonebot_plugin_searchBiliInfo')```  
+当然，如果是默认nb-cli创建的nonebot2的话，在bot路径```pyproject.toml```的```[tool.nonebot]```的```plugins```中添加```nonebot_plugin_searchBiliInfo```即可
+
+### 更新版本
+```
+nb plugin update nonebot_plugin_searchBiliInfo
+```
+
+## 🔧 配置
+
 ### cookie获取方式
 浏览器进入b站官网并登录: `https://www.bilibili.com/`  
 edge（或其他浏览器）按f12（或鼠标右键“检查” “开发者工具”等）, 然后点击右上角那个">>"符号, 进入"网络"  
@@ -62,28 +103,6 @@ searchBiliInfo_cookie="buvid3=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXXXXXXXinfoc;"
 |:----------------:|:----:|:----:|:----------------------------:|
 | `searchBiliInfo_cookie` | 否 | `""` | b站cookie，仅需要buvid3字段即可 |
 
-### nb-cli安装（推荐）
-在你bot工程的文件夹下，运行cmd（运行路径要对啊），执行nb命令安装插件，插件配置会自动添加至配置文件  
-```nb plugin install nonebot_plugin_searchBiliInfo```
-
-### 本地安装
-先安装下 `pip install aiohttp` 和 `pip install nonebot_plugin_htmlrender`  
-将文件夹clone到你的机器人插件下的对应插件目录内（一般为机器人文件夹下的src/plugins），然后把nonebot_plugin_searchBiliInfo文件夹里的内容拷贝至上一级目录即可。  
-
-也可以直接下载压缩包到插件目录解压，然后同样提取nonebot_plugin_searchBiliInfo至上一级目录。  
-目录结构： ```你的bot/src/plugins/nonebot_plugin_searchBiliInfo/__init__.py```  
-```git clone https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo.git```  
-
-### pip安装
-```pip install nonebot_plugin_searchBiliInfo```  
-打开 nonebot2 项目的 ```bot.py``` 文件, 在其中写入  
-```nonebot.load_plugin('nonebot_plugin_searchBiliInfo')```  
-当然，如果是默认配置的nonebot2的话，在bot路径```pyproject.toml```的```[tool.nonebot]```的```plugins```中添加```nonebot_plugin_searchBiliInfo```即可
-
-### 更新版本
-```
-nb plugin update nonebot_plugin_searchBiliInfo
-```
 
 ## 🎉 功能
 通过uid 或 设定好的短语 或 b站接口搜索查询指定b站用户的粉丝、舰团信息；直播收益数据；直播观看信息；关键词搜昵称、UID等信息；主播营收榜单。
