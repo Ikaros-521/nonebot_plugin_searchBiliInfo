@@ -25,7 +25,7 @@ from .data import DATA
 私人bot项目地址：https://github.com/Ikaros-521/LX_Bot
 本插件项目地址：https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo
 
-插件依赖：requests，nonebot_plugin_htmlrender
+插件依赖：aiohttp，nonebot_plugin_htmlrender
 
 插件功能：
 /查 昵称关键词或uid(uid需要以:或：或uid:或UID:打头)
@@ -35,6 +35,7 @@ from .data import DATA
 /查收益 昵称关键词或uid 收益类型(默认1: 礼物，2: 上舰，3: SC) 倒叙第n场(从0开始)
 /查观看 昵称关键词或uid
 /查弹幕 查询的目标人昵称关键词或uid 查询的主播昵称关键词或uid 页数 条数
+/查弹幕2 查询的目标人昵称关键词或uid 页数 条数
 /营收 日/周/月榜 人数（不填默认100）
 '''
 
@@ -248,8 +249,9 @@ async def _(bot: Bot, event: Event, state: T_State):
 
     try:
         for i in range(len(info_json['data']['data'])):
+            name = info_json['data']['data'][i]['channel']['name']
             title = info_json['data']['data'][i]['live']['title']
-            out_str += '| 标题 | ' + title + ' |\n'
+            out_str += '| 主播——标题 | ' + name + '——' + title + ' |\n'
             for j in range(len(info_json['data']['data'][i]['danmakus'])):
                 date = await timestamp_to_date(info_json['data']['data'][i]['danmakus'][j]['sendDate'])
                 if info_json['data']['data'][i]['danmakus'][j]['type'] in [0, 1, 2, 3]:
