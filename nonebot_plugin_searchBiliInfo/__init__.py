@@ -331,9 +331,11 @@ async def _(bot: Bot, event: Event, state: T_State):
     uId_list = list(uId_set)
     roomId_list = list(roomId_set)
 
-    out_str += " 观看总数：" + str(len(uId_set)) + "\n"
+    out_str += " 观看总数：" + str(len(name_set)) + "\n"
+    # nonebot.logger.info(out_str)
 
-    for i in range(len(uId_set)):
+    for i in range(len(name_set)):
+        # nonebot.logger.info("i:=" + str(i) + "  | {:<s} | {:<d} | {:<d} |".format(name_list[i], uId_list[i], roomId_list[i]))
         out_str += "| {:<s} | {:<d} | {:<d} |".format(name_list[i], uId_list[i], roomId_list[i])
         out_str += '\n'
     out_str += '\n数据源自：danmaku.suki.club\n'
