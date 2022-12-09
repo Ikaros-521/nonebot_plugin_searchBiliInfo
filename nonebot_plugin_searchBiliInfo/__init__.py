@@ -69,17 +69,16 @@ async def _(bot: Bot, event: Event, state: T_State):
     if 0 == temp["code"]:
         content = temp["uid"]
     else:
-        msg = '\n查询不到用户名为：' + content + ' 的相关信息'
+        msg = '\n查询不到用户名为：' + content + ' 的相关信息。'
         await catch_str.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     # 传入uid获取用户基本信息
     base_info_json = await get_base_info(content)
     # 获取用户信息失败
     if base_info_json['code'] != 0:
-        msg = '\n获取uid：' + content + '，用户信息失败'
+        msg = '\n获取uid：' + content + '，用户信息失败。\n接口返回：\n' + json.dumps(base_info_json, indent=2, ensure_ascii=False)
         await catch_str.finish(Message(f'{msg}'), at_sender=True)
-        return
+
     # 获取用户直播间id
     room_id = await get_room_id(content)
     # 没有直播间 默认为0
@@ -88,9 +87,12 @@ async def _(bot: Bot, event: Event, state: T_State):
     else:
         guard_info_json = await get_guard_info(content, room_id)
 
-    msg = '\n用户名：' + base_info_json['card']['name'] + '\nUID：' + str(base_info_json['card']['mid']) + \
-          '\n房间号：' + str(room_id) + '\n粉丝数：' + str(base_info_json['card']['fans']) + '\n舰团数：' + str(
-        guard_info_json['data']['info']['num'])
+    try:
+        msg = '\n用户名：' + base_info_json['card']['name'] + '\nUID：' + str(base_info_json['card']['mid']) + \
+            '\n房间号：' + str(room_id) + '\n粉丝数：' + str(base_info_json['card']['fans']) + '\n舰团数：' + str(
+            guard_info_json['data']['info']['num'])
+    except:
+        msg = "\n数据解析异常，请重试。（如果多次重试都失败，建议提issue待开发者修复）"
     await catch_str.finish(Message(f'{msg}'), at_sender=True)
 
 
@@ -116,7 +118,6 @@ async def _(bot: Bot, event: Event, state: T_State):
     else:
         msg = '传参错误，命令格式【/查弹幕 用户uid 目标uid 页数(可不填，默认0) 条数(可不填，默认3)】'
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     if len(content) == 3:
         page = content[2]
@@ -128,17 +129,15 @@ async def _(bot: Bot, event: Event, state: T_State):
     if 0 == temp["code"]:
         src_uid = temp["uid"]
     else:
-        msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息'
+        msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息。\n接口返回：\n' + temp["resp"]
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
-        return
     
     temp = await data_preprocess(tgt_uid)
     if 0 == temp["code"]:
         tgt_uid = temp["uid"]
     else:
-        msg = '\n查询不到用户名为：' + tgt_uid + ' 的相关信息'
+        msg = '\n查询不到用户名为：' + tgt_uid + ' 的相关信息。\n接口返回：\n' + temp["resp"]
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     nonebot.logger.debug("src_uid:" + src_uid + " tgt_uid:" + tgt_uid)
 
@@ -147,17 +146,20 @@ async def _(bot: Bot, event: Event, state: T_State):
     try:
         # 判断返回代码
         if info_json['code'] != 200:
-            msg = '查询出错'
+            msg = '\n查询出错。接口返回：\n' + json.dumps(info_json, indent=2, ensure_ascii=False)
             await catch_str1.finish(Message(f'{msg}'), at_sender=True)
             return
     except (KeyError, TypeError, IndexError) as e:
-        msg = '果咩，查询信息失败喵~请检查拼写'
+        msg = '\n果咩，查询信息失败喵~请检查拼写或者是API寄了'
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
 
     data_len = 0
-    out_str = "#查弹幕\n\n查询用户UID:" + src_uid + " , 目标UID:" + tgt_uid + " , 页数:" + page + " , 条数:" + page_size + "\n\n" + \
-              "| 时间 | 内容 |\n" \
-              "| :-----| :-----|\n"
+    out_str = "#查弹幕\n\n查询用户UID:" + src_uid + \
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;目标UID:" + tgt_uid + \
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;页数:" + page + \
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;条数:" + page_size + "\n\n" + \
+        "| 时间 | 内容 |\n" \
+        "| :-----| :-----|\n"
 
     try:
         for i in range(len(info_json['data']['data'])):
@@ -178,16 +180,15 @@ async def _(bot: Bot, event: Event, state: T_State):
     # nonebot.logger.info("\n" + out_str)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.error(e)
-        msg = '返回数据解析异常，寄~'
+        msg = '\n返回数据解析异常，寄~（请查日志排查问题）'
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
-        return
 
+    # 随便定的一个上限值 可以自行修改
     if data_len < 1000:
-        output = await md_to_pic(md=out_str, width=1000)
+        output = await md_to_pic(md=out_str, width=1100)
         await catch_str1.send(MessageSegment.image(output))
     else:
-        id = event.get_user_id()
-        msg = '果咩，弹幕数大于1000，发不出去喵~'
+        msg = '\n果咩，弹幕数大于1000，发不出去喵~（可自行修改源码中的数量上限）'
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
 
 
@@ -210,9 +211,8 @@ async def _(bot: Bot, event: Event, state: T_State):
     if len(content) >= 1:
         src_uid = content[0]
     else:
-        msg = '传参错误，命令格式【/查弹幕2 用户uid 页数(可不填，默认0) 条数(可不填，默认3)】'
+        msg = '\n传参错误，命令格式【/查弹幕2 用户uid 页数(可不填，默认0) 条数(可不填，默认3)】'
         await catch_str11.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     if len(content) == 2:
         page = content[1]
@@ -224,9 +224,8 @@ async def _(bot: Bot, event: Event, state: T_State):
     if 0 == temp["code"]:
         src_uid = temp["uid"]
     else:
-        msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息'
+        msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息。\n接口返回：\n' + temp["resp"]
         await catch_str11.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     nonebot.logger.debug("src_uid:" + src_uid + " tgt_uid:" + tgt_uid)
 
@@ -235,17 +234,20 @@ async def _(bot: Bot, event: Event, state: T_State):
     try:
         # 判断返回代码
         if info_json['code'] != 200:
-            msg = '查询出错'
+            msg = '\n查询出错。接口返回：\n' + json.dumps(info_json, indent=2, ensure_ascii=False)
             await catch_str11.finish(Message(f'{msg}'), at_sender=True)
-            return
     except (KeyError, TypeError, IndexError) as e:
-        msg = '果咩，查询信息失败喵~请检查拼写'
+        nonebot.logger.error(e)
+        msg = '\n果咩，查询信息失败喵~请检查拼写或者是API寄了'
         await catch_str11.finish(Message(f'{msg}'), at_sender=True)
 
     data_len = 0
-    out_str = "#查弹幕2\n\n查询用户UID:" + src_uid + " , 目标UID:" + tgt_uid + " , 页数:" + page + " , 条数:" + page_size + "\n\n" + \
-              "| 时间 | 内容 |\n" \
-              "| :-----| :-----|\n"
+    out_str = "#查弹幕2\n\n查询用户UID:" + src_uid + \
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;目标UID:" + tgt_uid + \
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;页数:" + page + \
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;条数:" + page_size + "\n\n" + \
+        "| 时间 | 内容 |\n" \
+        "| :-----| :-----|\n"
 
     try:
         for i in range(len(info_json['data']['data'])):
@@ -267,16 +269,14 @@ async def _(bot: Bot, event: Event, state: T_State):
     # nonebot.logger.info("\n" + out_str)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.error(e)
-        msg = '返回数据解析异常，寄~'
+        msg = '\n返回数据解析异常，寄~（请查日志排查问题）'
         await catch_str11.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     if data_len < 1000:
-        output = await md_to_pic(md=out_str, width=1000)
+        output = await md_to_pic(md=out_str, width=1100)
         await catch_str11.send(MessageSegment.image(output))
     else:
-        id = event.get_user_id()
-        msg = '果咩，弹幕数大于1000，发不出去喵~'
+        msg = '\n果咩，弹幕数大于1000，发不出去喵~（可自行修改源码中的数量上限）'
         await catch_str11.finish(Message(f'{msg}'), at_sender=True)
 
 
@@ -294,20 +294,19 @@ async def _(bot: Bot, event: Event, state: T_State):
     if 0 == temp["code"]:
         content = temp["uid"]
     else:
-        msg = '\n查询不到用户名为：' + content + ' 的相关信息'
+        msg = '\n查询不到用户名为：' + content + ' 的相关信息。\n接口返回：\n' + temp["resp"]
         await catch_str.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     user_info_json = await get_user_info(content)
 
     try:
         # 判断返回代码
         if user_info_json['code'] != 200:
-            msg = '查询用户：' + content + '失败'
+            msg = '\n查询用户：' + content + '失败'
             await catch_str2.finish(Message(f'{msg}'), at_sender=True)
-            return
     except (KeyError, TypeError, IndexError) as e:
-        msg = '果咩，查询用户信息失败喵~请检查拼写'
+        nonebot.logger.error(e)
+        msg = '\n果咩，查询用户信息失败喵~请检查拼写或者是API寄了'
         await catch_str2.finish(Message(f'{msg}'), at_sender=True)
 
     out_str = "#查观看\n\n查询用户UID：" + content + "\n\n" + \
@@ -342,10 +341,10 @@ async def _(bot: Bot, event: Event, state: T_State):
     # nonebot.logger.info("\n" + out_str)
 
     if len(uId_set) < 1000:
-        output = await md_to_pic(md=out_str, width=500)
+        output = await md_to_pic(md=out_str, width=600)
         await catch_str2.send(MessageSegment.image(output))
     else:
-        msg = '果咩，dd数大于1000，发不出去喵~'
+        msg = '\n果咩，dd数大于1000，发不出去喵~（可自行修改源码中的数量上限）'
         await catch_str2.finish(Message(f'{msg}'), at_sender=True)
 
 
@@ -370,39 +369,43 @@ async def _(bot: Bot, event: Event, state: T_State):
         src_uid = content[0]
         info_size = content[1]
     else:
-        msg = '传参错误，命令格式【/查直播 用户uid 最近场次数】'
+        msg = '\n传参错误，命令格式【/查直播 用户uid 最近场次数】'
         await catch_str3.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     temp = await data_preprocess(src_uid)
     if 0 == temp["code"]:
         src_uid = temp["uid"]
     else:
-        msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息'
+        msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息。\n接口返回：\n' + temp["resp"]
         await catch_str.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     info_json = await get_info(src_uid)
 
     try:
         # 判断返回代码
         if info_json['code'] != 200:
-            msg = '查询用户：' + src_uid + '失败'
+            msg = '\n查询用户：' + src_uid + '失败，请检查拼写或者是API寄了'
             await catch_str3.finish(Message(f'{msg}'), at_sender=True)
-            return
     except (KeyError, TypeError, IndexError) as e:
-        msg = '查询用户：' + src_uid + '失败'
+        nonebot.logger.error(e)
+        msg = '\n查询用户：' + src_uid + '失败，请检查拼写或者是API寄了'
         await catch_str3.finish(Message(f'{msg}'), at_sender=True)
-        return
 
-    out_str = "#查直播\n\n昵称:" + info_json["data"]["channel"]["name"] + "  UID:" + src_uid + "  房间号:" + \
-              str(info_json["data"]["channel"]["roomId"]) + "\n\n 总直播数:" + \
-              str(info_json["data"]["channel"]["totalLiveCount"]) + \
-              "  总弹幕数:" + str(info_json["data"]["channel"]["totalDanmakuCount"]) + "  总收益:￥" + \
-              str(info_json["data"]["channel"]["totalIncome"]) + \
-              "  总直播时长:" + str(round(info_json["data"]["channel"]["totalLiveSecond"] / 60 / 60, 2)) + "h\n\n" + \
-              "| 开始时间 | 时长 | 标题 | 弹幕数 | 观看数 | 互动数 | 总收益 |\n" \
-              "| :-----| :-----| :-----| :-----| :-----| :-----| :-----|\n"
+    out_str = ""
+    try:
+        out_str = "#查直播\n\n昵称:" + info_json["data"]["channel"]["name"] + \
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UID:" + src_uid + \
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;房间号:" + str(info_json["data"]["channel"]["roomId"]) +\
+                "\n\n 总直播数:" + str(info_json["data"]["channel"]["totalLiveCount"]) + \
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总弹幕数:" + str(info_json["data"]["channel"]["totalDanmakuCount"]) + \
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总收益:￥" + str(info_json["data"]["channel"]["totalIncome"]) + \
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总直播时长:" + str(round(info_json["data"]["channel"]["totalLiveSecond"] / 60 / 60, 2)) + "h\n\n" + \
+                "| 开始时间 | 时长 | 标题 | 弹幕数 | 观看数 | 互动数 | 总收益 |\n" \
+                "| :-----| :-----| :-----| :-----| :-----| :-----| :-----|\n"
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.error(e)
+        msg = '\n解析数据异常（请查日志排查问题）'
+        await catch_str3.finish(Message(f'{msg}'), at_sender=True)
 
     for i in range(len(info_json["data"]["lives"])):
         # 达到指定数量场次
@@ -443,11 +446,10 @@ async def _(bot: Bot, event: Event, state: T_State):
     # nonebot.logger.info("\n" + out_str)
 
     if len(info_json["data"]["lives"]) < 2000:
-        output = await md_to_pic(md=out_str, width=1000)
+        output = await md_to_pic(md=out_str, width=1100)
         await catch_str3.send(MessageSegment.image(output))
     else:
-        id = event.get_user_id()
-        msg = '果咩，直播数大于2000，发不出去喵~'
+        msg = '\n果咩，直播数大于2000，发不出去喵~'
         await catch_str3.finish(Message(f'{msg}'), at_sender=True)
 
 
@@ -457,7 +459,6 @@ catch_str4 = on_keyword({'/查收益 '})
 @catch_str4.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     get_msg = str(event.get_message())
-    id = event.get_user_id()
     # nonebot.logger.info(get_msg)
     content = get_msg[5:]
 
@@ -477,30 +478,27 @@ async def _(bot: Bot, event: Event, state: T_State):
         income_type = content[1]
         live_index = content[2]
     else:
-        msg = '传参错误，命令格式【/查直播 收益类型(默认1: 礼物，2: 上舰，3: SC) 用户uid 倒叙第n场(从0开始)】'
+        msg = '\n传参错误，命令格式【/查直播 收益类型(默认1: 礼物，2: 上舰，3: SC) 用户uid 倒叙第n场(从0开始)】'
         await catch_str4.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     temp = await data_preprocess(src_uid)
     if 0 == temp["code"]:
         src_uid = temp["uid"]
     else:
-        msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息'
+        msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息。\n接口返回：\n' + temp["resp"]
         await catch_str.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     live_json = await get_info(src_uid)
 
     try:
         # 判断返回代码
         if live_json['code'] != 200:
-            msg = '查询用户：' + src_uid + ' 直播信息失败'
+            msg = '\n查询用户：' + src_uid + ' 直播信息失败，请检查拼写或者是API寄了'
             await catch_str4.finish(Message(f'{msg}'), at_sender=True)
-            return
     except (KeyError, TypeError, IndexError) as e:
-        msg = '查询用户：' + src_uid + ' 直播信息失败'
+        nonebot.logger.error(e)
+        msg = '\n查询用户：' + src_uid + ' 直播信息失败，请检查拼写或者是API寄了'
         await catch_str4.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     try:
         live_id = live_json['data']['lives'][int(live_index)]['liveId']
@@ -511,13 +509,13 @@ async def _(bot: Bot, event: Event, state: T_State):
         totalIncome = str(live_json["data"]["channel"]["totalIncome"])
         totalLivehour = str(round(live_json["data"]["channel"]["totalLiveSecond"] / 60 / 60, 2))
     except (KeyError, TypeError, IndexError) as e:
-        msg = '查询用户：' + src_uid + '失败,live_id解析失败,可能原因：场次数不对；无此场次'
+        nonebot.logger.error(e)
+        msg = '\n查询用户：' + src_uid + '失败,live_id解析失败,可能原因：场次数不对/无此场次'
         await catch_str4.finish(Message(f'{msg}'), at_sender=True)
-        return
 
-    out_str = "#查收益\n\n昵称:" + username + "  UID:" + src_uid + "  房间号:" + room_id + "\n\n 总直播数:" + \
-              totalLiveCount + "  总弹幕数:" + totalDanmakuCount + "  总收益:￥" + totalIncome + \
-              "  总直播时长:" + totalLivehour + "h\n\n" + \
+    out_str = "#查收益\n\n昵称:" + username + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UID:" + src_uid + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;房间号:" + room_id +\
+             "\n\n 总直播数:" + totalLiveCount + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总弹幕数:" + totalDanmakuCount + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总收益:￥" + totalIncome + \
+              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总直播时长:" + totalLivehour + "h\n\n" + \
               "| 时间 | uid | 昵称 | 内容 | 价格|\n" \
               "| :-----| :-----| :-----| :-----| :-----|\n"
 
@@ -535,10 +533,14 @@ async def _(bot: Bot, event: Event, state: T_State):
 
     # 获取当场直播信息
     info_json = await get_live_info(live_id, income_type)
-    if info_json['code'] != 200:
-        msg = '查询用户：' + src_uid + ' 场次数据失败'
+    try:
+        if info_json['code'] != 200:
+            msg = '\n查询用户：' + src_uid + ' 场次数据失败，请检查拼写或者是API寄了'
+            await catch_str4.finish(Message(f'{msg}'), at_sender=True)
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.error(e)
+        msg = '\n查询用户：' + src_uid + ' 场次数据失败，请检查拼写或者是API寄了'
         await catch_str4.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     # 遍历弹幕信息
     for i in range(len(info_json["data"]["danmakus"])):
@@ -556,10 +558,10 @@ async def _(bot: Bot, event: Event, state: T_State):
     # nonebot.logger.info("\n" + out_str)
 
     if len(info_json["data"]["danmakus"]) < 2000:
-        output = await md_to_pic(md=out_str, width=1000)
+        output = await md_to_pic(md=out_str, width=1100)
         await catch_str4.send(MessageSegment.image(output))
     else:
-        msg = '果咩，礼物数大于2000，发不出去喵~'
+        msg = '\n果咩，礼物数大于2000，发不出去喵~（可修改源码增大上限）'
         await catch_str4.finish(Message(f'{msg}'), at_sender=True)
 
 
@@ -578,28 +580,50 @@ async def _(bot: Bot, event: Event, state: T_State):
     if 0 == temp["code"]:
         content = temp["uid"]
     else:
-        msg = '\n查询不到用户名为：' + content + ' 的相关信息'
+        msg = '\n查询不到UID：' + content + ' 的相关信息。\n接口返回：\n' + temp["resp"]
         await catch_str.finish(Message(f'{msg}'), at_sender=True)
-        return
+
+    base_info_json = await get_base_info(content)
+    try:
+        if base_info_json['code'] != 0:
+            msg = '\n获取uid：' + content + '，用户信息失败。\n接口返回：\n' + json.dumps(base_info_json, indent=2, ensure_ascii=False)
+            await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        username = base_info_json["card"]["name"]
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.error(e)
+        msg = '\n查询UID：' + content + '的用户名失败，请检查拼写/API寄了'
+        await catch_str.finish(Message(f'{msg}'), at_sender=True)
 
     guard_info_json = await get_user_guard(content)
 
-    out_str = "#查舰团\n\n查询用户名：" + username + "  UID：" + content + "\n\n" + \
+    try:
+        guard_len = len(guard_info_json)
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.error(e)
+        msg = '\n查询UID：' + content + '失败，请检查拼写/没有舰团/API寄了'
+        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+
+    out_str = "#查舰团\n\n查询用户名:" + username + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UID:" + content + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;舰团数:" + str(guard_len) + "\n\n" + \
               "| 昵称 | UID | 舰团类型 |\n" \
               "| :-----| :-----| :-----|\n"
-    for i in range(len(guard_info_json)):
-        uname = guard_info_json[i]['uname']
-        mid = guard_info_json[i]['mid']
-        if guard_info_json[i]['level'] == 0:
-            level = '总督'
-        elif guard_info_json[i]['level'] == 1:
-            level = '提督'
-        else:
-            level = '舰长'
-        out_str += "| {:<s} | {:<d} | {:<s} |".format(uname, mid, level)
-        out_str += '\n'
-    out_str += '\n数据源自：vtbs.moe\n'
-    # nonebot.logger.info("\n" + out_str)
+    try:
+        for i in range(guard_len):
+            uname = guard_info_json[i]['uname']
+            mid = guard_info_json[i]['mid']
+            if guard_info_json[i]['level'] == 0:
+                level = '总督'
+            elif guard_info_json[i]['level'] == 1:
+                level = '提督'
+            else:
+                level = '舰长'
+            out_str += "| {:<s} | {:<d} | {:<s} |".format(uname, mid, level)
+            out_str += '\n'
+        out_str += '\n数据源自：vtbs.moe\n'
+        # nonebot.logger.info("\n" + out_str)
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.error(e)
+        msg = '\n查询UID：' + content + '失败，请检查拼写/没有舰团/API寄了'
+        await catch_str.finish(Message(f'{msg}'), at_sender=True)
 
     output = await md_to_pic(md=out_str, width=500)
     await catch_str5.send(MessageSegment.image(output))
@@ -616,14 +640,13 @@ async def _(bot: Bot, event: Event, state: T_State):
 
     info_json = await get_user_keyword_info(content)
     # nonebot.logger.info(info_json)
-    id = event.get_user_id()
 
     try:
         result = info_json['data']['result']
-    except KeyError:
-        msg = "[CQ:at,qq={}]".format(id) + ' 查询无结果'
-        await catch_str6.finish(Message(f'{msg}'))
-        return
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.error(e)
+        msg = '\n查询无结果，请检查拼写或是接口寄了'
+        await catch_str6.finish(Message(f'{msg}'), at_sender=True)
 
     msg = "\n 查询用户名：" + content + "\n" + \
           " 显示格式为：【 UID  昵称  粉丝数 】\n"
@@ -657,17 +680,14 @@ async def _(bot: Bot, event: Event, state: T_State):
     else:
         msg = '\n命令错误，例如：【/营收 月榜】【/营收 周榜 10】【/营收 日榜 3】'
         await catch_str7.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     try:
         if json1["code"] != 200:
-            msg = '\n请求失败，寄了喵'
+            msg = '\n请求失败，寄了喵。\n接口返回：\n' + json.dumps(json1, indent=2, ensure_ascii=False)
             await catch_str7.finish(Message(f'{msg}'), at_sender=True)
-            return
     except (KeyError, TypeError, IndexError) as e:
-        msg = '\n请求失败，寄了喵'
+        msg = '\n请求解析失败，接口寄了喵'
         await catch_str7.finish(Message(f'{msg}'), at_sender=True)
-        return
 
     try:
         out_str = "#VTB营收" + date_range + "\n" + \
@@ -695,15 +715,14 @@ async def _(bot: Bot, event: Event, state: T_State):
         out_str += "\n\n数据源自：vtbs.fun"
         # nonebot.logger.info("\n" + out_str)
 
-        output = await md_to_pic(md=out_str, width=800)
+        output = await md_to_pic(md=out_str, width=900)
         # 如果需要保存到本地则去除下面2行注释
         # output = Image.open(BytesIO(img))
         # output.save("md2pic.png", format="PNG")
         await catch_str7.send(MessageSegment.image(output))
     except (KeyError, TypeError, IndexError) as e:
-        msg = '\n数据解析失败，寄了喵'
+        msg = '\n数据解析失败，寄了喵（请查日志排查问题）'
         await catch_str7.finish(Message(f'{msg}'), at_sender=True)
-        return
 
 
 # 获取营收榜单信息 传入 日/周/月榜 和 数量
@@ -728,7 +747,7 @@ async def get_revenue(date_range, size):
 
 # 数据预处理 返回uid
 async def data_preprocess(content):
-    temp = {"code": 0, "uid": content}
+    temp = {"code": 0, "uid": content, "resp": ""}
     # 由于逻辑问题 查uid时需要追加(以:或：或uid:或UID:打头)在命令后
     if content.startswith("uid:") or content.startswith("UID:"):
         temp["uid"] = content[4:]
@@ -757,8 +776,9 @@ async def data_preprocess(content):
             temp["uid"] = str(result[0]["mid"])
             return temp
         except (KeyError, TypeError, IndexError) as e:
-            nonebot.logger.info("查询不到用户名为：" + content + " 的相关信息")
+            temp["resp"] = json.dumps(info_json, ensure_ascii=False)
             temp["code"] = -1
+            nonebot.logger.info("查询不到用户名为：" + content + " 的相关信息。异常：" + str(e) + '\n' + temp["resp"])
             return temp
 
 
@@ -782,6 +802,7 @@ async def get_room_id(uid):
     try:
         room_id = ret['data']['room_id']
     except TypeError:
+        nonebot.logger.info("get_room_id " + str(uid) + "失败，code=" + str(ret['code']))
         return 0
     return room_id
 
