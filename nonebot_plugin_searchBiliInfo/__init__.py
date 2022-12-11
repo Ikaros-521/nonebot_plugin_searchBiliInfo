@@ -784,21 +784,28 @@ async def data_preprocess(content):
 
 # 传入uid获取用户基本信息
 async def get_base_info(uid):
-    API_URL = 'https://account.bilibili.com/api/member/getCardByMid?mid=' + uid
-    async with aiohttp.ClientSession(headers=header1) as session:
-        async with session.get(url=API_URL, headers=header1) as response:
-            result = await response.read()
-            ret = json.loads(result)
+    try:
+        API_URL = 'https://account.bilibili.com/api/member/getCardByMid?mid=' + uid
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                result = await response.read()
+                ret = json.loads(result)
+    except:
+        return {"code": 408}
     # nonebot.logger.info(ret)
     return ret
 
 
 # 传入uid获取用户直播间房间号
 async def get_room_id(uid):
-    API_URL = 'https://api.live.bilibili.com/room/v2/Room/room_id_by_uid?uid=' + uid
-    async with aiohttp.ClientSession(headers=header1) as session:
-        async with session.get(url=API_URL, headers=header1) as response:
-            ret = await response.json()
+    try:
+        API_URL = 'https://api.live.bilibili.com/room/v2/Room/room_id_by_uid?uid=' + uid
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                ret = await response.json()
+    except:
+        return {"code": 408}
+
     try:
         room_id = ret['data']['room_id']
     except TypeError:
@@ -809,94 +816,107 @@ async def get_room_id(uid):
 
 # 获取舰团信息
 async def get_guard_info(uid, room_id):
-    API_URL = 'https://api.live.bilibili.com/xlive/app-room/v2/guardTab/topList?roomid=' + str(
-        room_id) + '&page=1&ruid=' + uid + '&page_size=0'
-    async with aiohttp.ClientSession(headers=header1) as session:
-        async with session.get(url=API_URL, headers=header1) as response:
-            ret = await response.json()
+    try:
+        API_URL = 'https://api.live.bilibili.com/xlive/app-room/v2/guardTab/topList?roomid=' + str(
+            room_id) + '&page=1&ruid=' + uid + '&page_size=0'
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                ret = await response.json()
+    except:
+        return {"code": 408}
     return ret
 
 
 # 通过昵称查询用户信息
 async def get_user_keyword_info(name):
-    API_URL = 'https://api.bilibili.com/x/web-interface/search/type?page_size=10&keyword=' + name + \
-              '&search_type=bili_user'
-    async with aiohttp.ClientSession(headers=header1) as session:
-        async with session.get(url=API_URL, headers=header1) as response:
-            ret = await response.json()
+    try:
+        API_URL = 'https://api.bilibili.com/x/web-interface/search/type?page_size=10&keyword=' + name + \
+                '&search_type=bili_user'
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                ret = await response.json()
+    except:
+        return {"code": 408}
     # nonebot.logger.info(ret)
     return ret
 
 
 # 获取用户舰团信息
 async def get_user_guard(uid):
-    API_URL = 'https://api.tokyo.vtbs.moe/v1/guard/' + uid
-    async with aiohttp.ClientSession(headers=header1) as session:
-        async with session.get(url=API_URL, headers=header1) as response:
-            ret = await response.json()
+    try:
+        API_URL = 'https://api.vtbs.moe/v1/guard/' + uid
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                ret = await response.json()
+    except:
+        return False
     # nonebot.logger.info(ret)
     return ret
 
 
 # 查询用户互动过的直播间 (未去重
 async def get_user_info(uid):
-    API_URL = 'https://danmaku.suki.club/api/search/user/channel?uid=' + uid
-    async with aiohttp.ClientSession(headers=header1) as session:
-        async with session.get(url=API_URL, headers=header1) as response:
-            ret = await response.json()
+    try:
+        API_URL = 'https://danmaku.suki.club/api/search/user/channel?uid=' + uid
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                ret = await response.json()
+    except:
+        return {"code": 408}
     # nonebot.logger.info(ret)
     return ret
 
 
 # 查询用户记录
 async def get_detail_info(src_uid, tgt_uid, page, page_size):
-    API_URL = 'https://danmaku.suki.club/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
-              '&pagenum=' + page + '&pagesize=' + page_size
-    async with aiohttp.ClientSession(headers=header1) as session:
-        async with session.get(url=API_URL, headers=header1) as response:
-            ret = await response.json()
+    try:
+        API_URL = 'https://danmaku.suki.club/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
+                '&pagenum=' + page + '&pagesize=' + page_size
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                ret = await response.json()
+    except:
+        return {"code": 408}
     # nonebot.logger.info(ret)
     return ret
 
 
 # 查询主播信息
 async def get_info(uid):
-    API_URL = 'https://danmaku.suki.club/api/info/channel?cid=' + uid
-    async with aiohttp.ClientSession(headers=header1) as session:
-        async with session.get(url=API_URL, headers=header1) as response:
-            ret = await response.json()
+    try:
+        API_URL = 'https://danmaku.suki.club/api/info/channel?cid=' + uid
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                ret = await response.json()
+    except:
+        return {"code": 408}
     # nonebot.logger.info(ret)
     return ret
 
 
 # 查询单次直播详细信息
 async def get_live_info(live_id, income_type):
-    API_URL = 'https://danmaku.suki.club/api/info/live?liveid=' + live_id + '&type=' + income_type + '&uid='
-    async with aiohttp.ClientSession(headers=header1) as session:
-        async with session.get(url=API_URL, headers=header1) as response:
-            ret = await response.json()
-    # nonebot.logger.info(ret)
-    return ret
-
-
-# 通过昵称查询信息
-async def use_name_get_uid2(name):
-    API_URL = 'https://api.bilibili.com/x/web-interface/search/type?page_size=10&keyword=' + name + \
-              '&search_type=bili_user'
-    async with aiohttp.ClientSession(headers=header1) as session:
-        async with session.get(url=API_URL, headers=header1) as response:
-            ret = await response.json()
+    try:
+        API_URL = 'https://danmaku.suki.club/api/info/live?liveid=' + live_id + '&type=' + income_type + '&uid='
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                ret = await response.json()
+    except:
+        return {"code": 408}
     # nonebot.logger.info(ret)
     return ret
 
 
 # 通过昵称查询信息
 async def use_name_get_uid(name):
-    API_URL = 'https://api.bilibili.com/x/web-interface/search/type?page_size=10&keyword=' + name + \
-              '&search_type=bili_user'
-    async with aiohttp.ClientSession(headers=header1) as session:
-        async with session.get(url=API_URL, headers=header1) as response:
-            ret = await response.json()
+    try:
+        API_URL = 'https://api.bilibili.com/x/web-interface/search/type?page_size=10&keyword=' + name + \
+                '&search_type=bili_user'
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                ret = await response.json()
+    except:
+        return {"code": 408}
     # nonebot.logger.info(ret)
     return ret
 
