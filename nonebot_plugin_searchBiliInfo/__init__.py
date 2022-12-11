@@ -28,7 +28,7 @@ from .data import DATA
 插件依赖：aiohttp，nonebot_plugin_htmlrender
 
 插件功能：
-/查 昵称关键词或uid(uid需要以:或：或uid:或UID:打头)
+/查 昵称关键词或uid(uid需要以:或：或uid:或UID:或uid：打头)
 /查直播 昵称关键词或uid 场次数（默认不写为全部）
 /查舰团 昵称关键词或uid
 /查昵称 昵称关键词或uid
@@ -519,10 +519,10 @@ async def _(bot: Bot, event: Event, state: T_State):
               "| 时间 | uid | 昵称 | 内容 | 价格|\n" \
               "| :-----| :-----| :-----| :-----| :-----|\n"
 
-    # 默认1: 礼物，2: 上舰，3: SC
+    # 默认1: 礼物，2: 上舰或舰长，3: SC
     if income_type == "礼物":
         income_type = "1"
-    elif income_type == "上舰":
+    elif income_type == "上舰" or income_type == "舰长":
         income_type = "2"
     elif income_type == "SC" or income_type == "sc" or income_type == "Sc":
         income_type = "3"
@@ -748,8 +748,8 @@ async def get_revenue(date_range, size):
 # 数据预处理 返回uid
 async def data_preprocess(content):
     temp = {"code": 0, "uid": content, "resp": ""}
-    # 由于逻辑问题 查uid时需要追加(以:或：或uid:或UID:打头)在命令后
-    if content.startswith("uid:") or content.startswith("UID:"):
+    # 由于逻辑问题 查uid时需要追加(以:或：或uid:或UID:或uid：打头)在命令后
+    if content.startswith("uid:") or content.startswith("UID:") or content.startswith("uid："):
         temp["uid"] = content[4:]
         return temp
     elif content.startswith(":") or content.startswith("："):
@@ -817,6 +817,7 @@ async def get_guard_info(uid, room_id):
     return ret
 
 
+# 通过昵称查询用户信息
 async def get_user_keyword_info(name):
     API_URL = 'https://api.bilibili.com/x/web-interface/search/type?page_size=10&keyword=' + name + \
               '&search_type=bili_user'
@@ -827,6 +828,7 @@ async def get_user_keyword_info(name):
     return ret
 
 
+# 获取用户舰团信息
 async def get_user_guard(uid):
     API_URL = 'https://api.tokyo.vtbs.moe/v1/guard/' + uid
     async with aiohttp.ClientSession(headers=header1) as session:
@@ -836,6 +838,7 @@ async def get_user_guard(uid):
     return ret
 
 
+# 查询用户互动过的直播间 (未去重
 async def get_user_info(uid):
     API_URL = 'https://danmaku.suki.club/api/search/user/channel?uid=' + uid
     async with aiohttp.ClientSession(headers=header1) as session:
@@ -845,6 +848,7 @@ async def get_user_info(uid):
     return ret
 
 
+# 查询用户记录
 async def get_detail_info(src_uid, tgt_uid, page, page_size):
     API_URL = 'https://danmaku.suki.club/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
               '&pagenum=' + page + '&pagesize=' + page_size
@@ -855,6 +859,7 @@ async def get_detail_info(src_uid, tgt_uid, page, page_size):
     return ret
 
 
+# 查询主播信息
 async def get_info(uid):
     API_URL = 'https://danmaku.suki.club/api/info/channel?cid=' + uid
     async with aiohttp.ClientSession(headers=header1) as session:
@@ -864,6 +869,7 @@ async def get_info(uid):
     return ret
 
 
+# 查询单次直播详细信息
 async def get_live_info(live_id, income_type):
     API_URL = 'https://danmaku.suki.club/api/info/live?liveid=' + live_id + '&type=' + income_type + '&uid='
     async with aiohttp.ClientSession(headers=header1) as session:
@@ -895,6 +901,7 @@ async def use_name_get_uid(name):
     return ret
 
 
+# 时间戳转换
 async def timestamp_to_date(timestamp):
     # 转换成localtime
     time_local = time.localtime(timestamp / 1000)
