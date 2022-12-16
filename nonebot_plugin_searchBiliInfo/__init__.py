@@ -20,13 +20,10 @@ from nonebot_plugin_htmlrender import (
 )
 
 from .data import DATA
+from nonebot.plugin import PluginMetadata
 
-'''
-私人bot项目地址：https://github.com/Ikaros-521/LX_Bot
-本插件项目地址：https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo
 
-插件依赖：aiohttp，nonebot_plugin_htmlrender
-
+help_text = f"""
 插件功能：
 /查 昵称关键词或uid(uid需要以:或：或uid:或UID:或uid：打头)
 /查直播 昵称关键词或uid 场次数（默认不写为全部）
@@ -37,9 +34,17 @@ from .data import DATA
 /查弹幕 查询的目标人昵称关键词或uid 查询的主播昵称关键词或uid 页数 条数
 /查弹幕2 查询的目标人昵称关键词或uid 页数 条数
 /营收 日/周/月榜 人数（不填默认100）
-'''
 
-# 请求头贴入你的b站cookie
+调用的相关API源自b站官方接口、danmaku.suki.club和vtbs.fun
+""".strip()
+
+__plugin_meta__ = PluginMetadata(
+    name = 'b站用户信息查询',
+    description = '适用于nonebot2 v11的b站用户信息查询插件【粉丝、舰团信息；直播收益数据；直播观看信息；关键词搜昵称、UID等；主播营收榜单】',
+    usage = help_text
+)
+
+# 请求头 需要在env配置cookie
 header1 = {
     'content-type': 'text/plain; charset=utf-8',
     'cookie': '',
