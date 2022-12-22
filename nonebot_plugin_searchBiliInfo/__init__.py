@@ -7,7 +7,7 @@ import nonebot
 import aiohttp
 import time
 # from io import BytesIO
-from nonebot import on_keyword
+from nonebot import on_keyword, on_command
 from nonebot.adapters.onebot.v11 import Bot, Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 from nonebot.typing import T_State
@@ -728,6 +728,21 @@ async def _(bot: Bot, event: Event, state: T_State):
     except (KeyError, TypeError, IndexError) as e:
         msg = '\n数据解析失败，寄了喵（请查日志排查问题）'
         await catch_str7.finish(Message(f'{msg}'), at_sender=True)
+
+
+catch_str8 = on_command("vtb网站", aliases={"VTB网站", "Vtb网站", "vtb资源", "VTB资源"})
+
+
+@catch_str8.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    msg = '\nVTB数据看板：https://ikaros-521.gitee.io/vtb_data_board/' \
+        '\nmatsuri：https://matsuri.icu/' \
+        '\ndanmaku：https://danmaku.suki.club/' \
+        '\nvtbs.fun：http://www.vtbs.fun/' \
+        '\nbiligank：https://biligank.com/' \
+        '\n火龙榜：https://huolonglive.com/#/' \
+        '\nvtbs.moe：https://vtbs.moe/'
+    await catch_str8.finish(Message(f'{msg}'), at_sender=True)
 
 
 # 获取营收榜单信息 传入 日/周/月榜 和 数量
