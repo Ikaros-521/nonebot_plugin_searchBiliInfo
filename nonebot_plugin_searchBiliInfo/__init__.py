@@ -741,7 +741,10 @@ async def _(bot: Bot, event: Event, state: T_State):
         '\nvtbs.fun：http://www.vtbs.fun/' \
         '\nbiligank：https://biligank.com/' \
         '\n火龙榜：https://huolonglive.com/#/' \
-        '\nvtbs.moe：https://vtbs.moe/'
+        '\nvtbs.moe：https://vtbs.moe/' \
+        '\nvup.loveava.top：https://vup.loveava.top/ranking' \
+        '\nzeroroku：https://zeroroku.com/bilibili'
+        
     await catch_str8.finish(Message(f'{msg}'), at_sender=True)
 
 
