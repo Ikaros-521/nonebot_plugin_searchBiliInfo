@@ -707,11 +707,11 @@ async def _(bot: Bot, event: Event, state: T_State):
             live_time = json1['data'][i]['liveTime']
 
             out_str += '| ' + name + ' | ' + str(mid) + ' | '
-            if income > 1000000:
-                income = round(income / 1000000, 2)
+            if income > 10000000:
+                income = round(income / 10000000, 2)
                 out_str += str(income) + '万 | '
             else:
-                income = round(income / 100, 2)
+                income = round(income / 1000, 2)
                 out_str += str(income) + '元 | '
             out_str += str(gold_user) + '人 | ' + str(danmaku) + '条 | '
             live_time = round(live_time / 60 / 60, 2)
