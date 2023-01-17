@@ -11,6 +11,7 @@ from nonebot import on_keyword, on_command
 from nonebot.adapters.onebot.v11 import Bot, Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 from nonebot.typing import T_State
+from nonebot.params import CommandArg
 # from nonebot_plugin_imageutils import Text2Image
 from nonebot_plugin_htmlrender import (
     text_to_pic,
@@ -61,14 +62,12 @@ except:
 
 nonebot.logger.debug("cookie=" + header1["cookie"])
 
-catch_str = on_keyword({'/查 '})
+catch_str = on_command("查", priority=2)
 
 
 @catch_str.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    get_msg = str(event.get_message())
-    # nonebot.logger.info(get_msg)
-    content = get_msg[3:]
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
 
     temp = await data_preprocess(content)
     if 0 == temp["code"]:
@@ -101,14 +100,12 @@ async def _(bot: Bot, event: Event, state: T_State):
     await catch_str.finish(Message(f'{msg}'), at_sender=True)
 
 
-catch_str1 = on_keyword({'/查弹幕 '})
+catch_str1 = on_command("查弹幕")
 
 
 @catch_str1.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    get_msg = str(event.get_message())
-    # nonebot.logger.info(get_msg)
-    content = get_msg[5:]
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
 
     # 以空格分割 用户uid 目标uid 页数 条数
     content = content.split()
@@ -197,14 +194,12 @@ async def _(bot: Bot, event: Event, state: T_State):
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
 
 
-catch_str11 = on_keyword({'/查弹幕2 '})
+catch_str11 = on_command("查弹幕2")
 
 
 @catch_str11.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    get_msg = str(event.get_message())
-    # nonebot.logger.info(get_msg)
-    content = get_msg[6:]
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
 
     # 以空格分割 用户uid 页数 条数
     content = content.split()
@@ -285,15 +280,12 @@ async def _(bot: Bot, event: Event, state: T_State):
         await catch_str11.finish(Message(f'{msg}'), at_sender=True)
 
 
-catch_str2 = on_keyword({'/查观看 '})
+catch_str2 = on_command("查观看")
 
 
 @catch_str2.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    get_msg = str(event.get_message())
-    # nonebot.logger.info(get_msg)
-    content = get_msg[5:]
-    id = event.get_user_id()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
 
     temp = await data_preprocess(content)
     if 0 == temp["code"]:
@@ -353,15 +345,12 @@ async def _(bot: Bot, event: Event, state: T_State):
         await catch_str2.finish(Message(f'{msg}'), at_sender=True)
 
 
-catch_str3 = on_keyword({'/查直播 '})
+catch_str3 = on_command("查直播")
 
 
 @catch_str3.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    get_msg = str(event.get_message())
-    id = event.get_user_id()
-    # nonebot.logger.info(get_msg)
-    content = get_msg[5:]
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
 
     # 以空格分割 用户uid 最近n场
     content = content.split()
@@ -458,14 +447,12 @@ async def _(bot: Bot, event: Event, state: T_State):
         await catch_str3.finish(Message(f'{msg}'), at_sender=True)
 
 
-catch_str4 = on_keyword({'/查收益 '})
+catch_str4 = on_command('查收益')
 
 
 @catch_str4.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    get_msg = str(event.get_message())
-    # nonebot.logger.info(get_msg)
-    content = get_msg[5:]
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
 
     # 以空格分割 用户uid 收益类型(默认1: 礼物，2: 上舰，3: SC) 倒叙第n场(从0开始)
     content = content.split()
@@ -570,14 +557,12 @@ async def _(bot: Bot, event: Event, state: T_State):
         await catch_str4.finish(Message(f'{msg}'), at_sender=True)
 
 
-catch_str5 = on_keyword({'/查舰团 '})
+catch_str5 = on_command('查舰团')
 
 
 @catch_str5.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    get_msg = str(event.get_message())
-    # nonebot.logger.info(get_msg)
-    content = get_msg[5:]
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
 
     username = ""
 
@@ -634,14 +619,12 @@ async def _(bot: Bot, event: Event, state: T_State):
     await catch_str5.send(MessageSegment.image(output))
 
 
-catch_str6 = on_keyword({'/查昵称 '})
+catch_str6 = on_command('查昵称')
 
 
 @catch_str6.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    get_msg = str(event.get_message())
-    # nonebot.logger.info(get_msg)
-    content = get_msg[5:]
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
 
     info_json = await get_user_keyword_info(content)
     # nonebot.logger.info(info_json)
@@ -660,13 +643,12 @@ async def _(bot: Bot, event: Event, state: T_State):
     await catch_str6.finish(Message(f'{msg}'), at_sender=True)
 
 
-catch_str7 = on_keyword({'/营收 '})
+catch_str7 = on_command('营收')
 
 
 @catch_str7.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    get_msg = str(event.get_message())
-    content = get_msg[4:]
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
 
     # 分别传入 日/周/月榜 和 数量
     content = content.split()

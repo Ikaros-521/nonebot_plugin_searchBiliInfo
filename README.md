@@ -262,6 +262,9 @@ bot返回内容(图片)：
 ## 1.3.10
 适配vtbs.fun的营收接口变动  
 
+## 1.4.0
+修改on_keyword为on_command，从而适配自定义的命令前缀    
+
 </details>
 
 ## 致谢
