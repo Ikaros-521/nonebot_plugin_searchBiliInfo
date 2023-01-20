@@ -263,13 +263,16 @@ bot返回内容(图片)：
 适配vtbs.fun的营收接口变动  
 
 ## 1.4.0
-修改on_keyword为on_command，从而适配自定义的命令前缀    
+修改on_keyword为on_command，从而适配自定义的命令前缀  
+
+## 1.4.1
+修改danmaku.suki.club到新域名danmakus.com，接口也同步替换了。  
 
 </details>
 
 ## 致谢
 - [nonebot-plugin-htmlrender](https://github.com/kexue-z/nonebot-plugin-htmlrender) - 图片合成的好手
-- [danmaku.suki.club](https://danmaku.suki.club/) - b站主播、用户弹幕直播信息等来源（开放API接口很赞！）
+- [danmakus.com](https://danmakus.com/) - b站主播、用户弹幕直播信息等来源（开放API接口很赞！）
 - [vtbs.moe](https://vtbs.moe) - VTB本地数据信息来源（还有数据提供，TQL）  
 
 ## 项目打包上传至pypi

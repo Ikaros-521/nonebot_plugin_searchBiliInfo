@@ -36,7 +36,7 @@ help_text = f"""
 /查弹幕2 查询的目标人昵称关键词或uid 页数 条数
 /营收 日/周/月榜 人数（不填默认100）
 
-调用的相关API源自b站官方接口、danmaku.suki.club和vtbs.fun
+调用的相关API源自b站官方接口、danmakus.com和vtbs.fun
 """.strip()
 
 __plugin_meta__ = PluginMetadata(
@@ -178,7 +178,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 out_str += '| ' + str(date) + '| ' + message + '|\n'
                 data_len += 1
             out_str += '| -- | -- |\n'
-        out_str += '\n数据源自：danmaku.suki.club\n'
+        out_str += '\n数据源自：danmakus.com\n'
     # nonebot.logger.info("\n" + out_str)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.error(e)
@@ -265,7 +265,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 out_str += '| ' + str(date) + '| ' + message + '|\n'
                 data_len += 1
             out_str += '| -- | -- |\n'
-        out_str += '\n数据源自：danmaku.suki.club\n'
+        out_str += '\n数据源自：danmakus.com\n'
     # nonebot.logger.info("\n" + out_str)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.error(e)
@@ -334,7 +334,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         # nonebot.logger.info("i:=" + str(i) + "  | {:<s} | {:<d} | {:<d} |".format(name_list[i], uId_list[i], roomId_list[i]))
         out_str += "| {:<s} | {:<d} | {:<d} |".format(name_list[i], uId_list[i], roomId_list[i])
         out_str += '\n'
-    out_str += '\n数据源自：danmaku.suki.club\n'
+    out_str += '\n数据源自：danmakus.com\n'
     # nonebot.logger.info("\n" + out_str)
 
     if len(uId_set) < 1000:
@@ -436,7 +436,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         # 2000场就算了吧，太多了
         if i >= 2000:
             break
-    out_str += '\n数据源自：danmaku.suki.club\n'
+    out_str += '\n数据源自：danmakus.com\n'
     # nonebot.logger.info("\n" + out_str)
 
     if len(info_json["data"]["lives"]) < 2000:
@@ -546,7 +546,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         # 2000条就算了吧，太多了
         if i >= 2000:
             break
-    out_str += '\n数据源自：danmaku.suki.club\n'
+    out_str += '\n数据源自：danmakus.com\n'
     # nonebot.logger.info("\n" + out_str)
 
     if len(info_json["data"]["danmakus"]) < 2000:
@@ -719,7 +719,7 @@ catch_str8 = on_command("vtb网站", aliases={"VTB网站", "Vtb网站", "vtb资�
 async def _(bot: Bot, event: Event, state: T_State):
     msg = '\nVTB数据看板：https://ikaros-521.gitee.io/vtb_data_board/' \
         '\nmatsuri：https://matsuri.icu/' \
-        '\ndanmaku：https://danmaku.suki.club/' \
+        '\ndanmakus：https://danmakus.com/' \
         '\nvtbs.fun：http://www.vtbs.fun/' \
         '\nbiligank：https://biligank.com/' \
         '\n火龙榜：https://huolonglive.com/#/' \
@@ -862,7 +862,7 @@ async def get_user_guard(uid):
 # 查询用户互动过的直播间 (未去重
 async def get_user_info(uid):
     try:
-        API_URL = 'https://danmaku.suki.club/api/search/user/channel?uid=' + uid
+        API_URL = 'https://danmakus.com/api/search/user/channel?uid=' + uid
         async with aiohttp.ClientSession(headers=header1) as session:
             async with session.get(url=API_URL, headers=header1) as response:
                 ret = await response.json()
@@ -875,7 +875,7 @@ async def get_user_info(uid):
 # 查询用户记录
 async def get_detail_info(src_uid, tgt_uid, page, page_size):
     try:
-        API_URL = 'https://danmaku.suki.club/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
+        API_URL = 'https://danmakus.com/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
                 '&pagenum=' + page + '&pagesize=' + page_size
         async with aiohttp.ClientSession(headers=header1) as session:
             async with session.get(url=API_URL, headers=header1) as response:
@@ -889,7 +889,7 @@ async def get_detail_info(src_uid, tgt_uid, page, page_size):
 # 查询主播信息
 async def get_info(uid):
     try:
-        API_URL = 'https://danmaku.suki.club/api/info/channel?cid=' + uid
+        API_URL = 'https://danmakus.com/api/info/channel?cid=' + uid
         async with aiohttp.ClientSession(headers=header1) as session:
             async with session.get(url=API_URL, headers=header1) as response:
                 ret = await response.json()
@@ -902,7 +902,7 @@ async def get_info(uid):
 # 查询单次直播详细信息
 async def get_live_info(live_id, income_type):
     try:
-        API_URL = 'https://danmaku.suki.club/api/info/live?liveid=' + live_id + '&type=' + income_type + '&uid='
+        API_URL = 'https://danmakus.com/api/info/live?liveid=' + live_id + '&type=' + income_type + '&uid='
         async with aiohttp.ClientSession(headers=header1) as session:
             async with session.get(url=API_URL, headers=header1) as response:
                 ret = await response.json()
