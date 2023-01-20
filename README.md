@@ -33,7 +33,7 @@ _✨ NoneBot b站用户信息查询插件 ✨_
 
 适用于nonebot2 v11的b站用户信息查询插件【粉丝、舰团信息；直播收益数据；直播观看信息；关键词搜昵称、UID等；主播营收榜单】  
 （ps：微调源码可以兼容其他版本）   
-调用的相关API源自b站官方接口、danmaku.suki.club和vtbs.fun
+调用的相关API源自b站官方接口、danmakus.com和vtbs.fun
 
 ## 🔧 开发环境
 Nonebot2：2.0.0b5  
@@ -266,7 +266,7 @@ bot返回内容(图片)：
 修改on_keyword为on_command，从而适配自定义的命令前缀  
 
 ## 1.4.1
-修改danmaku.suki.club到新域名danmakus.com，接口也同步替换了。  
+修改danmakus.com到新域名danmakus.com，接口也同步替换了。  
 
 </details>
 
