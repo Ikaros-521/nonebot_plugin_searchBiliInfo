@@ -1,6 +1,6 @@
 # import datetime
 import json
-
+import re
 import nonebot
 # import requests
 # import asyncio
@@ -165,12 +165,12 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     try:
         for i in range(len(info_json['data']['data'])):
-            title = info_json['data']['data'][i]['live']['title']
+            title = await filter_markdown(info_json['data']['data'][i]['live']['title'])
             out_str += '| 标题 | ' + title + ' |\n'
             for j in range(len(info_json['data']['data'][i]['danmakus'])):
                 date = await timestamp_to_date(info_json['data']['data'][i]['danmakus'][j]['sendDate'])
                 if info_json['data']['data'][i]['danmakus'][j]['type'] in [0, 1, 2, 3]:
-                    message = info_json['data']['data'][i]['danmakus'][j]['message']
+                    message = await filter_markdown(info_json['data']['data'][i]['danmakus'][j]['message'])
                 elif info_json['data']['data'][i]['danmakus'][j]['type'] == 4:
                     message = "【进入直播间】"
                 else:
@@ -252,12 +252,12 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     try:
         for i in range(len(info_json['data']['data'])):
             name = info_json['data']['data'][i]['channel']['name']
-            title = info_json['data']['data'][i]['live']['title']
+            title = await filter_markdown(info_json['data']['data'][i]['live']['title'])
             out_str += '| 主播——标题 | ' + name + '——' + title + ' |\n'
             for j in range(len(info_json['data']['data'][i]['danmakus'])):
                 date = await timestamp_to_date(info_json['data']['data'][i]['danmakus'][j]['sendDate'])
                 if info_json['data']['data'][i]['danmakus'][j]['type'] in [0, 1, 2, 3]:
-                    message = info_json['data']['data'][i]['danmakus'][j]['message']
+                    message = await filter_markdown(info_json['data']['data'][i]['danmakus'][j]['message'])
                 elif info_json['data']['data'][i]['danmakus'][j]['type'] == 4:
                     message = "【进入直播间】"
                 else:
@@ -470,7 +470,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         income_type = content[1]
         live_index = content[2]
     else:
-        msg = '\n传参错误，命令格式【/查直播 收益类型(默认1: 礼物，2: 上舰，3: SC) 用户uid 倒叙第n场(从0开始)】'
+        msg = '\n传参错误，命令格式【/查直播 用户uid 收益类型(默认1: 礼物，2: 上舰，3: SC) 倒叙第n场(从0开始)】'
         await catch_str4.finish(Message(f'{msg}'), at_sender=True)
 
     temp = await data_preprocess(src_uid)
@@ -508,7 +508,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     out_str = "#查收益\n\n昵称:" + username + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UID:" + src_uid + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;房间号:" + room_id +\
              "\n\n 总直播数:" + totalLiveCount + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总弹幕数:" + totalDanmakuCount + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总收益:￥" + totalIncome + \
               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总直播时长:" + totalLivehour + "h\n\n" + \
-              "| 时间 | uid | 昵称 | 内容 | 价格|\n" \
+              "| 时间 | uid | 昵称 | 内容 | 价格 |\n" \
               "| :-----| :-----| :-----| :-----| :-----|\n"
 
     # 默认1: 礼物，2: 上舰或舰长，3: SC
@@ -540,7 +540,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             await timestamp_to_date(info_json["data"]["danmakus"][i]["sendDate"]),
             info_json["data"]["danmakus"][i]["uId"],
             info_json["data"]["danmakus"][i]["name"],
-            info_json["data"]["danmakus"][i]["message"],
+            await filter_markdown(info_json["data"]["danmakus"][i]["message"]),
             info_json["data"]["danmakus"][i]["price"])
         out_str += '\n'
         # 2000条就算了吧，太多了
@@ -933,3 +933,9 @@ async def timestamp_to_date(timestamp):
     # 转换成新的时间格式(精确到秒)
     dt = time.strftime("%Y-%m-%d %H:%M:%S", time_local)
     return dt  # 2021-11-09 09:46:48
+
+
+# markdown特殊字符过滤，并当字符串每超过20个时，在其后插入一个<br>
+async def filter_markdown(text):
+    filtered_text = re.sub(r'[_*#->`]', '', text)
+    return re.sub(r"(.{20})", r"\1<br>", filtered_text, 0, re.DOTALL)

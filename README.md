@@ -268,6 +268,10 @@ bot返回内容(图片)：
 ## 1.4.1
 修改danmakus.com到新域名danmakus.com，接口也同步替换了。  
 
+## 1.4.2
+新增markdown的特殊字符过滤和文本超长换行。  
+ps：vtbs.fun挂了，`营收`功能暂时无法使用。
+
 </details>
 
 ## 致谢
