@@ -35,6 +35,7 @@ help_text = f"""
 /查弹幕 查询的目标人昵称关键词或uid 查询的主播昵称关键词或uid 页数 条数
 /查弹幕2 查询的目标人昵称关键词或uid 页数 条数
 /营收 日/周/月榜 人数（不填默认100）
+/涨粉 日/周/月榜 人数（不填默认100）
 
 调用的相关API源自b站官方接口、danmakus.com和vtbs.fun
 """.strip()
@@ -62,7 +63,18 @@ except:
 
 nonebot.logger.debug("cookie=" + header1["cookie"])
 
+# 所有的命令都在这哦，要改命令触发关键词的请自便
 catch_str = on_command("查", priority=2)
+catch_str1 = on_command("查弹幕")
+catch_str11 = on_command("查弹幕2")
+catch_str2 = on_command("查观看")
+catch_str3 = on_command("查直播")
+catch_str4 = on_command('查收益')
+catch_str5 = on_command('查舰团')
+catch_str6 = on_command('查昵称')
+catch_str7 = on_command('营收')
+catch_str9 = on_command('涨粉')
+catch_str8 = on_command("vtb网站", aliases={"VTB网站", "Vtb网站", "vtb资源", "VTB资源"})
 
 
 @catch_str.handle()
@@ -98,9 +110,6 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except:
         msg = "\n数据解析异常，请重试。（如果多次重试都失败，建议提issue待开发者修复）"
     await catch_str.finish(Message(f'{msg}'), at_sender=True)
-
-
-catch_str1 = on_command("查弹幕")
 
 
 @catch_str1.handle()
@@ -194,9 +203,6 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
 
 
-catch_str11 = on_command("查弹幕2")
-
-
 @catch_str11.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -280,9 +286,6 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str11.finish(Message(f'{msg}'), at_sender=True)
 
 
-catch_str2 = on_command("查观看")
-
-
 @catch_str2.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -343,9 +346,6 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         msg = '\n果咩，dd数大于1000，发不出去喵~（可自行修改源码中的数量上限）'
         await catch_str2.finish(Message(f'{msg}'), at_sender=True)
-
-
-catch_str3 = on_command("查直播")
 
 
 @catch_str3.handle()
@@ -445,9 +445,6 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         msg = '\n果咩，直播数大于2000，发不出去喵~'
         await catch_str3.finish(Message(f'{msg}'), at_sender=True)
-
-
-catch_str4 = on_command('查收益')
 
 
 @catch_str4.handle()
@@ -557,9 +554,6 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str4.finish(Message(f'{msg}'), at_sender=True)
 
 
-catch_str5 = on_command('查舰团')
-
-
 @catch_str5.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -619,9 +613,6 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     await catch_str5.send(MessageSegment.image(output))
 
 
-catch_str6 = on_command('查昵称')
-
-
 @catch_str6.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -641,9 +632,6 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     for i in range(len(result)):
         msg += " 【 " + str(result[i]["mid"]) + "  " + result[i]["uname"] + "  " + str(result[i]["fans"]) + ' 】\n'
     await catch_str6.finish(Message(f'{msg}'), at_sender=True)
-
-
-catch_str7 = on_command('营收')
 
 
 @catch_str7.handle()
@@ -689,7 +677,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             live_time = json1['data'][i]['liveTime']
 
             out_str += '| ' + name + ' | ' + str(mid) + ' | '
-            if income > 10000000:
+            if income >= 10000000:
                 income = round(income / 10000000, 2)
                 out_str += str(income) + '万 | '
             else:
@@ -712,7 +700,80 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str7.finish(Message(f'{msg}'), at_sender=True)
 
 
-catch_str8 = on_command("vtb网站", aliases={"VTB网站", "Vtb网站", "vtb资源", "VTB资源"})
+@catch_str9.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    # 分别传入 日/周/月榜 和 数量
+    content = content.split()
+    date_range = ''
+    size = '100'
+
+    if len(content) == 1:
+        date_range = content[0]
+    elif len(content) >= 2:
+        date_range = content[0]
+        size = content[1]
+
+    date_ranges = ['月榜', '周榜', '日榜']
+    if date_range in date_ranges:
+        # 获取数据喵
+        json1 = await get_incfans(date_range, size)
+    else:
+        msg = '\n命令错误，例如：【/涨粉 月榜】【/涨粉 周榜 10】【/涨粉 日榜 3】'
+        await catch_str9.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        if json1["code"] != 200:
+            msg = '\n请求失败，寄了喵。\n接口返回：\n' + json.dumps(json1, indent=2, ensure_ascii=False)
+            await catch_str9.finish(Message(f'{msg}'), at_sender=True)
+    except (KeyError, TypeError, IndexError) as e:
+        msg = '\n请求解析失败，接口寄了喵'
+        await catch_str9.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        out_str = "#VTB涨粉" + date_range + "\n" + \
+                  "| 用户名 | uid | 涨粉 | 粉丝数 | 舰长数 | 播放量 |\n" \
+                  "| :-----| :-----| :-----| :-----| :-----| :-----|\n"
+        for i in range(len(json1['data'])):
+            archiveView = json1['data'][i]['archiveView']
+            fans = json1['data'][i]['fans']
+            guards = json1['data'][i]['guards']
+            incFans = json1['data'][i]['incFans']
+            mid = json1['data'][i]['mid']
+            name = json1['data'][i]['name']
+
+            out_str += '| ' + name + ' | ' + str(mid) + ' | ' + str(incFans) + ' | '
+            if fans > 10000:
+                fans = round(fans / 10000, 2)
+                out_str += str(fans) + '万 | '
+            else:
+                fans = round(fans, 2)
+                out_str += str(fans) + ' | '
+            out_str += str(guards) + ' | '
+            if archiveView >= 100000000:
+                archiveView = round(archiveView / 100000000, 2)
+                out_str += str(archiveView) + '亿 |'
+            elif archiveView >= 10000:
+                archiveView = round(archiveView / 10000, 2)
+                out_str += str(archiveView) + '万 |'
+            else:
+                archiveView = round(archiveView, 2)
+                out_str += str(archiveView) + ' |'
+
+            out_str += '\n'
+
+        out_str += "\n\n数据源自：vtbs.fun"
+        # nonebot.logger.info("\n" + out_str)
+
+        output = await md_to_pic(md=out_str, width=900)
+        # 如果需要保存到本地则去除下面2行注释
+        # output = Image.open(BytesIO(img))
+        # output.save("md2pic.png", format="PNG")
+        await catch_str9.send(MessageSegment.image(output))
+    except (KeyError, TypeError, IndexError) as e:
+        msg = '\n数据解析失败，寄了喵（请查日志排查问题）'
+        await catch_str9.finish(Message(f'{msg}'), at_sender=True)
 
 
 @catch_str8.handle()
@@ -743,6 +804,26 @@ async def get_revenue(date_range, size):
 
     API_URL = 'https://www.vtbs.fun:8050/rank/income?dateRange=' + date_range + '&current=1&size=' + size
     # nonebot.logger.info("API_URL=" + API_URL)
+    async with aiohttp.ClientSession(headers=header1) as session:
+        async with session.get(url=API_URL, headers=header1) as response:
+            ret = await response.json()
+    # nonebot.logger.info(ret)
+    return ret
+
+
+# 获取涨粉榜单信息 传入 日/周/月榜 和 数量
+async def get_incfans(date_range, size):
+    if date_range == '日榜':
+        date_range = '%E6%97%A5%E6%A6%9C'
+    elif date_range == '周榜':
+        date_range = '%E5%91%A8%E6%A6%9C'
+    elif date_range == '月榜':
+        date_range = '%E6%9C%88%E6%A6%9C'
+    else:
+        date_range = '%E6%9C%88%E6%A6%9C'
+
+    API_URL = 'https://www.vtbs.fun:8050/rank/incfans?dateRange=' + date_range + '&current=1&size=' + size
+    nonebot.logger.debug("API_URL=" + API_URL)
     async with aiohttp.ClientSession(headers=header1) as session:
         async with session.get(url=API_URL, headers=header1) as response:
             ret = await response.json()
