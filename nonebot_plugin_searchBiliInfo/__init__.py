@@ -741,7 +741,7 @@ async def get_revenue(date_range, size):
     else:
         date_range = '%E6%9C%88%E6%A6%9C'
 
-    API_URL = 'http://www.vtbs.fun:8050/rank/income?dateRange=' + date_range + '&current=1&size=' + size
+    API_URL = 'https://www.vtbs.fun:8050/rank/income?dateRange=' + date_range + '&current=1&size=' + size
     # nonebot.logger.info("API_URL=" + API_URL)
     async with aiohttp.ClientSession(headers=header1) as session:
         async with session.get(url=API_URL, headers=header1) as response:
