@@ -293,6 +293,9 @@ vtbs.fun活了，加了ssl，已兼容。
 ## 1.4.5
 新增命令 DD风云榜，接口源自ddstats-api.ericlamm.xyz  
 
+## 1.4.6
+补充遗漏的插件元信息    
+
 </details>
 
 ## 致谢
