@@ -75,6 +75,7 @@ catch_str6 = on_command('查昵称')
 catch_str7 = on_command('营收')
 catch_str9 = on_command('涨粉')
 catch_str8 = on_command("vtb网站", aliases={"VTB网站", "Vtb网站", "vtb资源", "VTB资源"})
+catch_str10 = on_command('DD风云榜', aliases={"风云榜", "dd风云榜"})
 
 
 @catch_str.handle()
@@ -786,9 +787,79 @@ async def _(bot: Bot, event: Event, state: T_State):
         '\n火龙榜：https://huolonglive.com/#/' \
         '\nvtbs.moe：https://vtbs.moe/' \
         '\nvup.loveava.top：https://vup.loveava.top/ranking' \
+        '\nddstats：https://ddstats.ericlamm.xyz/' \
         '\nzeroroku：https://zeroroku.com/bilibili'
         
     await catch_str8.finish(Message(f'{msg}'), at_sender=True)
+
+
+@catch_str10.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+    num = '10'
+
+    try:
+        if len(content) != 0:
+            num = str(int(content))
+    except (KeyError, TypeError, IndexError) as e:
+        num = '10'
+
+    json1 = await get_ddstats_stats(num)
+
+    try:
+        if json1["code"] != 200:
+            msg = '\n请求失败，寄了喵。\n接口返回：\n' + json.dumps(json1, indent=2, ensure_ascii=False)
+            await catch_str10.finish(Message(f'{msg}'), at_sender=True)
+    except (KeyError, TypeError, IndexError) as e:
+        msg = '\n请求解析失败，接口寄了喵'
+        await catch_str10.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        out_str = "#DD风云榜\n" + \
+                  "##DD行为次数最多\n" + \
+                  "| 用户名 | uid | DD行为次数 |\n" \
+                  "| :-----| :-----| :-----|\n"
+        for i in range(len(json1['data']['most_dd_behaviour_vups'])):
+            name = json1['data']['most_dd_behaviour_vups'][i]['name']
+            uid = json1['data']['most_dd_behaviour_vups'][i]['uid']
+            count = json1['data']['most_dd_behaviour_vups'][i]['count']
+
+            out_str += '| ' + name + ' | ' + str(uid) + ' | ' + str(count) + ' |'
+            out_str += '\n'
+
+        out_str += "\n##访问最多的直播间\n" + \
+                   "| 用户名 | uid | 访问过n个不同的直播间 |\n" \
+                   "| :-----| :-----| :-----|\n"
+        for i in range(len(json1['data']['most_dd_vups'])):
+            name = json1['data']['most_dd_vups'][i]['name']
+            uid = json1['data']['most_dd_vups'][i]['uid']
+            count = json1['data']['most_dd_vups'][i]['count']
+
+            out_str += '| ' + name + ' | ' + str(uid) + ' | ' + str(count) + ' |'
+            out_str += '\n'
+
+        out_str += "\n##打赏金额最多\n" + \
+                   "| 用户名 | uid | 打赏(元) |\n" \
+                   "| :-----| :-----| :-----|\n"
+        for i in range(len(json1['data']['most_spent_vups'])):
+            name = json1['data']['most_spent_vups'][i]['name']
+            uid = json1['data']['most_spent_vups'][i]['uid']
+            spent = json1['data']['most_spent_vups'][i]['spent']
+
+            out_str += '| ' + name + ' | ' + str(uid) + ' | ' + str(spent) + ' |'
+            out_str += '\n'
+
+        out_str += "\n\n数据源自：ddstats-api.ericlamm.xyz"
+        # nonebot.logger.info("\n" + out_str)
+
+        output = await md_to_pic(md=out_str, width=700)
+        # 如果需要保存到本地则去除下面2行注释
+        # output = Image.open(BytesIO(img))
+        # output.save("md2pic.png", format="PNG")
+        await catch_str10.send(MessageSegment.image(output))
+    except (KeyError, TypeError, IndexError) as e:
+        msg = '\n数据解析失败，寄了喵（请查日志排查问题）'
+        await catch_str10.finish(Message(f'{msg}'), at_sender=True)
 
 
 # 获取营收榜单信息 传入 日/周/月榜 和 数量
@@ -1001,6 +1072,20 @@ async def use_name_get_uid(name):
         async with aiohttp.ClientSession(headers=header1) as session:
             async with session.get(url=API_URL, headers=header1) as response:
                 ret = await response.json()
+    except:
+        return {"code": 408}
+    # nonebot.logger.info(ret)
+    return ret
+
+
+# 传入top数量 获取DD风云榜数据
+async def get_ddstats_stats(num):
+    try:
+        API_URL = 'https://ddstats-api.ericlamm.xyz/stats?top=' + num
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1, timeout=30) as response:
+                result = await response.read()
+                ret = json.loads(result)
     except:
         return {"code": 408}
     # nonebot.logger.info(ret)

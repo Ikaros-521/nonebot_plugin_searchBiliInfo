@@ -170,11 +170,17 @@ bot返回内容(图片)：
 bot返回内容(图片)：  
 ![](docs/incfans.png)
 
+### /DD风云榜 或 /dd风云榜 或 /风云榜
+命令结构：```/DD风云榜 top人数（不填默认10）```  
+例如：```/DD风云榜``` 或 ```/风云榜 20```  
+bot返回内容(图片)：  
+![](docs/incfans.png)
+
 ### vtb网站  （命令前缀自行添加）
 命令结构：```/vtb网站``` 或 ```/vtb资源```  
 例如：```/vtb网站``` 或 ```/vtb资源```  
 bot返回内容(图片)：  
-![](docs/website.png)
+![](docs/ddstats.png)
 
 ## ⚙ 拓展
 启用关键词搜索，需要在env中配置自己的cookie。
@@ -283,6 +289,9 @@ vtbs.fun活了，加了ssl，已兼容。
 
 ## 1.4.4
 新增命令 涨粉，接口源自vtbs.fun（和营收 基本一致）  
+
+## 1.4.5
+新增命令 DD风云榜，接口源自ddstats-api.ericlamm.xyz  
 
 </details>
 
