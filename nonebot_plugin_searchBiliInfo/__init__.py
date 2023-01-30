@@ -21,6 +21,8 @@ from nonebot_plugin_htmlrender import (
 )
 
 from .data import DATA
+from .data_medal import DATA_MEDAL
+
 from nonebot.plugin import PluginMetadata
 
 
@@ -37,6 +39,7 @@ help_text = f"""
 /营收 日/周/月榜 人数（不填默认100）
 /涨粉 日/周/月榜 人数（不填默认100）
 /DD风云榜 人数（不填默认10）
+/查牌子 主播牌子关键词
 
 调用的相关API源自b站官方接口、danmakus.com和vtbs.fun
 """.strip()
@@ -77,6 +80,7 @@ catch_str7 = on_command('营收')
 catch_str9 = on_command('涨粉')
 catch_str8 = on_command("vtb网站", aliases={"VTB网站", "Vtb网站", "vtb资源", "VTB资源"})
 catch_str10 = on_command('DD风云榜', aliases={"风云榜", "dd风云榜"})
+catch_str12 = on_command('查牌子')
 
 
 @catch_str.handle()
@@ -861,6 +865,36 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         msg = '\n数据解析失败，寄了喵（请查日志排查问题）'
         await catch_str10.finish(Message(f'{msg}'), at_sender=True)
+
+
+@catch_str12.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    try:
+        # 使用列表推导式和字典的 keys 方法来 检索匹配关键词的键值对
+        keys = [key for d in DATA_MEDAL for key in d.keys() if content in key]
+        values = [d[key] for d in DATA_MEDAL for key in d.keys() if content in key]
+        # result = {key: value for key, value in zip(keys, values)}
+        # json.dumps(result, indent=2, ensure_ascii=False)
+        out_str = "#查牌子 " + content + "\n" + \
+                  "| 牌子名 | 用户名 | uid | 房间号 |\n" \
+                  "| :-----| :-----| :-----| :-----|\n"
+        for key, value in zip(keys, values):
+            medal_name = key
+            name = value["uname"]
+            uid = value["mid"]
+            roomid = value["roomid"]
+
+            out_str += '| ' + medal_name + ' | ' + name + ' | ' + str(uid) + ' | ' + str(roomid) + ' |'
+            out_str += '\n'
+        out_str += '\n\n数据源自：本地'
+
+        output = await md_to_pic(md=out_str, width=700)
+        await catch_str10.send(MessageSegment.image(output))
+    except (KeyError, TypeError, IndexError) as e:
+        msg = '\n查询不到此牌子的数据（可能是数据不足或不存在此牌子喵~）'
+        await catch_str12.finish(Message(f'{msg}'), at_sender=True)
 
 
 # 获取营收榜单信息 传入 日/周/月榜 和 数量
