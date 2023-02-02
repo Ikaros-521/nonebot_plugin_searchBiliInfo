@@ -40,8 +40,13 @@ help_text = f"""
 /涨粉 日/周/月榜 人数（不填默认100）
 /DD风云榜 人数（不填默认10）
 /查牌子 主播牌子关键词
+/vtb网站 或 /vtb资源 （大写也可以）
+/v详情 昵称关键词或uid  （大写也可以）
+/dmk查用户 昵称关键词或uid  （大写也可以）
+/dmk查直播 昵称关键词或uid  （大写也可以）
 
-调用的相关API源自b站官方接口、danmakus.com和vtbs.fun
+
+调用的相关API源自b站官方接口、danmakus.com、ddstats.ericlamm.xyz和vtbs.fun
 """.strip()
 
 __plugin_meta__ = PluginMetadata(
@@ -81,6 +86,9 @@ catch_str9 = on_command('涨粉')
 catch_str8 = on_command("vtb网站", aliases={"VTB网站", "Vtb网站", "vtb资源", "VTB资源"})
 catch_str10 = on_command('DD风云榜', aliases={"风云榜", "dd风云榜"})
 catch_str12 = on_command('查牌子')
+catch_str13 = on_command('V详情', aliases={"v详情"})
+catch_str14 = on_command('dmk查用户', aliases={"DMK查用户", "danmakus查用户"})
+catch_str15 = on_command('dmk查直播', aliases={"DMK查直播", "danmakus查直播"})
 
 
 @catch_str.handle()
@@ -895,6 +903,87 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         msg = '\n查询不到此牌子的数据（可能是数据不足或不存在此牌子喵~）'
         await catch_str12.finish(Message(f'{msg}'), at_sender=True)
+
+
+@catch_str13.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        msg = '\n查询不到：' + content + ' 的相关信息。\n接口返回：\n' + temp["resp"]
+        await catch_str13.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        async with get_new_page(viewport={"width": 1415, "height": 1920}) as page:
+            await page.goto(
+                "https://vtbs.moe/detail/" + content,
+                timeout=30000,
+                wait_until="networkidle",
+            )
+            pic = await page.screenshot(full_page=True, path="./data/vtbs.moe_detail.png")
+
+        await catch_str13.finish(MessageSegment.image(pic))
+    except (KeyError, TypeError, IndexError) as e:
+        msg = '\n查打开页面失败喵（看看后台日志吧）'
+        nonebot.logger.info(e)
+        await catch_str13.finish(Message(f'{msg}'), at_sender=True)
+
+
+@catch_str14.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        msg = '\n查询不到：' + content + ' 的相关信息。\n接口返回：\n' + temp["resp"]
+        await catch_str14.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        async with get_new_page(viewport={"width": 1040, "height": 2500}) as page:
+            await page.goto(
+                "https://danmakus.com/user/" + content,
+                timeout=30000,
+                wait_until="networkidle",
+            )
+            pic = await page.screenshot(full_page=True, path="./data/vtbs.moe_detail.png")
+
+        await catch_str14.finish(MessageSegment.image(pic))
+    except (KeyError, TypeError, IndexError) as e:
+        msg = '\n查打开页面失败喵（看看后台日志吧）'
+        nonebot.logger.info(e)
+        await catch_str14.finish(Message(f'{msg}'), at_sender=True)
+
+
+@catch_str15.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        msg = '\n查询不到：' + content + ' 的相关信息。\n接口返回：\n' + temp["resp"]
+        await catch_str15.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        async with get_new_page(viewport={"width": 850, "height": 2000}) as page:
+            await page.goto(
+                "https://danmakus.com/channel/" + content,
+                timeout=30000,
+                wait_until="networkidle",
+            )
+            pic = await page.screenshot(full_page=True, path="./data/vtbs.moe_detail.png")
+
+        await catch_str15.finish(MessageSegment.image(pic))
+    except (KeyError, TypeError, IndexError) as e:
+        msg = '\n查打开页面失败喵（看看后台日志吧）'
+        nonebot.logger.info(e)
+        await catch_str15.finish(Message(f'{msg}'), at_sender=True)
 
 
 # 获取营收榜单信息 传入 日/周/月榜 和 数量
