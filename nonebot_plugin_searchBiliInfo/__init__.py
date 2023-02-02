@@ -920,7 +920,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         async with get_new_page(viewport={"width": 1415, "height": 1920}) as page:
             await page.goto(
                 "https://vtbs.moe/detail/" + content,
-                timeout=30000,
+                timeout=5 * 60 * 1000,
                 wait_until="networkidle",
             )
             pic = await page.screenshot(full_page=True, path="./data/vtbs.moe_detail.png")
@@ -947,7 +947,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         async with get_new_page(viewport={"width": 1040, "height": 2500}) as page:
             await page.goto(
                 "https://danmakus.com/user/" + content,
-                timeout=30000,
+                timeout=5 * 60 * 1000,
                 wait_until="networkidle",
             )
             pic = await page.screenshot(full_page=True, path="./data/vtbs.moe_detail.png")
@@ -974,7 +974,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         async with get_new_page(viewport={"width": 850, "height": 2000}) as page:
             await page.goto(
                 "https://danmakus.com/channel/" + content,
-                timeout=30000,
+                timeout=5 * 60 * 1000,
                 wait_until="networkidle",
             )
             pic = await page.screenshot(full_page=True, path="./data/vtbs.moe_detail.png")
