@@ -89,11 +89,11 @@ nb plugin update nonebot_plugin_searchBiliInfo
 
 ### cookie获取方式
 浏览器进入b站官网并登录: `https://www.bilibili.com/`  
-edge（或其他浏览器）按f12（或鼠标右键“检查” “开发者工具”等）, 然后点击右上角那个">>"符号, 进入"网络"  
-再按ctrl+r（或f5）刷新元素  
-随便点击一个请求, 在“请求标头”里面找到cookie（没有就换一个）  
+edge（或其他浏览器）按`f12`（或鼠标右键`“检查”` `“开发者工具”`等）, 然后点击右上角那个`">>"`符号, 进入`"网络"`  
+再按`ctrl+r`（或`f5`）刷新元素  
+随便点击一个请求, 在`“请求标头”`里面找到cookie（没有就换一个）  
 cookie冒号后面的就是cookie，复制一下, 可以把ta添加到env里  
-如果不想放太多cookie信息，只需要buvid3字段即可。  
+如果不想放太多cookie信息，只需要`buvid3`字段即可。  
 
 ### env配置
 ```
@@ -102,7 +102,7 @@ searchBiliInfo_cookie="buvid3=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXXXXXXXinfoc;"
 ```
 |       配置项        | 必填 | 默认值  |                      说明                      |
 |:----------------:|:----:|:----:|:----------------------------:|
-| `searchBiliInfo_cookie` | 否 | `""` | b站cookie，仅需要buvid3字段即可 |
+| `searchBiliInfo_cookie` | 否 | `""` | b站cookie，仅需要`buvid3`字段即可 |
 
 
 ## 🎉 功能
@@ -190,15 +190,45 @@ bot返回内容(图片)：
 
 ### /dmk查用户 或 /DMK查用户
 命令结构：```/dmk查用户 (uid:或UID:或：或:)+用户uid或昵称关键词```  
-例如：```/dmk查用户 uid:3709626``` 或 ```/dmk查用户 Love丶伊卡洛斯```  
+例如：```/dmk查用户 uid:3709626``` 或 ```/DMK查用户 Love丶伊卡洛斯```  
 bot返回内容(图片)：  
 ![](docs/dmk_user.png)
 
 ### /dmk查直播 或 /DMK查直播
 命令结构：```/dmk查直播 (uid:或UID:或：或:)+用户uid或昵称关键词```  
-例如：```/dmk查直播 uid:3709626``` 或 ```/dmk查直播 Love丶伊卡洛斯```  
+例如：```/dmk查直播 uid:3709626``` 或 ```/DMK查直播 Love丶伊卡洛斯```  
 bot返回内容(图片)：  
 ![](docs/dmk_live.png)
+
+### /blg查弹幕 或 /BLG查弹幕
+命令结构：```/blg查弹幕 (uid:或UID:或：或:)+用户uid或昵称关键词```  
+例如：```/blg查弹幕 uid:3709626``` 或 ```/BLG查弹幕 Love丶伊卡洛斯```  
+bot返回内容(图片)：  
+![](docs/blg_danmu.png)
+
+### /blg查入场 或 /BLG查入场
+命令结构：```/blg查入场 (uid:或UID:或：或:)+用户uid或昵称关键词```  
+例如：```/blg查入场 uid:3709626``` 或 ```/BLG查入场 Love丶伊卡洛斯```  
+bot返回内容(图片)：  
+![](docs/blg_enter.png)
+
+### /blg查礼物 或 /BLG查礼物
+命令结构：```/blg查礼物 (uid:或UID:或：或:)+用户uid或昵称关键词```  
+例如：```/blg查礼物 uid:3709626``` 或 ```/BLG查礼物 Love丶伊卡洛斯```  
+bot返回内容(图片)：  
+![](docs/blg_gift.png)
+
+### /blg直播记录 或 /BLG直播记录
+命令结构：```/blg直播记录 (uid:或UID:或：或:)+用户uid或昵称关键词```  
+例如：```/blg直播记录 uid:3709626``` 或 ```/BLG直播记录 Love丶伊卡洛斯```  
+bot返回内容(图片)：  
+![](docs/blg_tp.png)
+
+### /blg直播间sc 或 /BLG直播间SC
+命令结构：```/blg直播间sc (uid:或UID:或：或:)+用户uid或昵称关键词```  
+例如：```/blg直播间sc uid:3709626``` 或 ```/BLG直播间SC Love丶伊卡洛斯```  
+bot返回内容(图片)：  
+![](docs/blg_sc.png)
 
 
 ### vtb网站  （命令前缀自行添加）
@@ -342,6 +372,10 @@ vtbs.fun活了，加了ssl，已兼容。
 
 ## 1.4.13
 优化请求错误或无数据时的消息返回和日志打印。  
+
+# 1.5.0
+新增功能`blg查弹幕` `blg查入场` `blg查礼物` `blg直播记录` `blg直播间sc`，直接采用浏览器页面截图形式返回结果。（流量消耗会多一些，酌情使用）     
+
 
 </details>
 

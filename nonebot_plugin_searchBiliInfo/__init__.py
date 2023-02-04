@@ -44,9 +44,14 @@ help_text = f"""
 /v详情 昵称关键词或uid  （大写也可以）
 /dmk查用户 昵称关键词或uid  （大写也可以）
 /dmk查直播 昵称关键词或uid  （大写也可以）
+/blg查弹幕 昵称关键词或uid  （大写也可以）
+/blg查入场 昵称关键词或uid  （大写也可以）
+/blg查礼物 昵称关键词或uid  （大写也可以）
+/blg直播记录 昵称关键词或uid  （大写也可以）
+/blg直播间sc 昵称关键词或uid  （大写也可以）
 
 
-调用的相关API源自b站官方接口、danmakus.com、ddstats.ericlamm.xyz和vtbs.fun
+调用的相关API源自b站官方接口、danmakus.com、ddstats.ericlamm.xyz、biligank.com和vtbs.fun
 """.strip()
 
 __plugin_meta__ = PluginMetadata(
@@ -89,6 +94,11 @@ catch_str12 = on_command('查牌子')
 catch_str13 = on_command('V详情', aliases={"v详情"})
 catch_str14 = on_command('dmk查用户', aliases={"DMK查用户", "danmakus查用户"})
 catch_str15 = on_command('dmk查直播', aliases={"DMK查直播", "danmakus查直播"})
+catch_str16 = on_command('blg查弹幕', aliases={"BLG查弹幕", "biligank查弹幕"})
+catch_str17 = on_command('blg查入场', aliases={"BLG查入场", "biligank查入场"})
+catch_str18 = on_command('blg查礼物', aliases={"BLG查礼物", "biligank查礼物"})
+catch_str19 = on_command('blg直播记录', aliases={"BLG直播记录", "biligank直播记录"})
+catch_str20 = on_command('blg直播间sc', aliases={"BLG直播间sc", "blg直播间SC", "BLG直播间SC", "biligank直播间sc"})
 
 
 @catch_str.handle()
@@ -975,7 +985,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
-            pic = await page.screenshot(full_page=True, path="./data/vtbs.moe_detail.png")
+            pic = await page.screenshot(full_page=True, path="./data/danmakus.com_user.png")
 
         await catch_str14.finish(MessageSegment.image(pic))
     except (KeyError, TypeError, IndexError) as e:
@@ -1003,13 +1013,157 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
-            pic = await page.screenshot(full_page=True, path="./data/vtbs.moe_detail.png")
+            pic = await page.screenshot(full_page=True, path="./data/danmakus.com_channel.png")
 
         await catch_str15.finish(MessageSegment.image(pic))
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查打开页面失败喵（看看后台日志吧）'
         await catch_str15.finish(Message(f'{msg}'), at_sender=True)
+
+
+@catch_str16.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str16.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        async with get_new_page(viewport={"width": 800, "height": 200}) as page:
+            await page.goto(
+                "https://biligank.com/live/ablive_dm?offset=0&uid=" + content,
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_dm.png")
+
+        await catch_str16.finish(MessageSegment.image(pic))
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.info(e)
+        msg = '\n查打开页面失败喵（看看后台日志吧）'
+        await catch_str16.finish(Message(f'{msg}'), at_sender=True)
+
+
+# blg查入场
+@catch_str17.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str17.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        async with get_new_page(viewport={"width": 800, "height": 200}) as page:
+            await page.goto(
+                "https://biligank.com/live/ablive_en?offset=0&uid=" + content,
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_en.png")
+
+        await catch_str17.finish(MessageSegment.image(pic))
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.info(e)
+        msg = '\n查打开页面失败喵（看看后台日志吧）'
+        await catch_str17.finish(Message(f'{msg}'), at_sender=True)
+
+
+# blg查礼物
+@catch_str18.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str18.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        async with get_new_page(viewport={"width": 800, "height": 200}) as page:
+            await page.goto(
+                "https://biligank.com/live/ablive_gf?offset=0&uid=" + content,
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_gf.png")
+
+        await catch_str18.finish(MessageSegment.image(pic))
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.info(e)
+        msg = '\n查打开页面失败喵（看看后台日志吧）'
+        await catch_str18.finish(Message(f'{msg}'), at_sender=True)
+
+
+# blg直播记录
+@catch_str19.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str19.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        async with get_new_page(viewport={"width": 1000, "height": 200}) as page:
+            await page.goto(
+                "https://biligank.com/live/tp?offset=0&uid=" + content,
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_sc.png")
+
+        await catch_str19.finish(MessageSegment.image(pic))
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.info(e)
+        msg = '\n查打开页面失败喵（看看后台日志吧）'
+        await catch_str19.finish(Message(f'{msg}'), at_sender=True)
+
+
+# blg直播间sc
+@catch_str20.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str20.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        async with get_new_page(viewport={"width": 1000, "height": 200}) as page:
+            await page.goto(
+                "https://biligank.com/live/ablive_sc?offset=0&uid=" + content,
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_sc.png")
+
+        await catch_str20.finish(MessageSegment.image(pic))
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.info(e)
+        msg = '\n查打开页面失败喵（看看后台日志吧）'
+        await catch_str20.finish(Message(f'{msg}'), at_sender=True)
 
 
 # 获取营收榜单信息 传入 日/周/月榜 和 数量
