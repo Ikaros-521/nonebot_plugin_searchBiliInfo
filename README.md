@@ -230,6 +230,11 @@ bot返回内容(图片)：
 bot返回内容(图片)：  
 ![](docs/blg_sc.png)
 
+### /icu查直播 或 /ICU查直播 或 /matsuri查直播
+命令结构：```/icu查直播 (uid:或UID:或：或:)+用户uid或昵称关键词```  
+例如：```/icu查直播 uid:3709626``` 或 ```/ICU查直播 Love丶伊卡洛斯```  
+bot返回内容(图片)：  
+![](docs/icu_live.png)
 
 ### vtb网站  （命令前缀自行添加）
 命令结构：```/vtb网站``` 或 ```/vtb资源```  
@@ -238,11 +243,13 @@ bot返回内容(图片)：
 ![](docs/ddstats.png)
 
 ## ⚙ 拓展
-启用关键词搜索，需要在env中配置自己的cookie。
+启用关键词搜索，需要在`.env.xx`中配置自己的`cookie`。
 
-命令修改：修改data.py，在文件头部追加你需要定义的用户的json串，注意json格式！！！
+命令修改：  
+昵称自定义，修改`data.py`，在文件头部追加你需要定义的用户的json串，注意json格式！！！  
+命令自定义，修改`__init__.py`，`catch_str = on_command`这部分的代码即可。  
 
-返回内容格式修改对应的msg、out_str变量的内容  
+bot返回内容格式修改对应的msg、out_str变量的内容  
 
 ## 📝 更新日志
 
@@ -382,6 +389,10 @@ vtbs.fun活了，加了ssl，已兼容。
 # 1.5.2
 新增b站用户数据至10w  
 新增粉丝牌数据至4w+  
+
+# 1.5.3
+新增网站laplace.live  
+新增`icu查直播`命令，同样是playwright的直接加载  
 
 </details>
 

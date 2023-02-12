@@ -14,9 +14,9 @@ from nonebot.typing import T_State
 from nonebot.params import CommandArg
 # from nonebot_plugin_imageutils import Text2Image
 from nonebot_plugin_htmlrender import (
-    text_to_pic,
+    # text_to_pic,
     md_to_pic,
-    template_to_pic,
+    # template_to_pic,
     get_new_page,
 )
 
@@ -49,6 +49,7 @@ help_text = f"""
 /blg查礼物 昵称关键词或uid  （大写也可以）
 /blg直播记录 昵称关键词或uid  （大写也可以）
 /blg直播间sc 昵称关键词或uid  （大写也可以）
+/icu查直播 昵称关键词或uid  （大写也可以）
 
 
 调用的相关API源自b站官方接口、danmakus.com、ddstats.ericlamm.xyz、biligank.com和vtbs.fun
@@ -99,6 +100,7 @@ catch_str17 = on_command('blg查入场', aliases={"BLG查入场", "biligank查�
 catch_str18 = on_command('blg查礼物', aliases={"BLG查礼物", "biligank查礼物"})
 catch_str19 = on_command('blg直播记录', aliases={"BLG直播记录", "biligank直播记录"})
 catch_str20 = on_command('blg直播间sc', aliases={"BLG直播间sc", "blg直播间SC", "BLG直播间SC", "biligank直播间sc"})
+catch_str21 = on_command('icu查直播', aliases={"ICU查直播", "matsuri查直播"})
 
 
 @catch_str.handle()
@@ -830,7 +832,8 @@ async def _(bot: Bot, event: Event, state: T_State):
         '\nvtbs.moe：https://vtbs.moe/' \
         '\nvup.loveava.top：https://vup.loveava.top/ranking' \
         '\nddstats：https://ddstats.ericlamm.xyz/' \
-        '\nzeroroku：https://zeroroku.com/bilibili'
+        '\nzeroroku：https://zeroroku.com/bilibili' \
+        '\nlaplace：https://laplace.live/'
         
     await catch_str8.finish(Message(f'{msg}'), at_sender=True)
 
@@ -1164,6 +1167,35 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n查打开页面失败喵（看看后台日志吧）'
         await catch_str20.finish(Message(f'{msg}'), at_sender=True)
+
+
+# icu查直播
+@catch_str21.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str21.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        async with get_new_page(viewport={"width": 1200, "height": 300}) as page:
+            await page.goto(
+                "https://matsuri.icu/channel/" + content,
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            pic = await page.screenshot(full_page=True, path="./data/matsuri.icu_channel.png")
+
+        await catch_str21.finish(MessageSegment.image(pic))
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.info(e)
+        msg = '\n查打开页面失败喵（看看后台日志吧）'
+        await catch_str21.finish(Message(f'{msg}'), at_sender=True)
 
 
 # 获取营收榜单信息 传入 日/周/月榜 和 数量
