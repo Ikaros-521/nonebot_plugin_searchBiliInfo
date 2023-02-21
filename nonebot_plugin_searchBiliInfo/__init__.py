@@ -1,22 +1,17 @@
-# import datetime
 import json
 import re
 import nonebot
-# import requests
-# import asyncio
 import aiohttp
 import time
-# from io import BytesIO
-from nonebot import on_keyword, on_command
+from nonebot import on_command
 from nonebot.adapters.onebot.v11 import Bot, Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 from nonebot.typing import T_State
 from nonebot.params import CommandArg
-# from nonebot_plugin_imageutils import Text2Image
+from nonebot.exception import FinishedException
+
 from nonebot_plugin_htmlrender import (
-    # text_to_pic,
     md_to_pic,
-    # template_to_pic,
     get_new_page,
 )
 
@@ -40,6 +35,7 @@ help_text = f"""
 /涨粉 日/周/月榜 人数（不填默认100）
 /DD风云榜 人数（不填默认10）
 /查牌子 主播牌子关键词
+/查人气 昵称关键词或uid
 /vtb网站 或 /vtb资源 （大写也可以）
 /v详情 昵称关键词或uid  （大写也可以）
 /dmk查用户 昵称关键词或uid  （大写也可以）
@@ -101,6 +97,7 @@ catch_str18 = on_command('blg查礼物', aliases={"BLG查礼物", "biligank查�
 catch_str19 = on_command('blg直播记录', aliases={"BLG直播记录", "biligank直播记录"})
 catch_str20 = on_command('blg直播间sc', aliases={"BLG直播间sc", "blg直播间SC", "BLG直播间SC", "biligank直播间sc"})
 catch_str21 = on_command('icu查直播', aliases={"ICU查直播", "matsuri查直播"})
+catch_str22 = on_command('查人气')
 
 
 @catch_str.handle()
@@ -1197,6 +1194,49 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查打开页面失败喵（看看后台日志吧）'
         await catch_str21.finish(Message(f'{msg}'), at_sender=True)
 
+
+# 查人气
+@catch_str22.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str22.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        data_json = await get_popularity(content)
+        if data_json == None:
+            msg = '\n查询不到：' + content + ' 的相关信息。\nvtbs.moe没有收录喵，可以自行去官网添加。'
+            await catch_str22.finish(Message(f'{msg}'), at_sender=True)
+
+        msg = "最近一场直播的人气峰值：" + str(data_json["lastLive"]["online"])
+        await catch_str22.finish(Message(f'{msg}'), at_sender=True)
+    except FinishedException:
+        pass
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = '\n查询失败喵（看看后台日志吧）'
+        await catch_str22.finish(Message(f'{msg}'), at_sender=True)
+
+
+# 获取主播直播峰值人气
+async def get_popularity(uid):
+    try:
+        API_URL = 'https://api.vtbs.moe/v1/detail/' + uid
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                result = await response.read()
+                ret = json.loads(result)
+    except Exception as e:
+        nonebot.logger.info(e)
+        return None
+    # nonebot.logger.info(ret)
+    return ret
 
 # 获取营收榜单信息 传入 日/周/月榜 和 数量
 async def get_revenue(date_range, size):
