@@ -12,8 +12,10 @@ from nonebot.exception import FinishedException
 
 from nonebot_plugin_htmlrender import (
     md_to_pic,
-    get_new_page,
+    get_new_page
 )
+
+from playwright.async_api import TimeoutError
 
 from .data import DATA
 from .data_medal import DATA_MEDAL
@@ -952,6 +954,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str13.finish(Message(f'{msg}'), at_sender=True)
 
+    await catch_str13.send("正在获取数据中，请耐心等待...")
+
     try:
         async with get_new_page(viewport={"width": 1415, "height": 1920}) as page:
             await page.goto(
@@ -962,6 +966,10 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             pic = await page.screenshot(full_page=True, path="./data/vtbs.moe_detail.png")
 
         await catch_str13.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str13.finish(Message(f'{msg}'), at_sender=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
@@ -980,6 +988,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"]) 
         await catch_str14.finish(Message(f'{msg}'), at_sender=True)
 
+    await catch_str14.send("正在获取数据中，请耐心等待...")
+
     try:
         async with get_new_page(viewport={"width": 1040, "height": 2500}) as page:
             await page.goto(
@@ -990,6 +1000,10 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             pic = await page.screenshot(full_page=True, path="./data/danmakus.com_user.png")
 
         await catch_str14.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str14.finish(Message(f'{msg}'), at_sender=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
@@ -1008,6 +1022,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str15.finish(Message(f'{msg}'), at_sender=True)
 
+    await catch_str15.send("正在获取数据中，请耐心等待...")
+
     try:
         async with get_new_page(viewport={"width": 850, "height": 2000}) as page:
             await page.goto(
@@ -1018,6 +1034,10 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             pic = await page.screenshot(full_page=True, path="./data/danmakus.com_channel.png")
 
         await catch_str15.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str15.finish(Message(f'{msg}'), at_sender=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
@@ -1036,6 +1056,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str16.finish(Message(f'{msg}'), at_sender=True)
 
+    await catch_str16.send("正在获取数据中，请耐心等待...")
+
     try:
         async with get_new_page(viewport={"width": 800, "height": 200}) as page:
             await page.goto(
@@ -1046,6 +1068,10 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_dm.png")
 
         await catch_str16.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str16.finish(Message(f'{msg}'), at_sender=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
@@ -1065,6 +1091,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str17.finish(Message(f'{msg}'), at_sender=True)
 
+    await catch_str17.send("正在获取数据中，请耐心等待...")
+
     try:
         async with get_new_page(viewport={"width": 800, "height": 200}) as page:
             await page.goto(
@@ -1075,6 +1103,10 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_en.png")
 
         await catch_str17.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str17.finish(Message(f'{msg}'), at_sender=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
@@ -1094,6 +1126,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str18.finish(Message(f'{msg}'), at_sender=True)
 
+    await catch_str18.send("正在获取数据中，请耐心等待...")
+
     try:
         async with get_new_page(viewport={"width": 800, "height": 200}) as page:
             await page.goto(
@@ -1104,6 +1138,10 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_gf.png")
 
         await catch_str18.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str18.finish(Message(f'{msg}'), at_sender=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
@@ -1123,6 +1161,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str19.finish(Message(f'{msg}'), at_sender=True)
 
+    await catch_str19.send("正在获取数据中，请耐心等待...")
+
     try:
         async with get_new_page(viewport={"width": 1000, "height": 200}) as page:
             await page.goto(
@@ -1133,6 +1173,10 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_sc.png")
 
         await catch_str19.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str19.finish(Message(f'{msg}'), at_sender=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
@@ -1152,6 +1196,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str20.finish(Message(f'{msg}'), at_sender=True)
 
+    await catch_str20.send("正在获取数据中，请耐心等待...")
+
     try:
         async with get_new_page(viewport={"width": 1000, "height": 200}) as page:
             await page.goto(
@@ -1162,6 +1208,10 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_sc.png")
 
         await catch_str20.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str20.finish(Message(f'{msg}'), at_sender=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
@@ -1181,6 +1231,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str21.finish(Message(f'{msg}'), at_sender=True)
 
+    await catch_str21.send("正在获取数据中，请耐心等待...")
+
     try:
         async with get_new_page(viewport={"width": 1200, "height": 300}) as page:
             await page.goto(
@@ -1191,6 +1243,10 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             pic = await page.screenshot(full_page=True, path="./data/matsuri.icu_channel.png")
 
         await catch_str21.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str21.finish(Message(f'{msg}'), at_sender=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
@@ -1239,6 +1295,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str23.finish(Message(f'{msg}'), at_sender=True)
 
+    await catch_str23.send("正在获取数据中，请耐心等待...")
+
     try:
         async with get_new_page(viewport={"width": 758, "height": 300}) as page:
             await page.goto(
@@ -1260,6 +1318,10 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             pic = await page.screenshot(full_page=True, path="./data/laplace.live_user.png")
 
         await catch_str23.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str23.finish(Message(f'{msg}'), at_sender=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
