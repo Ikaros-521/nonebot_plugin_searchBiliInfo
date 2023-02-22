@@ -102,6 +102,7 @@ catch_str20 = on_command('blg直播间sc', aliases={"BLG直播间sc", "blg直播
 catch_str21 = on_command('icu查直播', aliases={"ICU查直播", "matsuri查直播"})
 catch_str22 = on_command('查人气')
 catch_str23 = on_command('lap查用户', aliases={"LAP查用户"})
+catch_str24 = on_command('zero查用户', aliases={"ZERO查用户"})
 
 
 @catch_str.handle()
@@ -192,7 +193,6 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             nonebot.logger.info(info_json)
 
             await catch_str1.finish(Message(f'{msg}'), at_sender=True)
-            return
     except (KeyError, TypeError, IndexError) as e:
         msg = '\n果咩，查询信息失败喵~请检查拼写或者是API寄了'
         nonebot.logger.info(e)
@@ -1326,6 +1326,45 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str23.finish(Message(f'{msg}'), at_sender=True)
+
+
+# zero查用户
+@catch_str24.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str24.finish(Message(f'{msg}'), at_sender=True)
+
+    await catch_str24.send("正在获取数据中，请耐心等待...")
+
+    try:
+        async with get_new_page(viewport={"width": 800, "height": 300}) as page:
+            await page.goto(
+                "https://zeroroku.com/bilibili/author/" + content,
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            ) 
+            click_js = 'setTimeout(() => {document.getElementsByClassName("r-btn r-btn-md r-btn-filled bg-default-2")[0].click()}, 2500);'
+            result = await page.evaluate(click_js)
+            nonebot.logger.info(result)
+            await asyncio.sleep(3)
+            pic = await page.screenshot(full_page=True, path="./data/zeroroku.com_author.png")
+
+        await catch_str24.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str24.finish(Message(f'{msg}'), at_sender=True)
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面失败喵（看看后台日志吧）'
+        await catch_str24.finish(Message(f'{msg}'), at_sender=True)
 
 
 # 获取主播直播峰值人气
