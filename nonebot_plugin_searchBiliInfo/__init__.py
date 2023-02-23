@@ -38,7 +38,6 @@ help_text = f"""
 /DD风云榜 人数（不填默认10）
 /查牌子 主播牌子关键词
 /查人气 昵称关键词或uid
-/vtb网站 或 /vtb资源 （大写也可以）
 /v详情 昵称关键词或uid  （大写也可以）
 /dmk查用户 昵称关键词或uid  （大写也可以）
 /dmk查直播 昵称关键词或uid  （大写也可以）
@@ -50,6 +49,8 @@ help_text = f"""
 /icu查直播 昵称关键词或uid  （大写也可以）
 /icu查直播 昵称关键词或uid  （大写也可以）
 /lap查用户 昵称关键词或uid  （大写也可以）
+/lap查牌子 昵称关键词或uid  （大写也可以）
+/vtb网站 或 /vtb资源 （大写也可以）
 
 调用的相关API源自b站官方接口、danmakus.com、ddstats.ericlamm.xyz、biligank.com、laplace.live和vtbs.fun
 """.strip()
@@ -102,7 +103,8 @@ catch_str20 = on_command('blg直播间sc', aliases={"BLG直播间sc", "blg直播
 catch_str21 = on_command('icu查直播', aliases={"ICU查直播", "matsuri查直播"})
 catch_str22 = on_command('查人气')
 catch_str23 = on_command('lap查用户', aliases={"LAP查用户"})
-catch_str24 = on_command('zero查用户', aliases={"ZERO查用户"})
+catch_str24 = on_command('lap查牌子', aliases={"LAP查牌子"})
+catch_str25 = on_command('zero查用户', aliases={"ZERO查用户"})
 
 
 @catch_str.handle()
@@ -604,19 +606,19 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到UID：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str5.finish(Message(f'{msg}'), at_sender=True)
 
     base_info_json = await get_base_info(content)
     try:
         if base_info_json['code'] != 0:
             nonebot.logger.info(base_info_json)
             msg = '\n获取uid：' + content + '，用户信息失败。\nError code：' + str(base_info_json["code"])
-            await catch_str.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str5.finish(Message(f'{msg}'), at_sender=True)
         username = base_info_json["card"]["name"]
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询UID：' + content + '的用户名失败，请检查拼写/API寄了'
-        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str5.finish(Message(f'{msg}'), at_sender=True)
 
     guard_info_json = await get_user_guard(content)
 
@@ -625,7 +627,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询UID：' + content + '失败，请检查拼写/没有舰团/API寄了'
-        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str5.finish(Message(f'{msg}'), at_sender=True)
 
     out_str = "#查舰团\n\n查询用户名:" + username + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UID:" + content + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;舰团数:" + str(guard_len) + "\n\n" + \
               "| 昵称 | UID | 舰团类型 |\n" \
@@ -647,7 +649,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询UID：' + content + '失败，请检查拼写/没有舰团/API寄了'
-        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str5.finish(Message(f'{msg}'), at_sender=True)
 
     output = await md_to_pic(md=out_str, width=500)
     await catch_str5.send(MessageSegment.image(output))
@@ -1328,7 +1330,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str23.finish(Message(f'{msg}'), at_sender=True)
 
 
-# zero查用户
+# lap查牌子
 @catch_str24.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -1341,7 +1343,51 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str24.finish(Message(f'{msg}'), at_sender=True)
 
-    await catch_str24.send("正在获取数据中，请耐心等待...")
+    data_json = await get_lap_user_medals(content)
+
+    if data_json == None:
+        msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了'
+        await catch_str24.finish(Message(f'{msg}'), at_sender=True)
+
+    # nonebot.logger.info(data_json)
+
+    out_str = "#lap查牌子\n\n查询用户名:" + data_json["data"]["name"] + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UID:" + str(data_json["data"]["uid"]) + "\n\n" + \
+              "| 主播名 | UID | 牌子名 | 等级 |\n" \
+              "| :-----| :-----| :-----| :-----|\n"
+    try:
+        for i in range(len(data_json["data"]["list"])):
+            target_name = data_json["data"]["list"][i]["target_name"]
+            target_id = data_json["data"]["list"][i]["medal_info"]["target_id"]
+            medal_name = data_json["data"]["list"][i]["medal_info"]["medal_name"]
+            level = data_json["data"]["list"][i]["medal_info"]["level"]
+            
+            out_str += "| {:<s} | {:<d} | {:<s} | {:<d} |".format(target_name, target_id, medal_name, level)
+            out_str += '\n'
+        out_str += '\n数据源自：laplace.live\n'
+        # nonebot.logger.info("\n" + out_str)
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.info(e)
+        msg = '\n查询UID：' + content + '失败，数据解析失败，请查看后台日志排查'
+        await catch_str24.finish(Message(f'{msg}'), at_sender=True)
+
+    output = await md_to_pic(md=out_str, width=800)
+    await catch_str24.send(MessageSegment.image(output))
+
+
+# zero查用户
+@catch_str25.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str25.finish(Message(f'{msg}'), at_sender=True)
+
+    await catch_str25.send("正在获取数据中，请耐心等待...")
 
     try:
         async with get_new_page(viewport={"width": 800, "height": 300}) as page:
@@ -1356,15 +1402,30 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             await asyncio.sleep(3)
             pic = await page.screenshot(full_page=True, path="./data/zeroroku.com_author.png")
 
-        await catch_str24.finish(MessageSegment.image(pic))
+        await catch_str25.finish(MessageSegment.image(pic))
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str24.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str25.finish(Message(f'{msg}'), at_sender=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str24.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str25.finish(Message(f'{msg}'), at_sender=True)
+
+
+# 获取laplace的用户牌子数据
+async def get_lap_user_medals(uid):
+    try:
+        API_URL = 'https://laplace.live/api/user-medals/' + uid
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                result = await response.read()
+                ret = json.loads(result)
+    except Exception as e:
+        nonebot.logger.info(e)
+        return None
+    # nonebot.logger.info(ret)
+    return ret
 
 
 # 获取主播直播峰值人气
