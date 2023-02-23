@@ -74,6 +74,7 @@ _✨ NoneBot b站用户信息查询插件 ✨_
     - [/blg直播间sc 或 /BLG直播间SC](#blg%E7%9B%B4%E6%92%AD%E9%97%B4sc-%E6%88%96-blg%E7%9B%B4%E6%92%AD%E9%97%B4sc)
     - [/icu查直播 或 /ICU查直播 或 /matsuri查直播](#icu%E6%9F%A5%E7%9B%B4%E6%92%AD-%E6%88%96-icu%E6%9F%A5%E7%9B%B4%E6%92%AD-%E6%88%96-matsuri%E6%9F%A5%E7%9B%B4%E6%92%AD)
     - [/lap查用户 或 /LAP查用户](#lap%E6%9F%A5%E7%94%A8%E6%88%B7-%E6%88%96-lap%E6%9F%A5%E7%94%A8%E6%88%B7)
+    - [/lap查牌子 或 /LAP查牌子](#lap%E6%9F%A5%E7%89%8C%E5%AD%90-%E6%88%96-lap%E6%9F%A5%E7%89%8C%E5%AD%90)
     - [/zero查用户 或 /ZERO查用户](#zero%E6%9F%A5%E7%94%A8%E6%88%B7-%E6%88%96-zero%E6%9F%A5%E7%94%A8%E6%88%B7)
     - [vtb网站  （命令前缀自行添加）](#vtb%E7%BD%91%E7%AB%99--%E5%91%BD%E4%BB%A4%E5%89%8D%E7%BC%80%E8%87%AA%E8%A1%8C%E6%B7%BB%E5%8A%A0)
   - [⚙ 拓展](#-%E6%8B%93%E5%B1%95)
