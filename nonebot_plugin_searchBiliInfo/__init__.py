@@ -3,6 +3,8 @@ import re
 import nonebot
 import aiohttp, asyncio
 import time
+from collections import Counter
+
 from nonebot import on_command
 from nonebot.adapters.onebot.v11 import Bot, Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
@@ -323,6 +325,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str11.finish(Message(f'{msg}'), at_sender=True)
 
 
+# 查观看
 @catch_str2.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -347,42 +350,32 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n果咩，查询用户信息失败喵~请检查拼写或者是API寄了'
         await catch_str2.finish(Message(f'{msg}'), at_sender=True)
 
+    # 创建一个计数器对象，并对重复的uId进行计数
+    uid_counter = Counter([(item['uId'], item['name'], item['roomId']) for item in user_info_json['data']])
+
+    # 统计不重复的总数
+    unique_uids = set([item['uId'] for item in user_info_json['data']])
+
     out_str = "#查观看\n\n查询用户UID：" + content + "\n\n" + \
-              "| 昵称 | UID | 房间号 |\n" \
-              "| :-----| :-----| :-----|\n"
-    # 数据集合
-    name_set = set()
-    uId_set = set()
-    roomId_set = set()
+        " 观看总数：" + str(len(user_info_json["data"])) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;主播总数：" + str(len(unique_uids)) + "\n\n" + \
+        "| 昵称 | UID | 房间号 | 观看次数 |\n" \
+        "| :-----| :-----| :-----| :-----|\n"
 
-    for i in range(len(user_info_json['data'])):
-        name = user_info_json['data'][i]['name']
-        uId = user_info_json['data'][i]['uId']
-        roomId = user_info_json['data'][i]['roomId']
-
-        name_set.add(name)
-        uId_set.add(uId)
-        roomId_set.add(roomId)
-
-    name_list = list(name_set)
-    uId_list = list(uId_set)
-    roomId_list = list(roomId_set)
-
-    out_str += " 观看总数：" + str(len(name_set)) + "\n"
     # nonebot.logger.info(out_str)
 
-    for i in range(len(name_set)):
-        # nonebot.logger.info("i:=" + str(i) + "  | {:<s} | {:<d} | {:<d} |".format(name_list[i], uId_list[i], roomId_list[i]))
-        out_str += "| {:<s} | {:<d} | {:<d} |".format(name_list[i], uId_list[i], roomId_list[i])
+    # 按照降序输出计数器对象的结果
+    for (uId, name, roomId), count in uid_counter.most_common():
+        out_str += "| {:<s} | {:<d} | {:<d} | {:<d} |".format(name, uId, roomId, count)
         out_str += '\n'
+
     out_str += '\n数据源自：danmakus.com\n'
     # nonebot.logger.info("\n" + out_str)
 
-    if len(uId_set) < 1000:
-        output = await md_to_pic(md=out_str, width=600)
+    if len(unique_uids) < 2000:
+        output = await md_to_pic(md=out_str, width=700)
         await catch_str2.send(MessageSegment.image(output))
     else:
-        msg = '\n果咩，dd数大于1000，发不出去喵~（可自行修改源码中的数量上限）'
+        msg = '\n果咩，dd数大于2000，发不出去喵~（可自行修改源码中的数量上限）'
         await catch_str2.finish(Message(f'{msg}'), at_sender=True)
 
 
