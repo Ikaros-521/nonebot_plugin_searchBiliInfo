@@ -174,7 +174,7 @@ bot返回内容(图片)：
 命令结构：```/DD风云榜 top人数（不填默认10）```  
 例如：```/DD风云榜``` 或 ```/风云榜 20```  
 bot返回内容(图片)：  
-![](docs/incfans.png)
+![](docs/ddstats.png)
 
 ### /查牌子
 命令结构：```/查牌子 主播牌子关键词```  
@@ -190,7 +190,7 @@ bot返回内容(图片)：
 
 ### /v详情 或 /V详情
 命令结构：```/v详情 (uid:或UID:或：或:)+用户uid或昵称关键词```  
-例如：```/v详情 uid:3709626``` 或 ```/风云榜 Love丶伊卡洛斯```  
+例如：```/v详情 uid:3709626``` 或 ```/V详情 Love丶伊卡洛斯```  
 bot返回内容(图片)：  
 ![](docs/v_detail.png)
 
@@ -258,7 +258,19 @@ bot返回内容(图片)：
 命令结构：```/vtb网站``` 或 ```/vtb资源```  
 例如：```/vtb网站``` 或 ```/vtb资源```  
 bot返回内容(图片)：  
-![](docs/ddstats.png)
+```
+VTB数据看板：https://ikaros-521.gitee.io/vtb_data_board/
+matsuri：https://matsuri.icu/
+danmakus：https://danmakus.com/
+vtbs.fun：http://www.vtbs.fun/
+biligank：https://biligank.com/
+火龙榜：https://huolonglive.com/#/
+vtbs.moe：https://vtbs.moe/
+vup.loveava.top：https://vup.loveava.top/ranking
+ddstats：https://ddstats.ericlamm.xyz/
+zeroroku：https://zeroroku.com/bilibili
+laplace：https://laplace.live/
+```
 
 ## ⚙ 拓展
 启用关键词搜索，需要在`.env.xx`中配置自己的`cookie`。
@@ -437,6 +449,9 @@ vtbs.fun活了，加了ssl，已兼容。
 
 # 1.5.11
 新增`zero查用户`命令，同理  
+
+# 1.5.12
+修复文档描述错误（不影响功能，暂不发版）    
 
 </details>
 
