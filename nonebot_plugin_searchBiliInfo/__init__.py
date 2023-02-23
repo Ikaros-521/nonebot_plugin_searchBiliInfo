@@ -1351,7 +1351,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     # nonebot.logger.info(data_json)
 
-    out_str = "#lap查牌子\n\n查询用户名:" + data_json["data"]["name"] + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UID:" + str(data_json["data"]["uid"]) + "\n\n" + \
+    out_str = "#lap查牌子\n\n查询用户名:" + data_json["data"]["name"] + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UID:" + content + "\n\n" + \
               "| 主播名 | UID | 牌子名 | 等级 |\n" \
               "| :-----| :-----| :-----| :-----|\n"
     try:
