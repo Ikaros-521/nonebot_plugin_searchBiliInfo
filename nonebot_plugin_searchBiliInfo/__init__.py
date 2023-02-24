@@ -115,6 +115,7 @@ catch_str25 = on_command('zero查用户', aliases={"ZERO查用户"})
 catch_str28 = on_command('zero被关注', aliases={"ZERO被关注"})
 
 
+# 查
 @catch_str.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -128,7 +129,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str.finish(Message(f'{msg}'), at_sender=True)
 
     # 传入uid获取用户基本信息
-    base_info_json = await get_base_info(content)
+    url = 'https://account.bilibili.com/api/member/getCardByMid?mid=' + content
+    base_info_json = await common_get_return_json(url)
+
+    if base_info_json == None:
+        msg = '\n查询UID：' + content + '的用户信息失败，可能是网络问题或者API寄了喵'
+        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+
     # 获取用户信息失败
     if base_info_json['code'] != 0:
         nonebot.logger.info(base_info_json)
@@ -141,7 +148,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     if room_id == 0:
         guard_info_json = {"data": {"info": {"num": 0}}}
     else:
-        guard_info_json = await get_guard_info(content, room_id)
+        url = 'https://api.live.bilibili.com/xlive/app-room/v2/guardTab/topList?roomid=' + str(room_id) + \
+            '&page=1&ruid=' + content + '&page_size=0'
+        guard_info_json = await common_get_return_json(url)
+
+    if guard_info_json == None:
+        msg = "\n请求失败喵~可能是网络问题或者API寄了喵~"
+        await catch_str.finish(Message(f'{msg}'), at_sender=True)
 
     try:
         msg = '\n用户名：' + base_info_json['card']['name'] + '\nUID：' + str(base_info_json['card']['mid']) + \
@@ -152,6 +165,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     await catch_str.finish(Message(f'{msg}'), at_sender=True)
 
 
+# 查弹幕
 @catch_str1.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -194,7 +208,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     nonebot.logger.debug("src_uid:" + src_uid + " tgt_uid:" + tgt_uid)
 
-    info_json = await get_detail_info(src_uid, tgt_uid, page, page_size)
+    url = 'https://danmakus.com/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
+            '&pagenum=' + page + '&pagesize=' + page_size
+    info_json = await common_get_return_json(url)
+
+    if info_json == None:
+        msg = '\n果咩，查询信息失败喵~API寄了喵'
+        await catch_str1.finish(Message(f'{msg}'), at_sender=True)
 
     try:
         # 判断返回代码
@@ -247,6 +267,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
 
 
+# 查弹幕2
 @catch_str11.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -280,7 +301,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     nonebot.logger.debug("src_uid:" + src_uid + " tgt_uid:" + tgt_uid)
 
-    info_json = await get_detail_info(src_uid, tgt_uid, page, page_size)
+    url = 'https://danmakus.com/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
+            '&pagenum=' + page + '&pagesize=' + page_size
+    info_json = await common_get_return_json(url)
+
+    if info_json == None:
+        msg = '\n果咩，查询信息失败喵~API寄了喵'
+        await catch_str11.finish(Message(f'{msg}'), at_sender=True)
 
     try:
         # 判断返回代码
@@ -344,7 +371,12 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到用户名为：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str.finish(Message(f'{msg}'), at_sender=True)
 
-    user_info_json = await get_user_info(content)
+    url = 'https://danmakus.com/api/search/user/channel?uid=' + content
+    user_info_json = await common_get_return_json(url)
+
+    if user_info_json == None:
+        msg = '\n果咩，查询用户信息失败喵~API寄了喵'
+        await catch_str2.finish(Message(f'{msg}'), at_sender=True)
 
     try:
         # 判断返回代码
@@ -400,7 +432,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     await catch_str26.send("正在获取数据中，请耐心等待...")
 
-    user_info_json = await get_user_info(content)
+    
+    url = 'https://danmakus.com/api/search/user/channel?uid=' + content
+    user_info_json = await common_get_return_json(url)
+
+    if user_info_json == None:
+        msg = '\n果咩，查询用户信息失败喵~API寄了喵'
+        await catch_str26.finish(Message(f'{msg}'), at_sender=True)
 
     try:
         # 判断返回代码
@@ -438,6 +476,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str26.finish(Message(f'{msg}'), at_sender=True)
 
 
+# 查直播
 @catch_str3.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -464,7 +503,12 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str.finish(Message(f'{msg}'), at_sender=True)
 
-    info_json = await get_info(src_uid)
+    url = 'https://danmakus.com/api/info/channel?cid=' + src_uid
+    info_json = await common_get_return_json(url)
+
+    if info_json == None:
+        msg = '\n查询用户：' + src_uid + '失败，API寄了喵'
+        await catch_str3.finish(Message(f'{msg}'), at_sender=True)
 
     try:
         # 判断返回代码
@@ -538,6 +582,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str3.finish(Message(f'{msg}'), at_sender=True)
 
 
+# 查收益
 @catch_str4.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -569,7 +614,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str.finish(Message(f'{msg}'), at_sender=True)
 
-    live_json = await get_info(src_uid)
+    url = 'https://danmakus.com/api/info/channel?cid=' + src_uid
+    live_json = await common_get_return_json(url)
 
     try:
         # 判断返回代码
@@ -613,7 +659,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     # nonebot.logger.info(out_str + "income_type:" + income_type)
 
     # 获取当场直播信息
-    info_json = await get_live_info(live_id, income_type)
+    url = 'https://danmakus.com/api/info/live?liveid=' + live_id + '&type=' + income_type + '&uid='
+    info_json = await common_get_return_json(url)
+
+    if info_json == None:
+        msg = '\n查询用户：' + src_uid + ' 场次数据失败，API寄了喵'
+        await catch_str4.finish(Message(f'{msg}'), at_sender=True)
+
     try:
         if info_json['code'] != 200:
             msg = '\n查询用户：' + src_uid + ' 场次数据失败，请检查拼写或者是API寄了\nError code：' + str(temp["code"])
@@ -660,7 +712,14 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到UID：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str5.finish(Message(f'{msg}'), at_sender=True)
 
-    base_info_json = await get_base_info(content)
+    # 传入uid获取用户基本信息
+    url = 'https://account.bilibili.com/api/member/getCardByMid?mid=' + content
+    base_info_json = await common_get_return_json(url)
+
+    if base_info_json == None:
+        msg = '\n查询UID：' + content + '的用户信息失败，可能是网络问题或者API寄了喵'
+        await catch_str5.finish(Message(f'{msg}'), at_sender=True)
+
     try:
         if base_info_json['code'] != 0:
             nonebot.logger.info(base_info_json)
@@ -672,7 +731,12 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询UID：' + content + '的用户名失败，请检查拼写/API寄了'
         await catch_str5.finish(Message(f'{msg}'), at_sender=True)
 
-    guard_info_json = await get_user_guard(content)
+    url = 'https://api.vtbs.moe/v1/guard/' + content
+    guard_info_json = await common_get_return_json(url)
+
+    if guard_info_json == None:
+        msg = '\n查询UID：' + content + '失败，API寄了喵，请进行问题排查~'
+        await catch_str5.finish(Message(f'{msg}'), at_sender=True)
 
     try:
         guard_len = len(guard_info_json)
@@ -707,12 +771,19 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     await catch_str5.send(MessageSegment.image(output))
 
 
+# 查昵称
 @catch_str6.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
 
-    info_json = await get_user_keyword_info(content)
+    url = 'https://api.bilibili.com/x/web-interface/search/type?page_size=10&keyword=' + content + \
+                '&search_type=bili_user'
+    info_json = await common_get_return_json(url)
     # nonebot.logger.info(info_json)
+
+    if info_json == None:
+        msg = '\n网络出问题了或者接口寄了喵~'
+        await catch_str6.finish(Message(f'{msg}'), at_sender=True)
 
     try:
         result = info_json['data']['result']
@@ -745,9 +816,14 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     date_ranges = ['月榜', '周榜', '日榜']
     if date_range in date_ranges:
-        json1 = await get_revenue(date_range, size)
+        url = 'https://www.vtbs.fun:8050/rank/income?dateRange=' + await date_range_change(date_range) + '&current=1&size=' + size
+        json1 = await common_get_return_json(url)
     else:
         msg = '\n命令错误，例如：【/营收 月榜】【/营收 周榜 10】【/营收 日榜 3】'
+        await catch_str7.finish(Message(f'{msg}'), at_sender=True)
+
+    if json1 == None:
+        msg = '\n请求失败，可能是网络问题或者接口寄了喵~'
         await catch_str7.finish(Message(f'{msg}'), at_sender=True)
 
     try:
@@ -797,6 +873,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str7.finish(Message(f'{msg}'), at_sender=True)
 
 
+# VTB涨粉
 @catch_str9.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -814,10 +891,15 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     date_ranges = ['月榜', '周榜', '日榜']
     if date_range in date_ranges:
+        url = 'https://www.vtbs.fun:8050/rank/incfans?dateRange=' + await date_range_change(date_range) + '&current=1&size=' + size
         # 获取数据喵
-        json1 = await get_incfans(date_range, size)
+        json1 = await common_get_return_json(url)
     else:
         msg = '\n命令错误，例如：【/涨粉 月榜】【/涨粉 周榜 10】【/涨粉 日榜 3】'
+        await catch_str9.finish(Message(f'{msg}'), at_sender=True)
+
+    if json1 == None:
+        msg = '\n请求失败，可能是网络问题或者接口寄了喵~'
         await catch_str9.finish(Message(f'{msg}'), at_sender=True)
 
     try:
@@ -893,6 +975,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     await catch_str8.finish(Message(f'{msg}'), at_sender=True)
 
 
+# DD风云榜
 @catch_str10.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -904,7 +987,12 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         num = '10'
 
-    json1 = await get_ddstats_stats(num)
+    url = 'https://ddstats-api.ericlamm.xyz/stats?top=' + num
+    json1 = await common_get_return_json(url)
+
+    if json1 == None:
+        msg = '\n请求失败，接口寄了喵'
+        await catch_str10.finish(Message(f'{msg}'), at_sender=True)
 
     try:
         if json1["code"] != 200:
@@ -1330,12 +1418,14 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str22.finish(Message(f'{msg}'), at_sender=True)
 
     try:
-        data_json = await get_popularity(content)
+        url = 'https://api.vtbs.moe/v1/detail/' + content
+        data_json = await common_get_return_json(url)
+
         if data_json == None:
-            msg = '\n查询不到：' + content + ' 的相关信息。\nvtbs.moe没有收录喵，可以自行去官网添加。'
+            msg = '\n查询不到：' + content + ' 的相关信息。\n可能是网络问题或API寄了或是vtbs.moe没有收录喵，可以自行去官网添加。'
             await catch_str22.finish(Message(f'{msg}'), at_sender=True)
 
-        msg = "最近一场直播的人气峰值：" + str(data_json["lastLive"]["online"])
+        msg = "UID:" + content + "\n最近一场直播的人气峰值：" + str(data_json["lastLive"]["online"])
         await catch_str22.finish(Message(f'{msg}'), at_sender=True)
     except FinishedException:
         pass
@@ -1405,7 +1495,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str24.finish(Message(f'{msg}'), at_sender=True)
 
-    data_json = await get_lap_user_medals(content)
+    url = 'https://laplace.live/api/user-medals/' + content
+    data_json = await common_get_return_json(url)
 
     if data_json == None:
         msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了'
@@ -1449,7 +1540,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str27.finish(Message(f'{msg}'), at_sender=True)
 
-    data_json = await get_lap_upower(content)
+    url = 'https://edge-fetcher.xn--7dvy22i.com/api/bilibili/upower/' + content
+    data_json = await common_get_return_json(url)
 
     if data_json == None:
         msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了'
@@ -1466,7 +1558,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     # nonebot.logger.info(data_json)
 
-    out_str = "#lap查充电\n\n查询UID:" + content + "\n\n" + \
+    out_str = "#lap查充电\n\n查询UID：" + content + "\n\n" + \
               "| 排名 | 用户名 | UID | 天数 |\n" \
               "| :-----| :-----| :-----| :-----|\n"
     try:
@@ -1542,7 +1634,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str28.finish(Message(f'{msg}'), at_sender=True)
 
-    data_json = await get_zero_famous_fans(content)
+    url = 'https://api.zeroroku.com/bilibili/author/famous-fans?mid=' + content
+    data_json = await common_get_return_json(url)
 
     if data_json == None:
         msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了'
@@ -1559,7 +1652,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     # nonebot.logger.info(data_json)
 
-    out_str = "#zero被关注\n\n查询UID:" + content + "\n\n" + \
+    out_str = "#zero被关注\n\n查询UID：" + content + "\n\n" + \
               "| 用户名 | UID | 粉丝数 |\n" \
               "| :-----| :-----| :-----|\n"
     try:
@@ -1581,104 +1674,16 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     await catch_str28.send(MessageSegment.image(output))
 
 
-# 获取用户被哪些知名UP关注的数据
-async def get_zero_famous_fans(uid):
-    try:
-        API_URL = 'https://api.zeroroku.com/bilibili/author/famous-fans?mid=' + uid
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                result = await response.read()
-                ret = json.loads(result)
-    except Exception as e:
-        nonebot.logger.info(e)
-        return None
-    # nonebot.logger.info(ret)
-    return ret
-
-
-# 获取用户充电榜数据(接口源自laplace)
-async def get_lap_upower(uid):
-    try:
-        API_URL = 'https://edge-fetcher.xn--7dvy22i.com/api/bilibili/upower/' + uid
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                result = await response.read()
-                ret = json.loads(result)
-    except Exception as e:
-        nonebot.logger.info(e)
-        return None
-    # nonebot.logger.info(ret)
-    return ret
-
-
-# 获取laplace的用户牌子数据
-async def get_lap_user_medals(uid):
-    try:
-        API_URL = 'https://laplace.live/api/user-medals/' + uid
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                result = await response.read()
-                ret = json.loads(result)
-    except Exception as e:
-        nonebot.logger.info(e)
-        return None
-    # nonebot.logger.info(ret)
-    return ret
-
-
-# 获取主播直播峰值人气
-async def get_popularity(uid):
-    try:
-        API_URL = 'https://api.vtbs.moe/v1/detail/' + uid
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                result = await response.read()
-                ret = json.loads(result)
-    except Exception as e:
-        nonebot.logger.info(e)
-        return None
-    # nonebot.logger.info(ret)
-    return ret
-
-
-# 获取营收榜单信息 传入 日/周/月榜 和 数量
-async def get_revenue(date_range, size):
+# 日/周/月榜转Unicode
+async def date_range_change(date_range):
     if date_range == '日榜':
-        date_range = '%E6%97%A5%E6%A6%9C'
+        return '%E6%97%A5%E6%A6%9C'
     elif date_range == '周榜':
-        date_range = '%E5%91%A8%E6%A6%9C'
+        return '%E5%91%A8%E6%A6%9C'
     elif date_range == '月榜':
-        date_range = '%E6%9C%88%E6%A6%9C'
+        return '%E6%9C%88%E6%A6%9C'
     else:
-        date_range = '%E6%9C%88%E6%A6%9C'
-
-    API_URL = 'https://www.vtbs.fun:8050/rank/income?dateRange=' + date_range + '&current=1&size=' + size
-    # nonebot.logger.info("API_URL=" + API_URL)
-    async with aiohttp.ClientSession(headers=header1) as session:
-        async with session.get(url=API_URL, headers=header1) as response:
-            ret = await response.json()
-    # nonebot.logger.info(ret)
-    return ret
-
-
-# 获取涨粉榜单信息 传入 日/周/月榜 和 数量
-async def get_incfans(date_range, size):
-    if date_range == '日榜':
-        date_range = '%E6%97%A5%E6%A6%9C'
-    elif date_range == '周榜':
-        date_range = '%E5%91%A8%E6%A6%9C'
-    elif date_range == '月榜':
-        date_range = '%E6%9C%88%E6%A6%9C'
-    else:
-        date_range = '%E6%9C%88%E6%A6%9C'
-
-    API_URL = 'https://www.vtbs.fun:8050/rank/incfans?dateRange=' + date_range + '&current=1&size=' + size
-    nonebot.logger.debug("API_URL=" + API_URL)
-    async with aiohttp.ClientSession(headers=header1) as session:
-        async with session.get(url=API_URL, headers=header1) as response:
-            ret = await response.json()
-    # nonebot.logger.info(ret)
-    return ret
+        return '%E6%9C%88%E6%A6%9C'
 
 
 # 数据预处理 返回uid 如果返回-1为异常 -2表示搜索成功但没有相关用户
@@ -1703,8 +1708,16 @@ async def data_preprocess(content):
                 continue
 
         # 通过昵称查询uid，默认只查搜索到的第一个用户
-        info_json = await use_name_get_uid(content)
+        url = 'https://api.bilibili.com/x/web-interface/search/type?page_size=10&keyword=' + content + \
+                '&search_type=bili_user'
+        info_json = await common_get_return_json(url)
         # nonebot.logger.info(info_json)
+
+        if info_json == None:
+            temp["resp"] = "None"
+            temp["code"] = -1
+            nonebot.logger.info("请求失败，请排查cookie是否配置，或者接口寄了或其他问题")
+            return temp
 
         try:
             if info_json['code'] != 0:
@@ -1728,29 +1741,13 @@ async def data_preprocess(content):
             return temp
 
 
-# 传入uid获取用户基本信息
-async def get_base_info(uid):
-    try:
-        API_URL = 'https://account.bilibili.com/api/member/getCardByMid?mid=' + uid
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                result = await response.read()
-                ret = json.loads(result)
-    except:
-        return {"code": 408}
-    # nonebot.logger.info(ret)
-    return ret
-
-
 # 传入uid获取用户直播间房间号
 async def get_room_id(uid):
-    try:
-        API_URL = 'https://api.live.bilibili.com/room/v2/Room/room_id_by_uid?uid=' + uid
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                ret = await response.json()
-    except:
-        return {"code": 408}
+    url = 'https://api.live.bilibili.com/room/v2/Room/room_id_by_uid?uid=' + uid
+    ret = await common_get_return_json(url)
+
+    if ret == None:
+        return 0
 
     try:
         room_id = ret['data']['room_id']
@@ -1760,123 +1757,15 @@ async def get_room_id(uid):
     return room_id
 
 
-# 获取舰团信息
-async def get_guard_info(uid, room_id):
+# 通用get请求返回json
+async def common_get_return_json(url, headers=header1, timeout=60):
     try:
-        API_URL = 'https://api.live.bilibili.com/xlive/app-room/v2/guardTab/topList?roomid=' + str(
-            room_id) + '&page=1&ruid=' + uid + '&page_size=0'
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                ret = await response.json()
-    except:
-        return {"code": 408}
-    return ret
-
-
-# 通过昵称查询用户信息
-async def get_user_keyword_info(name):
-    try:
-        API_URL = 'https://api.bilibili.com/x/web-interface/search/type?page_size=10&keyword=' + name + \
-                '&search_type=bili_user'
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                ret = await response.json()
-    except:
-        return {"code": 408}
-    # nonebot.logger.info(ret)
-    return ret
-
-
-# 获取用户舰团信息
-async def get_user_guard(uid):
-    try:
-        API_URL = 'https://api.vtbs.moe/v1/guard/' + uid
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                ret = await response.json()
-    except:
-        return False
-    # nonebot.logger.info(ret)
-    return ret
-
-
-# 查询用户互动过的直播间 (未去重
-async def get_user_info(uid):
-    try:
-        API_URL = 'https://danmakus.com/api/search/user/channel?uid=' + uid
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                ret = await response.json()
-    except:
-        return {"code": 408}
-    # nonebot.logger.info(ret)
-    return ret
-
-
-# 查询用户记录
-async def get_detail_info(src_uid, tgt_uid, page, page_size):
-    try:
-        API_URL = 'https://danmakus.com/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
-                '&pagenum=' + page + '&pagesize=' + page_size
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                ret = await response.json()
-    except:
-        return {"code": 408}
-    # nonebot.logger.info(ret)
-    return ret
-
-
-# 查询主播信息
-async def get_info(uid):
-    try:
-        API_URL = 'https://danmakus.com/api/info/channel?cid=' + uid
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                ret = await response.json()
-    except:
-        return {"code": 408}
-    # nonebot.logger.info(ret)
-    return ret
-
-
-# 查询单次直播详细信息
-async def get_live_info(live_id, income_type):
-    try:
-        API_URL = 'https://danmakus.com/api/info/live?liveid=' + live_id + '&type=' + income_type + '&uid='
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                ret = await response.json()
-    except:
-        return {"code": 408}
-    # nonebot.logger.info(ret)
-    return ret
-
-
-# 通过昵称查询信息
-async def use_name_get_uid(name):
-    try:
-        API_URL = 'https://api.bilibili.com/x/web-interface/search/type?page_size=10&keyword=' + name + \
-                '&search_type=bili_user'
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1) as response:
-                ret = await response.json()
-    except:
-        return {"code": 408}
-    # nonebot.logger.info(ret)
-    return ret
-
-
-# 传入top数量 获取DD风云榜数据
-async def get_ddstats_stats(num):
-    try:
-        API_URL = 'https://ddstats-api.ericlamm.xyz/stats?top=' + num
-        async with aiohttp.ClientSession(headers=header1) as session:
-            async with session.get(url=API_URL, headers=header1, timeout=30) as response:
+        async with aiohttp.ClientSession(headers=headers) as session:
+            async with session.get(url=url, headers=headers, timeout=timeout) as response:
                 result = await response.read()
                 ret = json.loads(result)
     except:
-        return {"code": 408}
+        return None
     # nonebot.logger.info(ret)
     return ret
 
