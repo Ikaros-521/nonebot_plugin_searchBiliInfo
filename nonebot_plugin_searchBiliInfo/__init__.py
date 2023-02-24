@@ -392,8 +392,10 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         content = temp["uid"]
     else:
         nonebot.logger.info(temp)
-        msg = '\n查询不到用户名为：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str26.finish(Message(f'{msg}'), at_sender=True)
+
+    await catch_str26.send("正在获取数据中，请耐心等待...")
 
     user_info_json = await get_user_info(content)
 
@@ -410,8 +412,6 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     try:
         dir_path = Path(__file__).parent
         file_path = dir_path / "html" / "composition_page.html"
-        
-        await catch_str26.send("正在获取数据中，请耐心等待...")
 
         async with get_new_page(viewport={"width": 1000, "height": 800}) as page:
             await page.goto(
@@ -421,7 +421,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             )
             await page.eval_on_selector('html', "generate_chart4('{}', '{}')".format(content, json.dumps(user_info_json)))
             await asyncio.sleep(3)
-            pic = await page.screenshot(full_page=True, path="./data/danmakus.com_composition.png")
+            temp_path = "./data/danmakus.com_composition" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
 
         await catch_str26.finish(MessageSegment.image(pic))
     except TimeoutError as e:
@@ -1013,7 +1014,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
-            pic = await page.screenshot(full_page=True, path="./data/vtbs.moe_detail.png")
+            temp_path = "./data/vtbs.moe_detail" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
 
         await catch_str13.finish(MessageSegment.image(pic))
     except TimeoutError as e:
@@ -1047,7 +1049,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
-            pic = await page.screenshot(full_page=True, path="./data/danmakus.com_user.png")
+            temp_path = "./data/danmakus.com_user" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
 
         await catch_str14.finish(MessageSegment.image(pic))
     except TimeoutError as e:
@@ -1081,7 +1084,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
-            pic = await page.screenshot(full_page=True, path="./data/danmakus.com_channel.png")
+            temp_path = "./data/danmakus.com_channel" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
 
         await catch_str15.finish(MessageSegment.image(pic))
     except TimeoutError as e:
@@ -1115,7 +1119,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
-            pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_dm.png")
+            temp_path = "./data/biligank.com_ablive_dm" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
 
         await catch_str16.finish(MessageSegment.image(pic))
     except TimeoutError as e:
@@ -1150,7 +1155,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
-            pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_en.png")
+            temp_path = "./data/biligank.com_ablive_en" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
 
         await catch_str17.finish(MessageSegment.image(pic))
     except TimeoutError as e:
@@ -1185,7 +1191,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
-            pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_gf.png")
+            temp_path = "./data/biligank.com_ablive_gf" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
 
         await catch_str18.finish(MessageSegment.image(pic))
     except TimeoutError as e:
@@ -1220,7 +1227,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
-            pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_sc.png")
+            temp_path = "./data/biligank.com_ablive_tp" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
 
         await catch_str19.finish(MessageSegment.image(pic))
     except TimeoutError as e:
@@ -1255,7 +1263,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
-            pic = await page.screenshot(full_page=True, path="./data/biligank.com_ablive_sc.png")
+            temp_path = "./data/biligank.com_ablive_sc" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
 
         await catch_str20.finish(MessageSegment.image(pic))
     except TimeoutError as e:
@@ -1290,7 +1299,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
-            pic = await page.screenshot(full_page=True, path="./data/matsuri.icu_channel.png")
+            temp_path = "./data/matsuri.icu_channel" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
 
         await catch_str21.finish(MessageSegment.image(pic))
     except TimeoutError as e:
@@ -1365,7 +1375,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             result = await page.evaluate(click_js)
             nonebot.logger.info(result)
             await asyncio.sleep(3)
-            pic = await page.screenshot(full_page=True, path="./data/laplace.live_user.png")
+            temp_path = "./data/laplace.live_user" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
 
         await catch_str23.finish(MessageSegment.image(pic))
     except TimeoutError as e:
@@ -1448,7 +1459,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             result = await page.evaluate(click_js)
             nonebot.logger.info(result)
             await asyncio.sleep(3)
-            pic = await page.screenshot(full_page=True, path="./data/zeroroku.com_author.png")
+            temp_path = "./data/zeroroku.com_author" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
 
         await catch_str25.finish(MessageSegment.image(pic))
     except TimeoutError as e:
@@ -1743,3 +1755,9 @@ async def timestamp_to_date(timestamp):
 async def filter_markdown(text):
     filtered_text = re.sub(r'[_*#->`]', '', text)
     return re.sub(r"(.{20})", r"\1<br>", filtered_text, 0, re.DOTALL)
+
+
+# 获取时间戳的当前的秒
+async def get_current_timestamp_seconds():
+    current_timestamp = int(time.time())
+    return str(current_timestamp % 60)
