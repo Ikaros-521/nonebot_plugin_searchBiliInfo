@@ -54,6 +54,7 @@ help_text = f"""
 /icu查直播 昵称关键词或uid  （大写也可以）
 /lap查用户 昵称关键词或uid  （大写也可以）
 /lap查牌子 昵称关键词或uid  （大写也可以）
+/lap查充电 昵称关键词或uid  （大写也可以）
 /vtb网站 或 /vtb资源 （大写也可以）
 
 调用的相关API源自b站官方接口、danmakus.com、ddstats.ericlamm.xyz、biligank.com、laplace.live和vtbs.fun
@@ -109,7 +110,9 @@ catch_str21 = on_command('icu查直播', aliases={"ICU查直播", "matsuri查直
 catch_str22 = on_command('查人气')
 catch_str23 = on_command('lap查用户', aliases={"LAP查用户"})
 catch_str24 = on_command('lap查牌子', aliases={"LAP查牌子"})
+catch_str27 = on_command('lap查充电', aliases={"LAP查充电"})
 catch_str25 = on_command('zero查用户', aliases={"ZERO查用户"})
+catch_str28 = on_command('zero被关注', aliases={"ZERO被关注"})
 
 
 @catch_str.handle()
@@ -1433,6 +1436,59 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     await catch_str24.send(MessageSegment.image(output))
 
 
+# lap查充电
+@catch_str27.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str27.finish(Message(f'{msg}'), at_sender=True)
+
+    data_json = await get_lap_upower(content)
+
+    if data_json == None:
+        msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了'
+        await catch_str27.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        if data_json['code'] != 0:
+            msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了\nError code：' + str(data_json["code"])
+            await catch_str27.finish(Message(f'{msg}'), at_sender=True)
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了\nError code：' + str(data_json["code"])
+        await catch_str27.finish(Message(f'{msg}'), at_sender=True)
+
+    # nonebot.logger.info(data_json)
+
+    out_str = "#lap查充电\n\n查询UID:" + content + "\n\n" + \
+              "| 排名 | 用户名 | UID | 天数 |\n" \
+              "| :-----| :-----| :-----| :-----|\n"
+    try:
+        for i in range(len(data_json["data"]["rank_info"])):
+            nickname = data_json["data"]["rank_info"][i]["nickname"]
+            mid = data_json["data"]["rank_info"][i]["mid"]
+            rank = data_json["data"]["rank_info"][i]["rank"]
+            day = data_json["data"]["rank_info"][i]["day"]
+            
+            out_str += "| {:<d} | {:<s} | {:<d} | {:<d} |".format(rank, nickname, mid, day)
+            out_str += '\n'
+        out_str += '\n数据源自：laplace.live\n'
+        # nonebot.logger.info("\n" + out_str)
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.info(e)
+        msg = '\n查询UID：' + content + '失败，数据解析失败，请查看后台日志排查'
+        await catch_str27.finish(Message(f'{msg}'), at_sender=True)
+
+    output = await md_to_pic(md=out_str, width=800)
+    await catch_str27.send(MessageSegment.image(output))
+
+
 # zero查用户
 @catch_str25.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
@@ -1473,6 +1529,88 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str25.finish(Message(f'{msg}'), at_sender=True)
 
 
+# zero被关注
+@catch_str28.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str28.finish(Message(f'{msg}'), at_sender=True)
+
+    data_json = await get_zero_famous_fans(content)
+
+    if data_json == None:
+        msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了'
+        await catch_str28.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        if len(data_json) == 0:
+            msg = '\n查询UID：' + content + '，无被关注数据，over~'
+            await catch_str28.finish(Message(f'{msg}'), at_sender=True)
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了\nError code：' + str(data_json["code"])
+        await catch_str28.finish(Message(f'{msg}'), at_sender=True)
+
+    # nonebot.logger.info(data_json)
+
+    out_str = "#zero被关注\n\n查询UID:" + content + "\n\n" + \
+              "| 用户名 | UID | 粉丝数 |\n" \
+              "| :-----| :-----| :-----|\n"
+    try:
+        for i in range(len(data_json)):
+            name = data_json[i]["name"]
+            mid = data_json[i]["mid"]
+            fans = data_json[i]["fans"]
+            
+            out_str += "| {:<s} | {:<d} | {:<d} |".format(name, mid, fans)
+            out_str += '\n'
+        out_str += '\n数据源自：zeroroku.com\n'
+        # nonebot.logger.info("\n" + out_str)
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.info(e)
+        msg = '\n查询UID：' + content + '失败，数据解析失败，请查看后台日志排查'
+        await catch_str28.finish(Message(f'{msg}'), at_sender=True)
+
+    output = await md_to_pic(md=out_str, width=600)
+    await catch_str28.send(MessageSegment.image(output))
+
+
+# 获取用户被哪些知名UP关注的数据
+async def get_zero_famous_fans(uid):
+    try:
+        API_URL = 'https://api.zeroroku.com/bilibili/author/famous-fans?mid=' + uid
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                result = await response.read()
+                ret = json.loads(result)
+    except Exception as e:
+        nonebot.logger.info(e)
+        return None
+    # nonebot.logger.info(ret)
+    return ret
+
+
+# 获取用户充电榜数据(接口源自laplace)
+async def get_lap_upower(uid):
+    try:
+        API_URL = 'https://edge-fetcher.xn--7dvy22i.com/api/bilibili/upower/' + uid
+        async with aiohttp.ClientSession(headers=header1) as session:
+            async with session.get(url=API_URL, headers=header1) as response:
+                result = await response.read()
+                ret = json.loads(result)
+    except Exception as e:
+        nonebot.logger.info(e)
+        return None
+    # nonebot.logger.info(ret)
+    return ret
+
+
 # 获取laplace的用户牌子数据
 async def get_lap_user_medals(uid):
     try:
@@ -1501,6 +1639,7 @@ async def get_popularity(uid):
         return None
     # nonebot.logger.info(ret)
     return ret
+
 
 # 获取营收榜单信息 传入 日/周/月榜 和 数量
 async def get_revenue(date_range, size):

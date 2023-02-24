@@ -9,6 +9,7 @@
             position: relative;
             height: 800px;
             overflow: hidden;
+            background: #100c2a;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
@@ -27,7 +28,7 @@
 
             var dom = document.getElementById('chart-container4');
 
-            var myChart = echarts.init(dom, null, {
+            var myChart = echarts.init(dom, 'dark', {
                 renderer: 'canvas',
                 useDirtyRect: false
             });
