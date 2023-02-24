@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>VTB数据看板-查成分</title>
+    <style>
+        #chart-container4 {
+            position: relative;
+            height: 800px;
+            overflow: hidden;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+</head>
+
+<body>
+    <div id="composition_page" style="text-align: center;">
+        <div id="chart_main4">
+            <div id="chart-container4"></div>
+        </div>
+    </div>
+    <script>
+        // 查成分 成分饼图
+        function generate_chart4(uid, json_str) {
+            let json = JSON.parse(json_str);
+
+            var dom = document.getElementById('chart-container4');
+
+            var myChart = echarts.init(dom, null, {
+                renderer: 'canvas',
+                useDirtyRect: false
+            });
+            var app = {};
+            var option;
+
+            const legendData = [];
+            const seriesData = [];
+
+            // 创建一个Map对象，并对重复的uId进行计数
+            const uid_counter = new Map();
+            for (const item of json.data) {
+                const { uId, name } = item;
+                uid_counter.set(uId, (uid_counter.get(uId) || 0) + 1);
+            }
+
+            for (const [uid, count] of uid_counter) {
+                let temp_name = json.data.find(item => item.uId === uid).name;
+                legendData.push(temp_name);
+                seriesData.push({
+                    name: temp_name,
+                    value: count
+                });
+            }
+
+            const data = {
+                legendData: legendData,
+                seriesData: seriesData
+            };
+
+            myChart.showLoading();
+            myChart.hideLoading();
+            option = {
+                title: {
+                    text: '查观看2    UID:' + uid,
+                    subtext: '数据源自danmukus.com',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b} : {c} ({d}%)'
+                },
+                legend: {
+                    show: false,
+                    type: 'scroll',
+                    orient: 'vertical',
+                    right: 10,
+                    top: 20,
+                    bottom: 20,
+                    data: data.legendData
+                },
+                series: [
+                    {
+                        top: 50,
+                        name: '昵称',
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['50%', '50%'],
+                        data: data.seriesData,
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            myChart.setOption(option);
+
+            if (option && typeof option === 'object') {
+                myChart.setOption(option);
+            }
+
+            window.addEventListener('resize', myChart.resize);
+        };
+    </script>
+</body>
+
+</html>

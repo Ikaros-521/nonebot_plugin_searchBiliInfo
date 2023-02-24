@@ -4,6 +4,7 @@ import nonebot
 import aiohttp, asyncio
 import time
 from collections import Counter
+from pathlib import Path
 
 from nonebot import on_command
 from nonebot.adapters.onebot.v11 import Bot, Event
@@ -33,6 +34,7 @@ help_text = f"""
 /查昵称 昵称关键词或uid
 /查收益 昵称关键词或uid 收益类型(默认1: 礼物，2: 上舰，3: SC) 倒叙第n场(从0开始)
 /查观看 昵称关键词或uid
+/查观看2 昵称关键词或uid
 /查弹幕 查询的目标人昵称关键词或uid 查询的主播昵称关键词或uid 页数 条数
 /查弹幕2 查询的目标人昵称关键词或uid 页数 条数
 /营收 日/周/月榜 人数（不填默认100）
@@ -85,6 +87,7 @@ catch_str = on_command("查", priority=2)
 catch_str1 = on_command("查弹幕")
 catch_str11 = on_command("查弹幕2")
 catch_str2 = on_command("查观看")
+catch_str26 = on_command("查观看2")
 catch_str3 = on_command("查直播")
 catch_str4 = on_command('查收益')
 catch_str5 = on_command('查舰团')
@@ -377,6 +380,58 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         msg = '\n果咩，dd数大于2000，发不出去喵~（可自行修改源码中的数量上限）'
         await catch_str2.finish(Message(f'{msg}'), at_sender=True)
+
+
+# 查观看2
+@catch_str26.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '\n查询不到用户名为：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str26.finish(Message(f'{msg}'), at_sender=True)
+
+    user_info_json = await get_user_info(content)
+
+    try:
+        # 判断返回代码
+        if user_info_json['code'] != 200:
+            msg = '\n查询用户：' + content + '失败'
+            await catch_str26.finish(Message(f'{msg}'), at_sender=True)
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.info(e)
+        msg = '\n果咩，查询用户信息失败喵~请检查拼写或者是API寄了'
+        await catch_str26.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        dir_path = Path(__file__).parent
+        file_path = dir_path / "html" / "composition_page.html"
+        
+        await catch_str26.send("正在获取数据中，请耐心等待...")
+
+        async with get_new_page(viewport={"width": 1000, "height": 800}) as page:
+            await page.goto(
+                "file://" + str(file_path.resolve()),
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            await page.eval_on_selector('html', "generate_chart4('{}', '{}')".format(content, json.dumps(user_info_json)))
+            await asyncio.sleep(3)
+            pic = await page.screenshot(full_page=True, path="./data/danmakus.com_composition.png")
+
+        await catch_str26.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str26.finish(Message(f'{msg}'), at_sender=True)
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面失败喵（看看后台日志吧）'
+        await catch_str26.finish(Message(f'{msg}'), at_sender=True)
 
 
 @catch_str3.handle()
