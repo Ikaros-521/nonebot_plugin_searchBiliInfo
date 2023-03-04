@@ -1459,14 +1459,21 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             )
             # 等待页面加载完成
             await page.wait_for_selector('.jsx-5797876f0d745d6c')
-            click_js = 'let details=document.getElementsByClassName("jsx-5797876f0d745d6c Home_scrollableContent__6y8XH Home_xl__sAgvD")[0].getElementsByTagName("details");' \
-                'let len=details.length;for(var i=0;i<len;i++){details[i].getElementsByTagName("summary")[0].click();}'
+            # 删除小作文
+            click_js = 'let p_arr=document.getElementsByClassName("Home_xl__sAgvD")[0].getElementsByTagName("p");for(let i=0;i<(p_arr.length-1);i++){setTimeout(function(){p_arr[0].remove()},100)}'
             # 执行 JavaScript 代码
             result = await page.evaluate(click_js)
+            click_js = 'let details=document.getElementsByClassName("jsx-5797876f0d745d6c Home_scrollableContent__6y8XH Home_xl__sAgvD")[0].getElementsByTagName("details");' \
+                'let len=details.length;for(var i=0;i<len;i++){details[i].getElementsByTagName("summary")[0].click();};' \
+                'document.getElementsByClassName("player")[0].remove();'
+            # 执行 JavaScript 代码
+            result = await page.evaluate(click_js)
+            nonebot.logger.debug(result)
+            # 修改长度已显示
             await page.wait_for_selector('.following-list')
             click_js = 'let len=document.getElementsByClassName("jsx-5797876f0d745d6c following-list").length;for(var i=0;i<len;i++){document.getElementsByClassName("jsx-5797876f0d745d6c following-list")[i].style.maxHeight="2000px"}'
             result = await page.evaluate(click_js)
-            nonebot.logger.info(result)
+            nonebot.logger.debug(result)
             await asyncio.sleep(3)
             temp_path = "./data/laplace.live_user" + await get_current_timestamp_seconds() + ".png"
             pic = await page.screenshot(full_page=True, path=temp_path)
