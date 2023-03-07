@@ -43,6 +43,12 @@ help_text = f"""
 /查牌子 主播牌子关键词
 /查人气 昵称关键词或uid
 /v详情 昵称关键词或uid  （大写也可以）
+/v直播势  （大写也可以）
+/v急上升  （大写也可以）
+/v急下降  （大写也可以）
+/v舰团  （大写也可以）
+/vdd  （大写也可以）
+/v宏观  （大写也可以）
 /dmk查用户 昵称关键词或uid  （大写也可以）
 /dmk查直播 昵称关键词或uid  （大写也可以）
 /blg查弹幕 昵称关键词或uid  （大写也可以）
@@ -99,6 +105,12 @@ catch_str8 = on_command("vtb网站", aliases={"VTB网站", "Vtb网站", "vtb资�
 catch_str10 = on_command('DD风云榜', aliases={"风云榜", "dd风云榜"})
 catch_str12 = on_command('查牌子')
 catch_str13 = on_command('V详情', aliases={"v详情"})
+catch_str29 = on_command('V直播势', aliases={"v直播势"})
+catch_str30 = on_command('V急上升', aliases={"v急上升"})
+catch_str31 = on_command('V急下降', aliases={"v急下降"})
+catch_str32 = on_command('V舰团', aliases={"v舰团"})
+catch_str33 = on_command('VDD风云榜', aliases={"vdd风云榜", "vdd", "VDD"})
+catch_str34 = on_command('V宏观', aliases={"v宏观"})
 catch_str14 = on_command('dmk查用户', aliases={"DMK查用户", "danmakus查用户"})
 catch_str15 = on_command('dmk查直播', aliases={"DMK查直播", "danmakus查直播"})
 catch_str16 = on_command('blg查弹幕', aliases={"BLG查弹幕", "biligank查弹幕"})
@@ -470,7 +482,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
         await catch_str26.finish(Message(f'{msg}'), at_sender=True)
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str26.finish(Message(f'{msg}'), at_sender=True)
@@ -867,7 +881,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         # output = Image.open(BytesIO(img))
         # output.save("md2pic.png", format="PNG")
         await catch_str7.send(MessageSegment.image(output))
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n数据解析失败，寄了喵（请查日志排查问题）'
         await catch_str7.finish(Message(f'{msg}'), at_sender=True)
@@ -952,7 +968,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         # output = Image.open(BytesIO(img))
         # output.save("md2pic.png", format="PNG")
         await catch_str9.send(MessageSegment.image(output))
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n数据解析失败，寄了喵（请查日志排查问题）'
         await catch_str9.finish(Message(f'{msg}'), at_sender=True)
@@ -1047,7 +1065,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         # output = Image.open(BytesIO(img))
         # output.save("md2pic.png", format="PNG")
         await catch_str10.send(MessageSegment.image(output))
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n数据解析失败，寄了喵（请查日志排查问题）'
         await catch_str10.finish(Message(f'{msg}'), at_sender=True)
@@ -1078,7 +1098,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
         output = await md_to_pic(md=out_str, width=700)
         await catch_str10.send(MessageSegment.image(output))
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n查询不到此牌子的数据（可能是数据不足或不存在此牌子喵~）'
         await catch_str12.finish(Message(f'{msg}'), at_sender=True)
@@ -1113,7 +1135,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
         await catch_str13.finish(Message(f'{msg}'), at_sender=True)
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str13.finish(Message(f'{msg}'), at_sender=True)
@@ -1148,7 +1172,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
         await catch_str14.finish(Message(f'{msg}'), at_sender=True)
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str14.finish(Message(f'{msg}'), at_sender=True)
@@ -1183,7 +1209,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
         await catch_str15.finish(Message(f'{msg}'), at_sender=True)
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str15.finish(Message(f'{msg}'), at_sender=True)
@@ -1218,7 +1246,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
         await catch_str16.finish(Message(f'{msg}'), at_sender=True)
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str16.finish(Message(f'{msg}'), at_sender=True)
@@ -1254,7 +1284,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
         await catch_str17.finish(Message(f'{msg}'), at_sender=True)
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str17.finish(Message(f'{msg}'), at_sender=True)
@@ -1290,7 +1322,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
         await catch_str18.finish(Message(f'{msg}'), at_sender=True)
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str18.finish(Message(f'{msg}'), at_sender=True)
@@ -1326,7 +1360,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
         await catch_str19.finish(Message(f'{msg}'), at_sender=True)
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str19.finish(Message(f'{msg}'), at_sender=True)
@@ -1362,7 +1398,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
         await catch_str20.finish(Message(f'{msg}'), at_sender=True)
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str20.finish(Message(f'{msg}'), at_sender=True)
@@ -1398,7 +1436,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
         await catch_str21.finish(Message(f'{msg}'), at_sender=True)
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str21.finish(Message(f'{msg}'), at_sender=True)
@@ -1483,7 +1523,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
         await catch_str23.finish(Message(f'{msg}'), at_sender=True)
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str23.finish(Message(f'{msg}'), at_sender=True)
@@ -1622,7 +1664,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
         await catch_str25.finish(Message(f'{msg}'), at_sender=True)
-    except (KeyError, TypeError, IndexError) as e:
+    except FinishedException:
+        pass
+    except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str25.finish(Message(f'{msg}'), at_sender=True)
@@ -1679,6 +1723,178 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     output = await md_to_pic(md=out_str, width=600)
     await catch_str28.send(MessageSegment.image(output))
+
+
+# v直播势
+@catch_str29.handle()
+async def _(bot: Bot, event: Event):
+    await catch_str29.send("正在获取数据中，请耐心等待...")
+
+    try:
+        async with get_new_page(viewport={"width": 950, "height": 3000}) as page:
+            await page.goto(
+                "https://vtbs.moe/live",
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            temp_path = "./data/vtbs.moe_live" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=False, path=temp_path)
+
+        await catch_str29.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str29.finish(Message(f'{msg}'), at_sender=True)
+    except FinishedException:
+        pass
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面失败喵（看看后台日志吧）'
+        await catch_str29.finish(Message(f'{msg}'), at_sender=True)
+
+
+# v急上升
+@catch_str30.handle()
+async def _(bot: Bot, event: Event):
+    await catch_str30.send("正在获取数据中，请耐心等待...")
+
+    try:
+        async with get_new_page(viewport={"width": 950, "height": 3000}) as page:
+            await page.goto(
+                "https://vtbs.moe/rise",
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            temp_path = "./data/vtbs.moe_rise" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=False, path=temp_path)
+
+        await catch_str30.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str30.finish(Message(f'{msg}'), at_sender=True)
+    except FinishedException:
+        pass
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面失败喵（看看后台日志吧）'
+        await catch_str30.finish(Message(f'{msg}'), at_sender=True)
+
+
+# v急下降
+@catch_str31.handle()
+async def _(bot: Bot, event: Event):
+    await catch_str31.send("正在获取数据中，请耐心等待...")
+
+    try:
+        async with get_new_page(viewport={"width": 950, "height": 3000}) as page:
+            await page.goto(
+                "https://vtbs.moe/drop",
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            temp_path = "./data/vtbs.moe_drop" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=False, path=temp_path)
+
+        await catch_str31.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str31.finish(Message(f'{msg}'), at_sender=True)
+    except FinishedException:
+        pass
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面失败喵（看看后台日志吧）'
+        await catch_str31.finish(Message(f'{msg}'), at_sender=True)
+
+
+# v舰团
+@catch_str32.handle()
+async def _(bot: Bot, event: Event):
+    await catch_str32.send("正在获取数据中，请耐心等待...")
+
+    try:
+        async with get_new_page(viewport={"width": 950, "height": 3000}) as page:
+            await page.goto(
+                "https://vtbs.moe/guard",
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            temp_path = "./data/vtbs.moe_guard" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=False, path=temp_path)
+
+        await catch_str32.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str32.finish(Message(f'{msg}'), at_sender=True)
+    except FinishedException:
+        pass
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面失败喵（看看后台日志吧）'
+        await catch_str32.finish(Message(f'{msg}'), at_sender=True)
+
+
+# VDD风云榜
+@catch_str33.handle()
+async def _(bot: Bot, event: Event):
+    await catch_str33.send("正在获取数据中，请耐心等待...")
+
+    try:
+        async with get_new_page(viewport={"width": 950, "height": 20000}) as page:
+            await page.goto(
+                "https://vtbs.moe/dd",
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            await page.wait_for_selector('.columns')
+            temp_path = "./data/vtbs.moe_dd" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=False, path=temp_path)
+
+        await catch_str33.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str33.finish(Message(f'{msg}'), at_sender=True)
+    except FinishedException:
+        pass
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面失败喵（看看后台日志吧）'
+        await catch_str33.finish(Message(f'{msg}'), at_sender=True)
+
+
+# V宏观
+@catch_str34.handle()
+async def _(bot: Bot, event: Event):
+    await catch_str34.send("正在获取数据中，请耐心等待...\n(数据加载较慢，至少30秒以上)")
+
+    try:
+        async with get_new_page(viewport={"width": 950, "height": 2500}) as page:
+            await page.goto(
+                "https://vtbs.moe/macro",
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            # 渲染很慢，建议多等等，等待个30秒
+            await page.wait_for_timeout(30)
+            await asyncio.sleep(30)
+            temp_path = "./data/vtbs.moe_macro" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=False, path=temp_path)
+
+        await catch_str34.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str34.finish(Message(f'{msg}'), at_sender=True)
+    except FinishedException:
+        pass
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面失败喵（看看后台日志吧）'
+        await catch_str34.finish(Message(f'{msg}'), at_sender=True)
 
 
 # 日/周/月榜转Unicode
