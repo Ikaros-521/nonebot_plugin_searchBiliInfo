@@ -1127,6 +1127,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
+            await page.wait_for_selector('.el-row')
+            await page.wait_for_timeout(10)
+            await asyncio.sleep(10)
             temp_path = "./data/vtbs.moe_detail" + await get_current_timestamp_seconds() + ".png"
             pic = await page.screenshot(full_page=True, path=temp_path)
 
