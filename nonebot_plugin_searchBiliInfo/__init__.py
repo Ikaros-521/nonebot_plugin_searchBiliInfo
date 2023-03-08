@@ -37,11 +37,12 @@ help_text = f"""
 /查观看2 昵称关键词或uid
 /查弹幕 查询的目标人昵称关键词或uid 查询的主播昵称关键词或uid 页数 条数
 /查弹幕2 查询的目标人昵称关键词或uid 页数 条数
+/查牌子 主播牌子关键词
+/查人气 昵称关键词或uid
+/查装扮 昵称关键词或uid
 /营收 日/周/月榜 人数（不填默认100）
 /涨粉 日/周/月榜 人数（不填默认100）
 /DD风云榜 人数（不填默认10）
-/查牌子 主播牌子关键词
-/查人气 昵称关键词或uid
 /v详情 昵称关键词或uid  （大写也可以）
 /v直播势  （大写也可以）
 /v急上升  （大写也可以）
@@ -99,11 +100,13 @@ catch_str3 = on_command("查直播")
 catch_str4 = on_command('查收益')
 catch_str5 = on_command('查舰团')
 catch_str6 = on_command('查昵称')
+catch_str12 = on_command('查牌子')
+catch_str22 = on_command('查人气')
+catch_str35 = on_command('查装扮', aliases={"查装扮"})
 catch_str7 = on_command('营收')
 catch_str9 = on_command('涨粉')
 catch_str8 = on_command("vtb网站", aliases={"VTB网站", "Vtb网站", "vtb资源", "VTB资源"})
 catch_str10 = on_command('DD风云榜', aliases={"风云榜", "dd风云榜"})
-catch_str12 = on_command('查牌子')
 catch_str13 = on_command('V详情', aliases={"v详情"})
 catch_str29 = on_command('V直播势', aliases={"v直播势"})
 catch_str30 = on_command('V急上升', aliases={"v急上升"})
@@ -119,12 +122,12 @@ catch_str18 = on_command('blg查礼物', aliases={"BLG查礼物", "biligank查�
 catch_str19 = on_command('blg直播记录', aliases={"BLG直播记录", "biligank直播记录"})
 catch_str20 = on_command('blg直播间sc', aliases={"BLG直播间sc", "blg直播间SC", "BLG直播间SC", "biligank直播间sc"})
 catch_str21 = on_command('icu查直播', aliases={"ICU查直播", "matsuri查直播"})
-catch_str22 = on_command('查人气')
 catch_str23 = on_command('lap查用户', aliases={"LAP查用户"})
 catch_str24 = on_command('lap查牌子', aliases={"LAP查牌子"})
 catch_str27 = on_command('lap查充电', aliases={"LAP查充电"})
 catch_str25 = on_command('zero查用户', aliases={"ZERO查用户"})
 catch_str28 = on_command('zero被关注', aliases={"ZERO被关注"})
+
 
 
 # 查
@@ -885,7 +888,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         pass
     except Exception as e:
         nonebot.logger.info(e)
-        msg = '\n数据解析失败，寄了喵（请查日志排查问题）'
+        msg = '\n数据解析失败，寄了喵（请查看日志排查问题）'
         await catch_str7.finish(Message(f'{msg}'), at_sender=True)
 
 
@@ -972,7 +975,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         pass
     except Exception as e:
         nonebot.logger.info(e)
-        msg = '\n数据解析失败，寄了喵（请查日志排查问题）'
+        msg = '\n数据解析失败，寄了喵（请查看日志排查问题）'
         await catch_str9.finish(Message(f'{msg}'), at_sender=True)
 
 
@@ -1069,7 +1072,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         pass
     except Exception as e:
         nonebot.logger.info(e)
-        msg = '\n数据解析失败，寄了喵（请查日志排查问题）'
+        msg = '\n数据解析失败，寄了喵（请查看日志排查问题）'
         await catch_str10.finish(Message(f'{msg}'), at_sender=True)
 
 
@@ -1898,6 +1901,72 @@ async def _(bot: Bot, event: Event):
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
         await catch_str34.finish(Message(f'{msg}'), at_sender=True)
+
+
+# 查装扮
+@catch_str35.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str35.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        # 默认第一页 100个（应该够了）
+        url = 'https://app.bilibili.com/x/v2/space/garb/list?pn=1&ps=100&vmid=' + content
+        json1 = await common_get_return_json(url)
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = '\n请求失败，寄了喵（请查看日志排查问题）'
+        await catch_str10.finish(Message(f'{msg}'), at_sender=True)
+
+    if json1 == None:
+        msg = '\n查询不到：' + content + ' 的相关信息。\n可能是网络问题或API寄了'
+        await catch_str35.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        if json1["code"] != 0:
+            nonebot.logger.info(json1)
+            msg = '\n请求失败，寄了喵。\nError code：' + str(json1["code"])
+            await catch_str35.finish(Message(f'{msg}'), at_sender=True)
+    except (KeyError, TypeError, IndexError) as e:
+        nonebot.logger.info(e)
+        msg = '\n请求解析失败，接口寄了喵'
+        await catch_str35.finish(Message(f'{msg}'), at_sender=True)
+
+    try:
+        out_str = "#查装扮\n查询UID：" + content + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;装扮总数：" + str(json1['data']['count']) + "\n\n" + \
+                "| 装扮标题 | 粉丝号 | 装扮图数 | 标题背景图 |\n" \
+                "| :-----| :-----| :-----| :-----|\n"
+        for i in range(len(json1['data']['list'])):
+            garb_title = json1['data']['list'][i]['garb_title']
+            if 'fans_number' in json1['data']['list'][i]:
+                fans_number = json1['data']['list'][i]['fans_number']
+            else:
+                fans_number = '无'
+            img_count = str(len(json1['data']['list'][i]['images']))
+            title_bg_image = json1['data']['list'][i]['title_bg_image']
+
+            out_str += '| ' + garb_title + ' | ' + fans_number + ' | ' + img_count + \
+                ' | ' + '![title_bg_image](' + title_bg_image + ')' + ' |'
+            out_str += '\n'
+
+        # nonebot.logger.info("\n" + out_str)
+
+        output = await md_to_pic(md=out_str, width=1000)
+        await catch_str35.send(MessageSegment.image(output))
+    except FinishedException:
+        pass
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = '\n数据解析失败，寄了喵（请查看日志排查问题）'
+        await catch_str35.finish(Message(f'{msg}'), at_sender=True)
+
 
 
 # 日/周/月榜转Unicode
