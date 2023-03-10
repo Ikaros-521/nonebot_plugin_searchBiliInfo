@@ -64,6 +64,7 @@ help_text = f"""
 /lap查充电 昵称关键词或uid  （大写也可以）
 /vtb网站 或 /vtb资源 （大写也可以）
 
+
 调用的相关API源自b站官方接口、danmakus.com、ddstats.ericlamm.xyz、biligank.com、laplace.live和vtbs.fun
 """.strip()
 
@@ -107,7 +108,7 @@ catch_str7 = on_command('营收')
 catch_str9 = on_command('涨粉')
 catch_str8 = on_command("vtb网站", aliases={"VTB网站", "Vtb网站", "vtb资源", "VTB资源"})
 catch_str10 = on_command('DD风云榜', aliases={"风云榜", "dd风云榜"})
-catch_str13 = on_command('V详情', aliases={"v详情"})
+catch_str13 = on_command('V详情', aliases={"v详情", "v详细", "V详细"})
 catch_str29 = on_command('V直播势', aliases={"v直播势"})
 catch_str30 = on_command('V急上升', aliases={"v急上升"})
 catch_str31 = on_command('V急下降', aliases={"v急下降"})
@@ -192,18 +193,12 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     page = "0"
     page_size = "3"
 
-    if len(content) > 1:
-        src_uid = content[0]
-        tgt_uid = content[1]
+    if len(content) >= 2:
+        src_uid, tgt_uid, *args = content
+        page, page_size = args[:2] if len(args) >= 2 else (args[0], "3")
     else:
-        msg = '传参错误，命令格式【/查弹幕 用户uid 目标uid 页数(可不填，默认0) 条数(可不填，默认3)】'
+        msg = '\n传参错误，命令格式【/查弹幕 用户uid或昵称 目标uid或昵称 页数(可不填，默认0) 条数(可不填，默认3)】'
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
-
-    if len(content) == 3:
-        page = content[2]
-    elif len(content) > 3:
-        page = content[2]
-        page_size = content[3]
 
     temp = await data_preprocess(src_uid)
     if 0 == temp["code"]:
@@ -222,6 +217,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
 
     nonebot.logger.debug("src_uid:" + src_uid + " tgt_uid:" + tgt_uid)
+
+    await catch_str1.send("正在获取数据中，请耐心等待...")
 
     url = 'https://danmakus.com/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
             '&pagenum=' + page + '&pagesize=' + page_size
@@ -295,16 +292,11 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     page_size = "3"
 
     if len(content) >= 1:
-        src_uid = content[0]
+        src_uid, *args = content
+        page, page_size = args[:2] if len(args) >= 2 else (args[0], "3")
     else:
-        msg = '\n传参错误，命令格式【/查弹幕2 用户uid 页数(可不填，默认0) 条数(可不填，默认3)】'
+        msg = '\n传参错误，命令格式【/查弹幕2 用户uid或昵称 页数(可不填，默认0) 条数(可不填，默认3)】'
         await catch_str11.finish(Message(f'{msg}'), at_sender=True)
-
-    if len(content) == 2:
-        page = content[1]
-    elif len(content) > 2:
-        page = content[1]
-        page_size = content[2]
 
     temp = await data_preprocess(src_uid)
     if 0 == temp["code"]:
@@ -315,6 +307,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str11.finish(Message(f'{msg}'), at_sender=True)
 
     nonebot.logger.debug("src_uid:" + src_uid + " tgt_uid:" + tgt_uid)
+
+    await catch_str11.send("正在获取数据中，请耐心等待...")
 
     url = 'https://danmakus.com/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
             '&pagenum=' + page + '&pagesize=' + page_size
@@ -385,6 +379,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(temp)
         msg = '\n查询不到用户名为：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str.finish(Message(f'{msg}'), at_sender=True)
+
+    await catch_str.send("正在获取数据中，请耐心等待...")
 
     url = 'https://danmakus.com/api/search/user/channel?uid=' + content
     user_info_json = await common_get_return_json(url)
@@ -498,19 +494,18 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
 
-    # 以空格分割 用户uid 最近n场
+    # 以空格分割 用户uid或昵称 最近n场
     content = content.split()
     src_uid = ""
     info_size = "99999"
 
-    if len(content) == 1:
-        src_uid = content[0]
-    elif len(content) > 1:
-        src_uid = content[0]
-        info_size = content[1]
-    else:
-        msg = '\n传参错误，命令格式【/查直播 用户uid 最近场次数】'
+    if len(content) < 1 or len(content) > 3 or content[0] == "":
+        msg = '\n传参错误，命令格式【/查直播 用户uid或昵称 最近场次数】'
         await catch_str3.finish(Message(f'{msg}'), at_sender=True)
+    else:
+        src_uid = content[0]
+        if len(content) > 1 and content[1]:
+            info_size = content[1]
 
     temp = await data_preprocess(src_uid)
     if 0 == temp["code"]:
@@ -518,7 +513,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str3.finish(Message(f'{msg}'), at_sender=True)
+
+    await catch_str3.send("正在获取数据中，请耐心等待...")
 
     url = 'https://danmakus.com/api/info/channel?cid=' + src_uid
     info_json = await common_get_return_json(url)
@@ -604,24 +601,21 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
 
-    # 以空格分割 用户uid 收益类型(默认1: 礼物，2: 上舰，3: SC) 倒叙第n场(从0开始)
+    # 以空格分割 用户uid或昵称 收益类型(默认1: 礼物，2: 上舰，3: SC) 倒叙第n场(从0开始)
     content = content.split()
     src_uid = ""
     live_index = "0"
     income_type = "1"
 
-    if len(content) == 1:
-        src_uid = content[0]
-    elif len(content) == 2:
-        src_uid = content[0]
-        income_type = content[1]
-    elif len(content) > 2:
-        src_uid = content[0]
-        income_type = content[1]
-        live_index = content[2]
-    else:
-        msg = '\n传参错误，命令格式【/查直播 用户uid 收益类型(默认1: 礼物，2: 上舰，3: SC) 倒叙第n场(从0开始)】'
+    if len(content) < 1 or len(content) > 3 or content[0] == "":
+        msg = '\n传参错误，命令格式【/查直播 用户uid或昵称 收益类型(默认1: 礼物，2: 上舰，3: SC) 倒叙第n场(从0开始)】'
         await catch_str4.finish(Message(f'{msg}'), at_sender=True)
+    else:
+        src_uid = content[0]
+        if len(content) > 1 and content[1]:
+            income_type = content[1]
+        if len(content) > 2 and content[2]:
+            live_index = content[2]
 
     temp = await data_preprocess(src_uid)
     if 0 == temp["code"]:
@@ -630,6 +624,33 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         nonebot.logger.info(temp)
         msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息。\nError code：' + str(temp["code"])
         await catch_str.finish(Message(f'{msg}'), at_sender=True)
+
+    # 默认1: 礼物，2: 上舰或舰长，3: SC
+    # 定义了一个名为INCOME_TYPES的字典，其中包含了每种类型收入对应的代码。
+    INCOME_TYPES = {
+        "礼物": "1",
+        "上舰": "2",
+        "舰长": "2",
+        "SC": "3",
+        "sc": "3",
+        "Sc": "3",
+        "1": "1",
+        "2": "2",
+        "3": "3"
+    }
+    # 使用get()方法来获取字典中对应的值，如果找不到则返回默认值"1"
+    income_type = INCOME_TYPES.get(income_type, "1")
+    # nonebot.logger.info("income_type:" + income_type)
+
+    INCOME_TYPE_CHS = {
+        "1": "礼物",
+        "2": "上舰",
+        "3": "舰长",
+    }
+
+    income_type_ch = INCOME_TYPE_CHS.get(income_type, "礼物")
+
+    await catch_str4.send("正在获取数据中，请耐心等待...")
 
     url = 'https://danmakus.com/api/info/channel?cid=' + src_uid
     live_json = await common_get_return_json(url)
@@ -657,23 +678,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         msg = '\n查询用户：' + src_uid + '失败,live_id解析失败,可能原因：场次数不对/无此场次'
         await catch_str4.finish(Message(f'{msg}'), at_sender=True)
 
-    out_str = "#查收益\n\n昵称:" + username + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UID:" + src_uid + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;房间号:" + room_id +\
+    out_str = "#查收益 " + income_type_ch + "\n\n昵称:" + username + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UID:" + src_uid + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;房间号:" + room_id +\
              "\n\n 总直播数:" + totalLiveCount + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总弹幕数:" + totalDanmakuCount + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总收益:￥" + totalIncome + \
               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总直播时长:" + totalLivehour + "h\n\n" + \
               "| 时间 | uid | 昵称 | 内容 | 价格 |\n" \
               "| :-----| :-----| :-----| :-----| :-----|\n"
 
-    # 默认1: 礼物，2: 上舰或舰长，3: SC
-    if income_type == "礼物":
-        income_type = "1"
-    elif income_type == "上舰" or income_type == "舰长":
-        income_type = "2"
-    elif income_type == "SC" or income_type == "sc" or income_type == "Sc":
-        income_type = "3"
-    else:
-        income_type = "1"
-
-    # nonebot.logger.info(out_str + "income_type:" + income_type)
+    # nonebot.logger.info(out_str)
 
     # 获取当场直播信息
     url = 'https://danmakus.com/api/info/live?liveid=' + live_id + '&type=' + income_type + '&uid='
@@ -831,6 +842,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         date_range = content[0]
         size = content[1]
 
+    await catch_str7.send("正在获取数据中，请耐心等待...")
+
     date_ranges = ['月榜', '周榜', '日榜']
     if date_range in date_ranges:
         url = 'https://www.vtbs.fun:8050/rank/income?dateRange=' + await date_range_change(date_range) + '&current=1&size=' + size
@@ -907,6 +920,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     elif len(content) >= 2:
         date_range = content[0]
         size = content[1]
+
+    await catch_str9.send("正在获取数据中，请耐心等待...")
 
     date_ranges = ['月榜', '周榜', '日榜']
     if date_range in date_ranges:
@@ -1008,6 +1023,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         num = '10'
 
+    await catch_str10.send("正在获取数据中，请耐心等待...")
+
     url = 'https://ddstats-api.ericlamm.xyz/stats?top=' + num
     json1 = await common_get_return_json(url)
 
@@ -1076,6 +1093,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str10.finish(Message(f'{msg}'), at_sender=True)
 
 
+# 查牌子
 @catch_str12.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -1109,6 +1127,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str12.finish(Message(f'{msg}'), at_sender=True)
 
 
+# v详情
 @catch_str13.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -1149,6 +1168,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str13.finish(Message(f'{msg}'), at_sender=True)
 
 
+# dmk查用户
 @catch_str14.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -1186,6 +1206,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str14.finish(Message(f'{msg}'), at_sender=True)
 
 
+# dmk查直播
 @catch_str15.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
@@ -1223,6 +1244,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str15.finish(Message(f'{msg}'), at_sender=True)
 
 
+# blg查弹幕
 @catch_str16.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     content = msg.extract_plain_text()
