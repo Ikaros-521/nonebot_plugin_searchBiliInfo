@@ -195,7 +195,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     if len(content) >= 2:
         src_uid, tgt_uid, *args = content
-        page, page_size = args[:2] if len(args) >= 2 else (args[0], "3")
+        page = args[0] if args else "0"
+        page_size = args[1] if len(args) > 1 else "3"
     else:
         msg = '\n传参错误，命令格式【/查弹幕 用户uid或昵称 目标uid或昵称 页数(可不填，默认0) 条数(可不填，默认3)】'
         await catch_str1.finish(Message(f'{msg}'), at_sender=True)
@@ -291,13 +292,14 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     page = "0"
     page_size = "3"
 
-    if len(content) >= 1:
+    if content:
         src_uid, *args = content
-        page, page_size = args[:2] if len(args) >= 2 else (args[0], "3")
+        page = args[0] if args else "0"
+        page_size = args[1] if len(args) > 1 else "3"
     else:
         msg = '\n传参错误，命令格式【/查弹幕2 用户uid或昵称 页数(可不填，默认0) 条数(可不填，默认3)】'
         await catch_str11.finish(Message(f'{msg}'), at_sender=True)
-
+ 
     temp = await data_preprocess(src_uid)
     if 0 == temp["code"]:
         src_uid = temp["uid"]
