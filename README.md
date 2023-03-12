@@ -65,7 +65,7 @@ _✨ NoneBot b站用户信息查询插件 ✨_
   - [/营收](#%E8%90%A5%E6%94%B6)
   - [/涨粉](#%E6%B6%A8%E7%B2%89)
   - [/DD风云榜 或 /dd风云榜 或 /风云榜 (寄了)](#dd%E9%A3%8E%E4%BA%91%E6%A6%9C-%E6%88%96-dd%E9%A3%8E%E4%BA%91%E6%A6%9C-%E6%88%96-%E9%A3%8E%E4%BA%91%E6%A6%9C-%E5%AF%84%E4%BA%86)
-  - [/v详情 或 /V详情](#v%E8%AF%A6%E6%83%85-%E6%88%96-v%E8%AF%A6%E6%83%85)
+  - [/v详情 或 /V详情 或 /v详细 或 /V详细](#v%E8%AF%A6%E6%83%85-%E6%88%96-v%E8%AF%A6%E6%83%85-%E6%88%96-v%E8%AF%A6%E7%BB%86-%E6%88%96-v%E8%AF%A6%E7%BB%86)
   - [/v直播势 或 /V直播势](#v%E7%9B%B4%E6%92%AD%E5%8A%BF-%E6%88%96-v%E7%9B%B4%E6%92%AD%E5%8A%BF)
   - [/v急上升 或 /V急上升](#v%E6%80%A5%E4%B8%8A%E5%8D%87-%E6%88%96-v%E6%80%A5%E4%B8%8A%E5%8D%87)
   - [/v急下降 或 /V急下降](#v%E6%80%A5%E4%B8%8B%E9%99%8D-%E6%88%96-v%E6%80%A5%E4%B8%8B%E9%99%8D)
@@ -83,6 +83,7 @@ _✨ NoneBot b站用户信息查询插件 ✨_
   - [/lap查用户 或 /LAP查用户](#lap%E6%9F%A5%E7%94%A8%E6%88%B7-%E6%88%96-lap%E6%9F%A5%E7%94%A8%E6%88%B7)
   - [/lap查牌子 或 /LAP查牌子](#lap%E6%9F%A5%E7%89%8C%E5%AD%90-%E6%88%96-lap%E6%9F%A5%E7%89%8C%E5%AD%90)
   - [/lap查充电 或 /LAP查充电](#lap%E6%9F%A5%E5%85%85%E7%94%B5-%E6%88%96-lap%E6%9F%A5%E5%85%85%E7%94%B5)
+  - [/lapdd 或 /LAPDD 或 /lapdd排行榜](#lapdd-%E6%88%96-lapdd-%E6%88%96-lapdd%E6%8E%92%E8%A1%8C%E6%A6%9C)
   - [/zero查用户 或 /ZERO查用户](#zero%E6%9F%A5%E7%94%A8%E6%88%B7-%E6%88%96-zero%E6%9F%A5%E7%94%A8%E6%88%B7)
   - [/zero被关注 或 /ZERO被关注](#zero%E8%A2%AB%E5%85%B3%E6%B3%A8-%E6%88%96-zero%E8%A2%AB%E5%85%B3%E6%B3%A8)
   - [/vtb网站](#vtb%E7%BD%91%E7%AB%99)
@@ -92,6 +93,9 @@ _✨ NoneBot b站用户信息查询插件 ✨_
 - [项目打包上传至pypi](#%E9%A1%B9%E7%9B%AE%E6%89%93%E5%8C%85%E4%B8%8A%E4%BC%A0%E8%87%B3pypi)
   - [poetry](#poetry)
   - [twine](#twine)
+- [目录自动生成](#%E7%9B%AE%E5%BD%95%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90)
+  - [安装](#%E5%AE%89%E8%A3%85)
+  - [使用](#%E4%BD%BF%E7%94%A8)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -368,6 +372,12 @@ bot返回内容(图片)：
 bot返回内容(图片)：  
 ![](docs/laplace_upower.png)
 
+### /lapdd 或 /LAPDD 或 /lapdd排行榜
+命令结构：```/lapdd 搜索类型(默认0: 月供，1: 总督，2: 提督，3：舰长)```  
+例如：```/lapdd``` 或 ```/lapdd 1``` 或 ```/LAPDD 舰长```  
+bot返回内容(图片)：  
+![](docs/laplace_dd.png)
+
 ### /zero查用户 或 /ZERO查用户
 命令结构：```/zero查用户 (uid:或UID:或：或:)+用户uid或昵称关键词```  
 例如：```/zero查用户 uid:387636363``` 或 ```/ZERO查用户 雫るる```  
@@ -634,6 +644,11 @@ vtbs.fun活了，加了ssl，已兼容。
 ### 1.6.6
 1.修复`查弹幕`和`查弹幕2`的bug（让GPT帮忙写，很好，bug写得不错）  
 
+### 1.6.7
+1.命令文本消息内容改艾特为回复。  
+2.新增命令`lapdd`或`lapdd排行榜`，截图laplace.live的dd页面。  
+3.优化说明文档。  
+
 </details>
 
 ## 致谢
@@ -696,3 +711,20 @@ twine check dist/*
 # 4、上传包到pypi（需输入用户名、密码）
 twine upload dist/*
 ```
+
+## 目录自动生成
+
+[doctoc](https://github.com/thlorenz/doctoc),在本地git存储库中生成降价文件的目录。链接通过命令行标志兼容github或其他网站生成的锚。
+
+### 安装
+进入包含本地git项目的目录，键入: `npm install -g doctoc`  
+
+### 使用
+在`README.md`中，找个生成目录位置，写入如下代码，确认生成位置：
+```
+<!-- START doctoc -->
+<!-- END doctoc -->
+```
+cmd输入命令即可：`doctoc /path/to/file`  
+例如：`doctoc README.md`  
+

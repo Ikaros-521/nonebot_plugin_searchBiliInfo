@@ -27,7 +27,7 @@ from nonebot.plugin import PluginMetadata
 
 
 help_text = f"""
-插件功能：
+插件功能：（tip：命令如果有英文的，大小写都可以支持）
 /查 昵称关键词或uid(uid需要以:或：或uid:或UID:或uid：打头)
 /查直播 昵称关键词或uid 场次数（默认不写为全部）
 /查舰团 昵称关键词或uid
@@ -43,26 +43,27 @@ help_text = f"""
 /营收 日/周/月榜 人数（不填默认100）
 /涨粉 日/周/月榜 人数（不填默认100）
 /DD风云榜 人数（不填默认10）
-/v详情 昵称关键词或uid  （大写也可以）
-/v直播势  （大写也可以）
-/v急上升  （大写也可以）
-/v急下降  （大写也可以）
-/v舰团  （大写也可以）
-/vdd  （大写也可以）
-/v宏观  （大写也可以）
-/dmk查用户 昵称关键词或uid  （大写也可以）
-/dmk查直播 昵称关键词或uid  （大写也可以）
-/blg查弹幕 昵称关键词或uid  （大写也可以）
-/blg查入场 昵称关键词或uid  （大写也可以）
-/blg查礼物 昵称关键词或uid  （大写也可以）
-/blg直播记录 昵称关键词或uid  （大写也可以）
-/blg直播间sc 昵称关键词或uid  （大写也可以）
-/icu查直播 昵称关键词或uid  （大写也可以）
-/icu查直播 昵称关键词或uid  （大写也可以）
-/lap查用户 昵称关键词或uid  （大写也可以）
-/lap查牌子 昵称关键词或uid  （大写也可以）
-/lap查充电 昵称关键词或uid  （大写也可以）
-/vtb网站 或 /vtb资源 （大写也可以）
+/v详情 昵称关键词或uid
+/v直播势
+/v急上升
+/v急下降
+/v舰团
+/vdd
+/v宏观
+/dmk查用户 昵称关键词或uid
+/dmk查直播 昵称关键词或uid
+/blg查弹幕 昵称关键词或uid
+/blg查入场 昵称关键词或uid
+/blg查礼物 昵称关键词或uid
+/blg直播记录 昵称关键词或uid
+/blg直播间sc 昵称关键词或uid
+/icu查直播 昵称关键词或uid
+/icu查直播 昵称关键词或uid
+/lap查用户 昵称关键词或uid
+/lap查牌子 昵称关键词或uid
+/lap查充电 昵称关键词或uid
+/lapdd排行榜 搜索类型(默认0: 月供，1: 总督，2: 提督，3：舰长)
+/vtb网站 或 /vtb资源
 
 
 调用的相关API源自b站官方接口、danmakus.com、ddstats.ericlamm.xyz、biligank.com、laplace.live和vtbs.fun
@@ -126,6 +127,7 @@ catch_str21 = on_command('icu查直播', aliases={"ICU查直播", "matsuri查直
 catch_str23 = on_command('lap查用户', aliases={"LAP查用户"})
 catch_str24 = on_command('lap查牌子', aliases={"LAP查牌子"})
 catch_str27 = on_command('lap查充电', aliases={"LAP查充电"})
+catch_str36 = on_command('lapdd排行榜', aliases={"lapdd", "LAPDD排行榜", "LAPDD"})
 catch_str25 = on_command('zero查用户', aliases={"ZERO查用户"})
 catch_str28 = on_command('zero被关注', aliases={"ZERO被关注"})
 
@@ -142,7 +144,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到用户名为：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str.finish(Message(f'{msg}'), reply_message=True)
 
     # 传入uid获取用户基本信息
     url = 'https://account.bilibili.com/api/member/getCardByMid?mid=' + content
@@ -150,13 +152,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     if base_info_json == None:
         msg = '\n查询UID：' + content + '的用户信息失败，可能是网络问题或者API寄了喵'
-        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str.finish(Message(f'{msg}'), reply_message=True)
 
     # 获取用户信息失败
     if base_info_json['code'] != 0:
         nonebot.logger.info(base_info_json)
         msg = '\n获取uid：' + content + '，用户信息失败。\nError code：' + str(base_info_json['code'])
-        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str.finish(Message(f'{msg}'), reply_message=True)
 
     # 获取用户直播间id
     room_id = await get_room_id(content)
@@ -170,7 +172,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     if guard_info_json == None:
         msg = "\n请求失败喵~可能是网络问题或者API寄了喵~"
-        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         msg = '\n用户名：' + base_info_json['card']['name'] + '\nUID：' + str(base_info_json['card']['mid']) + \
@@ -178,7 +180,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             guard_info_json['data']['info']['num'])
     except:
         msg = "\n数据解析异常，请重试。（如果多次重试都失败，建议提issue待开发者修复）"
-    await catch_str.finish(Message(f'{msg}'), at_sender=True)
+    await catch_str.finish(Message(f'{msg}'), reply_message=True)
 
 
 # 查弹幕
@@ -199,7 +201,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         page_size = args[1] if len(args) > 1 else "3"
     else:
         msg = '\n传参错误，命令格式【/查弹幕 用户uid或昵称 目标uid或昵称 页数(可不填，默认0) 条数(可不填，默认3)】'
-        await catch_str1.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str1.finish(Message(f'{msg}'), reply_message=True)
 
     temp = await data_preprocess(src_uid)
     if 0 == temp["code"]:
@@ -207,7 +209,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息。\nError code：' + str(temp["code"])
         nonebot.logger.info(temp)
-        await catch_str1.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str1.finish(Message(f'{msg}'), reply_message=True)
     
     temp = await data_preprocess(tgt_uid)
     if 0 == temp["code"]:
@@ -215,11 +217,11 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         msg = '\n查询不到用户名为：' + tgt_uid + ' 的相关信息。\nError code：' + str(temp["code"])
         nonebot.logger.info(temp)
-        await catch_str1.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str1.finish(Message(f'{msg}'), reply_message=True)
 
     nonebot.logger.debug("src_uid:" + src_uid + " tgt_uid:" + tgt_uid)
 
-    await catch_str1.send("正在获取数据中，请耐心等待...")
+    await catch_str1.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     url = 'https://danmakus.com/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
             '&pagenum=' + page + '&pagesize=' + page_size
@@ -227,7 +229,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     if info_json == None:
         msg = '\n果咩，查询信息失败喵~API寄了喵'
-        await catch_str1.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str1.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         # 判断返回代码
@@ -235,11 +237,11 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             msg = '\n查询出错。Error code：' + str(temp["code"])
             nonebot.logger.info(info_json)
 
-            await catch_str1.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str1.finish(Message(f'{msg}'), reply_message=True)
     except (KeyError, TypeError, IndexError) as e:
         msg = '\n果咩，查询信息失败喵~请检查拼写或者是API寄了'
         nonebot.logger.info(e)
-        await catch_str1.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str1.finish(Message(f'{msg}'), reply_message=True)
 
     data_len = 0
     out_str = "#查弹幕\n\n查询用户UID:" + src_uid + \
@@ -269,7 +271,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n返回数据解析异常，寄~（请查日志排查问题）'
-        await catch_str1.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str1.finish(Message(f'{msg}'), reply_message=True)
 
     # 随便定的一个上限值 可以自行修改
     if data_len < 1000:
@@ -277,7 +279,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str1.send(MessageSegment.image(output))
     else:
         msg = '\n果咩，弹幕数大于1000，发不出去喵~（可自行修改源码中的数量上限）'
-        await catch_str1.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str1.finish(Message(f'{msg}'), reply_message=True)
 
 
 # 查弹幕2
@@ -298,7 +300,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         page_size = args[1] if len(args) > 1 else "3"
     else:
         msg = '\n传参错误，命令格式【/查弹幕2 用户uid或昵称 页数(可不填，默认0) 条数(可不填，默认3)】'
-        await catch_str11.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str11.finish(Message(f'{msg}'), reply_message=True)
  
     temp = await data_preprocess(src_uid)
     if 0 == temp["code"]:
@@ -306,11 +308,11 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str11.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str11.finish(Message(f'{msg}'), reply_message=True)
 
     nonebot.logger.debug("src_uid:" + src_uid + " tgt_uid:" + tgt_uid)
 
-    await catch_str11.send("正在获取数据中，请耐心等待...")
+    await catch_str11.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     url = 'https://danmakus.com/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
             '&pagenum=' + page + '&pagesize=' + page_size
@@ -318,17 +320,17 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     if info_json == None:
         msg = '\n果咩，查询信息失败喵~API寄了喵'
-        await catch_str11.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str11.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         # 判断返回代码
         if info_json['code'] != 200:
             msg = '\n查询出错。接口返回：\n' + json.dumps(info_json, indent=2, ensure_ascii=False)
-            await catch_str11.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str11.finish(Message(f'{msg}'), reply_message=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n果咩，查询信息失败喵~请检查拼写或者是API寄了'
-        await catch_str11.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str11.finish(Message(f'{msg}'), reply_message=True)
 
     data_len = 0
     out_str = "#查弹幕2\n\n查询用户UID:" + src_uid + \
@@ -359,14 +361,14 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n返回数据解析异常，寄~（请查日志排查问题）'
-        await catch_str11.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str11.finish(Message(f'{msg}'), reply_message=True)
 
     if data_len < 1000:
         output = await md_to_pic(md=out_str, width=1100)
         await catch_str11.send(MessageSegment.image(output))
     else:
         msg = '\n果咩，弹幕数大于1000，发不出去喵~（可自行修改源码中的数量上限）'
-        await catch_str11.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str11.finish(Message(f'{msg}'), reply_message=True)
 
 
 # 查观看
@@ -380,26 +382,26 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到用户名为：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str.send("正在获取数据中，请耐心等待...")
+    await catch_str.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     url = 'https://danmakus.com/api/search/user/channel?uid=' + content
     user_info_json = await common_get_return_json(url)
 
     if user_info_json == None:
         msg = '\n果咩，查询用户信息失败喵~API寄了喵'
-        await catch_str2.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str2.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         # 判断返回代码
         if user_info_json['code'] != 200:
             msg = '\n查询用户：' + content + '失败'
-            await catch_str2.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str2.finish(Message(f'{msg}'), reply_message=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n果咩，查询用户信息失败喵~请检查拼写或者是API寄了'
-        await catch_str2.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str2.finish(Message(f'{msg}'), reply_message=True)
 
     # 创建一个计数器对象，并对重复的uId进行计数
     uid_counter = Counter([(item['uId'], item['name'], item['roomId']) for item in user_info_json['data']])
@@ -427,7 +429,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str2.send(MessageSegment.image(output))
     else:
         msg = '\n果咩，dd数大于2000，发不出去喵~（可自行修改源码中的数量上限）'
-        await catch_str2.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str2.finish(Message(f'{msg}'), reply_message=True)
 
 
 # 查观看2
@@ -441,9 +443,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str26.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str26.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str26.send("正在获取数据中，请耐心等待...")
+    await catch_str26.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     
     url = 'https://danmakus.com/api/search/user/channel?uid=' + content
@@ -451,17 +453,17 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     if user_info_json == None:
         msg = '\n果咩，查询用户信息失败喵~API寄了喵'
-        await catch_str26.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str26.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         # 判断返回代码
         if user_info_json['code'] != 200:
             msg = '\n查询用户：' + content + '失败'
-            await catch_str26.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str26.finish(Message(f'{msg}'), reply_message=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n果咩，查询用户信息失败喵~请检查拼写或者是API寄了'
-        await catch_str26.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str26.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         dir_path = Path(__file__).parent
@@ -482,13 +484,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str26.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str26.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str26.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str26.finish(Message(f'{msg}'), reply_message=True)
 
 
 # 查直播
@@ -503,7 +505,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     if len(content) < 1 or len(content) > 3 or content[0] == "":
         msg = '\n传参错误，命令格式【/查直播 用户uid或昵称 最近场次数】'
-        await catch_str3.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str3.finish(Message(f'{msg}'), reply_message=True)
     else:
         src_uid = content[0]
         if len(content) > 1 and content[1]:
@@ -515,26 +517,26 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str3.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str3.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str3.send("正在获取数据中，请耐心等待...")
+    await catch_str3.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     url = 'https://danmakus.com/api/info/channel?cid=' + src_uid
     info_json = await common_get_return_json(url)
 
     if info_json == None:
         msg = '\n查询用户：' + src_uid + '失败，API寄了喵'
-        await catch_str3.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str3.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         # 判断返回代码
         if info_json['code'] != 200:
             msg = '\n查询用户：' + src_uid + '失败，请检查拼写或者是API寄了\nError code：' + str(info_json["code"])
-            await catch_str3.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str3.finish(Message(f'{msg}'), reply_message=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询用户：' + src_uid + '失败，请检查拼写或者是API寄了'
-        await catch_str3.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str3.finish(Message(f'{msg}'), reply_message=True)
 
     out_str = ""
     try:
@@ -550,7 +552,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n解析数据异常（请查日志排查问题）'
-        await catch_str3.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str3.finish(Message(f'{msg}'), reply_message=True)
 
     for i in range(len(info_json["data"]["lives"])):
         # 达到指定数量场次
@@ -595,7 +597,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str3.send(MessageSegment.image(output))
     else:
         msg = '\n果咩，直播数大于2000，发不出去喵~'
-        await catch_str3.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str3.finish(Message(f'{msg}'), reply_message=True)
 
 
 # 查收益
@@ -611,7 +613,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     if len(content) < 1 or len(content) > 3 or content[0] == "":
         msg = '\n传参错误，命令格式【/查直播 用户uid或昵称 收益类型(默认1: 礼物，2: 上舰，3: SC) 倒叙第n场(从0开始)】'
-        await catch_str4.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str4.finish(Message(f'{msg}'), reply_message=True)
     else:
         src_uid = content[0]
         if len(content) > 1 and content[1]:
@@ -625,7 +627,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到用户名为：' + src_uid + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str.finish(Message(f'{msg}'), reply_message=True)
 
     # 默认1: 礼物，2: 上舰或舰长，3: SC
     # 定义了一个名为INCOME_TYPES的字典，其中包含了每种类型收入对应的代码。
@@ -652,7 +654,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     income_type_ch = INCOME_TYPE_CHS.get(income_type, "礼物")
 
-    await catch_str4.send("正在获取数据中，请耐心等待...")
+    await catch_str4.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     url = 'https://danmakus.com/api/info/channel?cid=' + src_uid
     live_json = await common_get_return_json(url)
@@ -661,11 +663,11 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         # 判断返回代码
         if live_json['code'] != 200:
             msg = '\n查询用户：' + src_uid + ' 直播信息失败，请检查拼写或者是API寄了\nError code：' + str(live_json["code"])
-            await catch_str4.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str4.finish(Message(f'{msg}'), reply_message=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询用户：' + src_uid + ' 直播信息失败，请检查拼写或者是API寄了'
-        await catch_str4.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str4.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         live_id = live_json['data']['lives'][int(live_index)]['liveId']
@@ -678,7 +680,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询用户：' + src_uid + '失败,live_id解析失败,可能原因：场次数不对/无此场次'
-        await catch_str4.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str4.finish(Message(f'{msg}'), reply_message=True)
 
     out_str = "#查收益 " + income_type_ch + "\n\n昵称:" + username + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UID:" + src_uid + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;房间号:" + room_id +\
              "\n\n 总直播数:" + totalLiveCount + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总弹幕数:" + totalDanmakuCount + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总收益:￥" + totalIncome + \
@@ -694,16 +696,16 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     if info_json == None:
         msg = '\n查询用户：' + src_uid + ' 场次数据失败，API寄了喵'
-        await catch_str4.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str4.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         if info_json['code'] != 200:
             msg = '\n查询用户：' + src_uid + ' 场次数据失败，请检查拼写或者是API寄了\nError code：' + str(temp["code"])
-            await catch_str4.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str4.finish(Message(f'{msg}'), reply_message=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询用户：' + src_uid + ' 场次数据失败，请检查拼写或者是API寄了'
-        await catch_str4.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str4.finish(Message(f'{msg}'), reply_message=True)
 
     # 遍历弹幕信息
     for i in range(len(info_json["data"]["danmakus"])):
@@ -725,7 +727,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str4.send(MessageSegment.image(output))
     else:
         msg = '\n果咩，礼物数大于2000，发不出去喵~（可修改源码增大上限）'
-        await catch_str4.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str4.finish(Message(f'{msg}'), reply_message=True)
 
 
 @catch_str5.handle()
@@ -740,7 +742,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到UID：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str5.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str5.finish(Message(f'{msg}'), reply_message=True)
 
     # 传入uid获取用户基本信息
     url = 'https://account.bilibili.com/api/member/getCardByMid?mid=' + content
@@ -748,32 +750,32 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     if base_info_json == None:
         msg = '\n查询UID：' + content + '的用户信息失败，可能是网络问题或者API寄了喵'
-        await catch_str5.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str5.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         if base_info_json['code'] != 0:
             nonebot.logger.info(base_info_json)
             msg = '\n获取uid：' + content + '，用户信息失败。\nError code：' + str(base_info_json["code"])
-            await catch_str5.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str5.finish(Message(f'{msg}'), reply_message=True)
         username = base_info_json["card"]["name"]
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询UID：' + content + '的用户名失败，请检查拼写/API寄了'
-        await catch_str5.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str5.finish(Message(f'{msg}'), reply_message=True)
 
     url = 'https://api.vtbs.moe/v1/guard/' + content
     guard_info_json = await common_get_return_json(url)
 
     if guard_info_json == None:
         msg = '\n查询UID：' + content + '失败，API寄了喵，请进行问题排查~'
-        await catch_str5.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str5.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         guard_len = len(guard_info_json)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询UID：' + content + '失败，请检查拼写/没有舰团/API寄了'
-        await catch_str5.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str5.finish(Message(f'{msg}'), reply_message=True)
 
     out_str = "#查舰团\n\n查询用户名:" + username + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UID:" + content + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;舰团数:" + str(guard_len) + "\n\n" + \
               "| 昵称 | UID | 舰团类型 |\n" \
@@ -795,7 +797,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询UID：' + content + '失败，请检查拼写/没有舰团/API寄了'
-        await catch_str5.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str5.finish(Message(f'{msg}'), reply_message=True)
 
     output = await md_to_pic(md=out_str, width=500)
     await catch_str5.send(MessageSegment.image(output))
@@ -813,20 +815,20 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     if info_json == None:
         msg = '\n网络出问题了或者接口寄了喵~'
-        await catch_str6.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str6.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         result = info_json['data']['result']
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询无结果，请检查拼写或是接口寄了'
-        await catch_str6.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str6.finish(Message(f'{msg}'), reply_message=True)
 
     msg = "\n 查询用户名：" + content + "\n" + \
           " 显示格式为：【 UID  昵称  粉丝数 】\n"
     for i in range(len(result)):
         msg += " 【 " + str(result[i]["mid"]) + "  " + result[i]["uname"] + "  " + str(result[i]["fans"]) + ' 】\n'
-    await catch_str6.finish(Message(f'{msg}'), at_sender=True)
+    await catch_str6.finish(Message(f'{msg}'), reply_message=True)
 
 
 @catch_str7.handle()
@@ -844,7 +846,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         date_range = content[0]
         size = content[1]
 
-    await catch_str7.send("正在获取数据中，请耐心等待...")
+    await catch_str7.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     date_ranges = ['月榜', '周榜', '日榜']
     if date_range in date_ranges:
@@ -852,21 +854,21 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         json1 = await common_get_return_json(url)
     else:
         msg = '\n命令错误，例如：【/营收 月榜】【/营收 周榜 10】【/营收 日榜 3】'
-        await catch_str7.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str7.finish(Message(f'{msg}'), reply_message=True)
 
     if json1 == None:
         msg = '\n请求失败，可能是网络问题或者接口寄了喵~'
-        await catch_str7.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str7.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         if json1["code"] != 200:
             nonebot.logger.info(json1)
             msg = '\n请求失败，寄了喵。\nError code：' + str(json1["code"])
-            await catch_str7.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str7.finish(Message(f'{msg}'), reply_message=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n请求解析失败，接口寄了喵'
-        await catch_str7.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str7.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         out_str = "#VTB营收" + date_range + "\n" + \
@@ -904,7 +906,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n数据解析失败，寄了喵（请查看日志排查问题）'
-        await catch_str7.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str7.finish(Message(f'{msg}'), reply_message=True)
 
 
 # VTB涨粉
@@ -923,7 +925,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         date_range = content[0]
         size = content[1]
 
-    await catch_str9.send("正在获取数据中，请耐心等待...")
+    await catch_str9.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     date_ranges = ['月榜', '周榜', '日榜']
     if date_range in date_ranges:
@@ -932,21 +934,21 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         json1 = await common_get_return_json(url)
     else:
         msg = '\n命令错误，例如：【/涨粉 月榜】【/涨粉 周榜 10】【/涨粉 日榜 3】'
-        await catch_str9.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str9.finish(Message(f'{msg}'), reply_message=True)
 
     if json1 == None:
         msg = '\n请求失败，可能是网络问题或者接口寄了喵~'
-        await catch_str9.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str9.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         if json1["code"] != 200:
             nonebot.logger.info(json1)
             msg = '\n请求失败，寄了喵。\n接口返回：\nError code：' + str(json1["code"])
-            await catch_str9.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str9.finish(Message(f'{msg}'), reply_message=True)
     except (KeyError, TypeError, IndexError) as e:
         msg = '\n请求解析失败，接口寄了喵'
         nonebot.logger.info(e)
-        await catch_str9.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str9.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         out_str = "#VTB涨粉" + date_range + "\n" + \
@@ -993,7 +995,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n数据解析失败，寄了喵（请查看日志排查问题）'
-        await catch_str9.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str9.finish(Message(f'{msg}'), reply_message=True)
 
 
 @catch_str8.handle()
@@ -1010,7 +1012,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         '\nzeroroku：https://zeroroku.com/bilibili' \
         '\nlaplace：https://laplace.live/'
         
-    await catch_str8.finish(Message(f'{msg}'), at_sender=True)
+    await catch_str8.finish(Message(f'{msg}'), reply_message=True)
 
 
 # DD风云榜
@@ -1025,24 +1027,24 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         num = '10'
 
-    await catch_str10.send("正在获取数据中，请耐心等待...")
+    await catch_str10.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     url = 'https://ddstats-api.ericlamm.xyz/stats?top=' + num
     json1 = await common_get_return_json(url)
 
     if json1 == None:
         msg = '\n请求失败，接口寄了喵'
-        await catch_str10.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str10.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         if json1["code"] != 200:
             nonebot.logger.info(json1)
             msg = '\n请求失败，寄了喵。\nError code：' + str(json1["code"])
-            await catch_str10.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str10.finish(Message(f'{msg}'), reply_message=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n请求解析失败，接口寄了喵'
-        await catch_str10.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str10.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         out_str = "#DD风云榜\n" + \
@@ -1092,7 +1094,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n数据解析失败，寄了喵（请查看日志排查问题）'
-        await catch_str10.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str10.finish(Message(f'{msg}'), reply_message=True)
 
 
 # 查牌子
@@ -1126,7 +1128,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n查询不到此牌子的数据（可能是数据不足或不存在此牌子喵~）'
-        await catch_str12.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str12.finish(Message(f'{msg}'), reply_message=True)
 
 
 # v详情
@@ -1140,9 +1142,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str13.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str13.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str13.send("正在获取数据中，请耐心等待...")
+    await catch_str13.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 1415, "height": 1920}) as page:
@@ -1161,13 +1163,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str13.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str13.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str13.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str13.finish(Message(f'{msg}'), reply_message=True)
 
 
 # dmk查用户
@@ -1181,9 +1183,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"]) 
-        await catch_str14.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str14.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str14.send("正在获取数据中，请耐心等待...")
+    await catch_str14.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 1040, "height": 2500}) as page:
@@ -1199,13 +1201,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str14.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str14.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str14.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str14.finish(Message(f'{msg}'), reply_message=True)
 
 
 # dmk查直播
@@ -1219,9 +1221,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str15.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str15.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str15.send("正在获取数据中，请耐心等待...")
+    await catch_str15.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 850, "height": 2000}) as page:
@@ -1237,13 +1239,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str15.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str15.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str15.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str15.finish(Message(f'{msg}'), reply_message=True)
 
 
 # blg查弹幕
@@ -1257,9 +1259,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str16.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str16.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str16.send("正在获取数据中，请耐心等待...")
+    await catch_str16.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 800, "height": 200}) as page:
@@ -1275,13 +1277,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str16.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str16.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str16.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str16.finish(Message(f'{msg}'), reply_message=True)
 
 
 # blg查入场
@@ -1295,9 +1297,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str17.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str17.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str17.send("正在获取数据中，请耐心等待...")
+    await catch_str17.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 800, "height": 200}) as page:
@@ -1313,13 +1315,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str17.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str17.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str17.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str17.finish(Message(f'{msg}'), reply_message=True)
 
 
 # blg查礼物
@@ -1333,9 +1335,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str18.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str18.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str18.send("正在获取数据中，请耐心等待...")
+    await catch_str18.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 800, "height": 200}) as page:
@@ -1351,13 +1353,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str18.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str18.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str18.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str18.finish(Message(f'{msg}'), reply_message=True)
 
 
 # blg直播记录
@@ -1371,9 +1373,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str19.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str19.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str19.send("正在获取数据中，请耐心等待...")
+    await catch_str19.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 1000, "height": 200}) as page:
@@ -1389,13 +1391,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str19.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str19.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str19.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str19.finish(Message(f'{msg}'), reply_message=True)
 
 
 # blg直播间sc
@@ -1409,9 +1411,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str20.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str20.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str20.send("正在获取数据中，请耐心等待...")
+    await catch_str20.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 1000, "height": 200}) as page:
@@ -1427,13 +1429,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str20.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str20.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str20.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str20.finish(Message(f'{msg}'), reply_message=True)
 
 
 # icu查直播
@@ -1447,9 +1449,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str21.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str21.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str21.send("正在获取数据中，请耐心等待...")
+    await catch_str21.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 1200, "height": 300}) as page:
@@ -1465,13 +1467,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str21.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str21.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str21.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str21.finish(Message(f'{msg}'), reply_message=True)
 
 
 # 查人气
@@ -1485,7 +1487,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str22.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str22.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         url = 'https://api.vtbs.moe/v1/detail/' + content
@@ -1493,16 +1495,16 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
         if data_json == None:
             msg = '\n查询不到：' + content + ' 的相关信息。\n可能是网络问题或API寄了或是vtbs.moe没有收录喵，可以自行去官网添加。'
-            await catch_str22.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str22.finish(Message(f'{msg}'), reply_message=True)
 
         msg = "UID:" + content + "\n最近一场直播的人气峰值：" + str(data_json["lastLive"]["online"])
-        await catch_str22.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str22.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n查询失败喵（看看后台日志吧）'
-        await catch_str22.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str22.finish(Message(f'{msg}'), reply_message=True)
 
 
 # lap查用户
@@ -1516,9 +1518,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str23.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str23.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str23.send("正在获取数据中，请耐心等待...")
+    await catch_str23.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 758, "height": 300}) as page:
@@ -1552,13 +1554,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str23.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str23.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str23.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str23.finish(Message(f'{msg}'), reply_message=True)
 
 
 # lap查牌子
@@ -1572,14 +1574,14 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str24.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str24.finish(Message(f'{msg}'), reply_message=True)
 
     url = 'https://laplace.live/api/user-medals/' + content
     data_json = await common_get_return_json(url)
 
     if data_json == None:
         msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了'
-        await catch_str24.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str24.finish(Message(f'{msg}'), reply_message=True)
 
     # nonebot.logger.info(data_json)
 
@@ -1600,7 +1602,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询UID：' + content + '失败，数据解析失败，请查看后台日志排查'
-        await catch_str24.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str24.finish(Message(f'{msg}'), reply_message=True)
 
     output = await md_to_pic(md=out_str, width=800)
     await catch_str24.send(MessageSegment.image(output))
@@ -1617,23 +1619,23 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str27.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str27.finish(Message(f'{msg}'), reply_message=True)
 
     url = 'https://edge-fetcher.xn--7dvy22i.com/api/bilibili/upower/' + content
     data_json = await common_get_return_json(url)
 
     if data_json == None:
         msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了'
-        await catch_str27.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str27.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         if data_json['code'] != 0:
             msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了\nError code：' + str(data_json["code"])
-            await catch_str27.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str27.finish(Message(f'{msg}'), reply_message=True)
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了\nError code：' + str(data_json["code"])
-        await catch_str27.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str27.finish(Message(f'{msg}'), reply_message=True)
 
     # nonebot.logger.info(data_json)
 
@@ -1654,7 +1656,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询UID：' + content + '失败，数据解析失败，请查看后台日志排查'
-        await catch_str27.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str27.finish(Message(f'{msg}'), reply_message=True)
 
     output = await md_to_pic(md=out_str, width=800)
     await catch_str27.send(MessageSegment.image(output))
@@ -1671,9 +1673,9 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str25.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str25.finish(Message(f'{msg}'), reply_message=True)
 
-    await catch_str25.send("正在获取数据中，请耐心等待...")
+    await catch_str25.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 800, "height": 300}) as page:
@@ -1693,13 +1695,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str25.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str25.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str25.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str25.finish(Message(f'{msg}'), reply_message=True)
 
 
 # zero被关注
@@ -1713,23 +1715,23 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str28.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str28.finish(Message(f'{msg}'), reply_message=True)
 
     url = 'https://api.zeroroku.com/bilibili/author/famous-fans?mid=' + content
     data_json = await common_get_return_json(url)
 
     if data_json == None:
         msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了'
-        await catch_str28.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str28.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         if len(data_json) == 0:
             msg = '\n查询UID：' + content + '，无被关注数据，over~'
-            await catch_str28.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str28.finish(Message(f'{msg}'), reply_message=True)
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n查询UID：' + content + '的数据失败，请检查拼写/API寄了\nError code：' + str(data_json["code"])
-        await catch_str28.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str28.finish(Message(f'{msg}'), reply_message=True)
 
     # nonebot.logger.info(data_json)
 
@@ -1749,7 +1751,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n查询UID：' + content + '失败，数据解析失败，请查看后台日志排查'
-        await catch_str28.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str28.finish(Message(f'{msg}'), reply_message=True)
 
     output = await md_to_pic(md=out_str, width=600)
     await catch_str28.send(MessageSegment.image(output))
@@ -1758,7 +1760,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 # v直播势
 @catch_str29.handle()
 async def _(bot: Bot, event: Event):
-    await catch_str29.send("正在获取数据中，请耐心等待...")
+    await catch_str29.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 950, "height": 3000}) as page:
@@ -1774,19 +1776,19 @@ async def _(bot: Bot, event: Event):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str29.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str29.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str29.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str29.finish(Message(f'{msg}'), reply_message=True)
 
 
 # v急上升
 @catch_str30.handle()
 async def _(bot: Bot, event: Event):
-    await catch_str30.send("正在获取数据中，请耐心等待...")
+    await catch_str30.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 950, "height": 3000}) as page:
@@ -1802,19 +1804,19 @@ async def _(bot: Bot, event: Event):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str30.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str30.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str30.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str30.finish(Message(f'{msg}'), reply_message=True)
 
 
 # v急下降
 @catch_str31.handle()
 async def _(bot: Bot, event: Event):
-    await catch_str31.send("正在获取数据中，请耐心等待...")
+    await catch_str31.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 950, "height": 3000}) as page:
@@ -1830,19 +1832,19 @@ async def _(bot: Bot, event: Event):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str31.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str31.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str31.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str31.finish(Message(f'{msg}'), reply_message=True)
 
 
 # v舰团
 @catch_str32.handle()
 async def _(bot: Bot, event: Event):
-    await catch_str32.send("正在获取数据中，请耐心等待...")
+    await catch_str32.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 950, "height": 3000}) as page:
@@ -1858,19 +1860,19 @@ async def _(bot: Bot, event: Event):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str32.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str32.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str32.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str32.finish(Message(f'{msg}'), reply_message=True)
 
 
 # VDD风云榜
 @catch_str33.handle()
 async def _(bot: Bot, event: Event):
-    await catch_str33.send("正在获取数据中，请耐心等待...")
+    await catch_str33.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
         async with get_new_page(viewport={"width": 950, "height": 20000}) as page:
@@ -1887,13 +1889,13 @@ async def _(bot: Bot, event: Event):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str33.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str33.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str33.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str33.finish(Message(f'{msg}'), reply_message=True)
 
 
 # V宏观
@@ -1918,13 +1920,13 @@ async def _(bot: Bot, event: Event):
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
-        await catch_str34.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str34.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n打开页面失败喵（看看后台日志吧）'
-        await catch_str34.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str34.finish(Message(f'{msg}'), reply_message=True)
 
 
 # 查装扮
@@ -1938,7 +1940,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '\n查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str35.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str35.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         # 默认第一页 100个（应该够了）
@@ -1947,21 +1949,21 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n请求失败，寄了喵（请查看日志排查问题）'
-        await catch_str10.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str10.finish(Message(f'{msg}'), reply_message=True)
 
     if json1 == None:
         msg = '\n查询不到：' + content + ' 的相关信息。\n可能是网络问题或API寄了'
-        await catch_str35.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str35.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         if json1["code"] != 0:
             nonebot.logger.info(json1)
             msg = '\n请求失败，寄了喵。\nError code：' + str(json1["code"])
-            await catch_str35.finish(Message(f'{msg}'), at_sender=True)
+            await catch_str35.finish(Message(f'{msg}'), reply_message=True)
     except (KeyError, TypeError, IndexError) as e:
         nonebot.logger.info(e)
         msg = '\n请求解析失败，接口寄了喵'
-        await catch_str35.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str35.finish(Message(f'{msg}'), reply_message=True)
 
     try:
         out_str = "#查装扮\n查询UID：" + content + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;装扮总数：" + str(json1['data']['count']) + "\n\n" + \
@@ -1989,7 +1991,67 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     except Exception as e:
         nonebot.logger.info(e)
         msg = '\n数据解析失败，寄了喵（请查看日志排查问题）'
-        await catch_str35.finish(Message(f'{msg}'), at_sender=True)
+        await catch_str35.finish(Message(f'{msg}'), reply_message=True)
+
+
+# LAPDD排行榜
+@catch_str36.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+    radio_sort = "radio-sort-price"
+
+    content = content.split()
+
+    if len(content) > 1:
+        msg = '\n传参错误，命令格式【/lapdd 搜索类型(默认0: 月供，1: 总督，2: 提督，3：舰长)】'
+        await catch_str36.finish(Message(f'{msg}'), reply_message=True)
+
+    # 默认0: 月供，1: 总督，2: 提督，3：舰长
+    RADIO_SORTS = {
+        "月供": "radio-sort-price",
+        "总督": "radio-sort-t1",
+        "提督": "radio-sort-t2",
+        "舰长": "radio-sort-t3",
+        "0": "radio-sort-price",
+        "1": "radio-sort-t1",
+        "2": "radio-sort-t2",
+        "3": "radio-sort-t3"
+    }
+    # 使用get()方法来获取字典中对应的值，如果找不到则返回默认值
+    radio_sort = RADIO_SORTS.get(content[0], "radio-sort-price")
+
+    await catch_str36.send("正在获取数据中，请耐心等待...", reply_message=True)
+
+    try:
+        async with get_new_page(viewport={"width": 530, "height": 29999}) as page:
+            await page.goto(
+                "https://laplace.live/dd",
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            await page.wait_for_selector('.jsx-a9b5b32e4de3b53c')
+            click_js = 'document.getElementById("' + radio_sort + '").click();document.getElementById("showVup").click()'
+            # 执行 JavaScript 代码
+            result = await page.evaluate(click_js)
+            nonebot.logger.debug(result)
+            await page.wait_for_selector('.item')
+            # 渲染比较慢，建议多等等，等待个10秒
+            await page.wait_for_timeout(10)
+            await asyncio.sleep(10)
+            temp_path = "./data/laplace.live_dd" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=False, path=temp_path)
+
+        await catch_str36.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str36.finish(Message(f'{msg}'), reply_message=True)
+    except FinishedException:
+        pass
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = '\n打开页面失败喵（看看后台日志吧）'
+        await catch_str36.finish(Message(f'{msg}'), reply_message=True)
 
 
 
