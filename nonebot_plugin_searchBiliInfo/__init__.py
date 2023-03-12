@@ -2005,6 +2005,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     if len(content) > 1:
         msg = '\n传参错误，命令格式【/lapdd 搜索类型(默认0: 月供，1: 总督，2: 提督，3：舰长)】'
         await catch_str36.finish(Message(f'{msg}'), reply_message=True)
+    elif len(content) == 0:
+        content = ["月供"]
 
     # 默认0: 月供，1: 总督，2: 提督，3：舰长
     RADIO_SORTS = {
