@@ -6,12 +6,14 @@ import time, datetime
 from collections import Counter
 from pathlib import Path
 
-from nonebot import on_command, on_regex
+from nonebot import require, on_command, on_regex
 from nonebot.adapters.onebot.v11 import Bot, Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 from nonebot.typing import T_State
 from nonebot.params import CommandArg
 from nonebot.exception import FinishedException
+
+require("nonebot_plugin_htmlrender")
 
 from nonebot_plugin_htmlrender import (
     md_to_pic,
