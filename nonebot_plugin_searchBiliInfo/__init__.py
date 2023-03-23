@@ -2157,14 +2157,40 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str38.finish(Message(f'{msg}'), reply_message=True)
 
     try:
-        msg = MessageSegment.image(file=("http://eihei.gendaimahou.net/listen/livepic.php?uid=" + content))
-        await catch_str38.finish(Message(msg))
+        async with get_new_page(viewport={"width": 760, "height": 1100}) as page:
+            await page.goto(
+                "https://eihei.gendaimahou.net/listen/livepic.php?uid=" + content,
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            await page.wait_for_selector('img')
+            js_str = 'document.getElementsByTagName("img")[0].style.width="720px"'
+            # 执行 JavaScript 代码
+            result = await page.evaluate(js_str)
+            temp_path = "./data/eihei_livepic" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
+
+        await catch_str38.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str38.finish(Message(f'{msg}'), reply_message=True)
     except FinishedException:
         pass
     except Exception as e:
         nonebot.logger.info(e)
-        msg = "发送失败，请检查后台日志排查问题喵~"
+        msg = '打开页面失败喵（看看后台日志吧）'
         await catch_str38.finish(Message(f'{msg}'), reply_message=True)
+
+    # try:
+    #     msg = MessageSegment.image(file=("http://eihei.gendaimahou.net/listen/livepic.php?uid=" + content))
+    #     await catch_str38.finish(Message(msg))
+    # except FinishedException:
+    #     pass
+    # except Exception as e:
+    #     nonebot.logger.info(e)
+    #     msg = "发送失败，请检查后台日志排查问题喵~"
+    #     await catch_str38.finish(Message(f'{msg}'), reply_message=True)
 
 
 
