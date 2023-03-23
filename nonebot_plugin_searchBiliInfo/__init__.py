@@ -67,6 +67,7 @@ help_text = f"""
 /lapdd排行榜 搜索类型(默认0: 月供，1: 总督，2: 提督，3：舰长)
 /斗虫 主播1的昵称关键词或uid 主播2的昵称关键词或uid 主播n的昵称关键词或uid（主播数得至少2个） 日期起始偏移值(就是以今天开始前推n天，例如:2，就是前天) 日期结束偏移值
 /vtb网站 或 /vtb资源
+/eh查直播 或 /诶嘿查直播
 
 
 调用的相关API源自b站官方接口、danmakus.com、ddstats.ericlamm.xyz、biligank.com、laplace.live、vtbs.fun、stats.nailv.live
@@ -136,7 +137,7 @@ catch_str28 = on_command('zero被关注', aliases={"ZERO被关注"})
 #catch_str37 = on_regex(r"(?P<option>斗虫|主播pk|主播PK) (?P<usernames>(?:[\u4e00-\u9fa5\w\d]{1,30} ){1,})(?:#(?P<start_offset>\d*) (?P<end_offset>\d*))?")
 #catch_str37 = on_regex(r"(?P<option>斗虫|主播pk|主播PK) (?P<usernames>(?:[\u4e00-\u9fa5\w\d]{1,30} ){1,})(?:#(?P<start_offset>\d*) (?P<end_offset>\d*))?")
 catch_str37 = on_regex(r"(?P<option>斗虫|主播pk|主播PK) (?P<usernames>(?:[\u4e00-\u9fa5\w\d]{1,30}(?: )?){1,})(?:#(?P<start_offset>\d*) (?P<end_offset>\d*))?")
-
+catch_str38 = on_command('eh查直播', aliases={"诶嘿查直播", "eihei查直播"})
 
 # 查
 @catch_str.handle()
@@ -176,7 +177,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         guard_info_json = await common_get_return_json(url)
 
     if guard_info_json == None:
-        msg = "\n请求失败喵~可能是网络问题或者API寄了喵~"
+        msg = "请求失败喵~可能是网络问题或者API寄了喵~"
         await catch_str.finish(Message(f'{msg}'), reply_message=True)
 
     try:
@@ -184,7 +185,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             '\n房间号：' + str(room_id) + '\n粉丝数：' + str(base_info_json['card']['fans']) + '\n舰团数：' + str(
             guard_info_json['data']['info']['num'])
     except:
-        msg = "\n数据解析异常，请重试。（如果多次重试都失败，建议提issue待开发者修复）"
+        msg = "数据解析异常，请重试。（如果多次重试都失败，建议提issue待开发者修复）"
     await catch_str.finish(Message(f'{msg}'), reply_message=True)
 
 
@@ -2140,6 +2141,31 @@ async def _(bot: Bot, event: Event, state: T_State):
         nonebot.logger.info(e)
         msg = '打开页面失败喵（看看后台日志吧）'
         await catch_str37.finish(Message(f'{msg}'), reply_message=True)
+
+
+# eh查直播
+@catch_str38.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text().strip()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '查询不到用户名为：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str.finish(Message(f'{msg}'), reply_message=True)
+
+    try:
+        msg = MessageSegment.image(file=("https://eihei.gendaimahou.net/listen/livepic.php?uid=" + content))
+        await catch_str38.finish(Message(msg))
+    except FinishedException:
+        pass
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = "发送失败，请检查后台日志排查问题喵~"
+        await catch_str38.finish(Message(f'{msg}'), reply_message=True)
+
 
 
 # 日/周/月榜转Unicode
