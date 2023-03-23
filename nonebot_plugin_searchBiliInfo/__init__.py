@@ -2154,10 +2154,10 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     else:
         nonebot.logger.info(temp)
         msg = '查询不到用户名为：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
-        await catch_str.finish(Message(f'{msg}'), reply_message=True)
+        await catch_str38.finish(Message(f'{msg}'), reply_message=True)
 
     try:
-        msg = MessageSegment.image(file=("https://eihei.gendaimahou.net/listen/livepic.php?uid=" + content))
+        msg = MessageSegment.image(file=("http://eihei.gendaimahou.net/listen/livepic.php?uid=" + content))
         await catch_str38.finish(Message(msg))
     except FinishedException:
         pass

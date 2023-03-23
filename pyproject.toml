@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-plugin-searchbiliinfo"
-version = "1.7.1"
+version = "1.7.2"
 description = "A plugin for nonebot2. Query Bilibili user information（一个Nonebot2的插件，b站用户信息查询插件【粉丝、舰团信息；直播收益数据；直播观看信息；关键词搜昵称、UID；主播营收榜单；查成分；查牌子等】）"
 authors = ["Ikaros <327209194@qq.com>"]
 license = "MIT"
