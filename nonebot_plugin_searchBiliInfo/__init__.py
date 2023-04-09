@@ -5,6 +5,7 @@ import aiohttp, asyncio
 import time, datetime
 from collections import Counter
 from pathlib import Path
+import ssl
 
 from nonebot import require, on_command, on_regex
 from nonebot.adapters.onebot.v11 import Bot, Event
@@ -2157,20 +2158,24 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str38.finish(Message(f'{msg}'), reply_message=True)
 
     try:
-        async with get_new_page(viewport={"width": 760, "height": 1100}) as page:
-            await page.goto(
-                "https://eihei.gendaimahou.net/listen/livepic.php?uid=" + content,
-                timeout=2 * 60 * 1000,
-                wait_until="networkidle",
-            )
-            await page.wait_for_selector('img')
-            js_str = 'document.getElementsByTagName("img")[0].style.width="720px"'
-            # 执行 JavaScript 代码
-            result = await page.evaluate(js_str)
-            temp_path = "./data/eihei_livepic" + await get_current_timestamp_seconds() + ".png"
-            pic = await page.screenshot(full_page=True, path=temp_path)
+        # htmlrender版本
+        # async with get_new_page(viewport={"width": 760, "height": 1100}) as page:
+        #     await page.goto(
+        #         "https://eihei.gendaimahou.net/listen/livepic.php?uid=" + content,
+        #         timeout=2 * 60 * 1000,
+        #         wait_until="networkidle",
+        #     )
+        #     await page.wait_for_selector('img')
+        #     js_str = 'document.getElementsByTagName("img")[0].style.width="720px"'
+        #     # 执行 JavaScript 代码
+        #     result = await page.evaluate(js_str)
+        #     temp_path = "./data/eihei_livepic" + await get_current_timestamp_seconds() + ".png"
+        #     pic = await page.screenshot(full_page=True, path=temp_path)
 
-        await catch_str38.finish(MessageSegment.image(pic))
+        url = "https://eihei.gendaimahou.net/listen/livepic.php?uid=" + content
+        img_data = await common_get_return_stream(url, headers=header1, timeout=60, ssl_flag=False)
+
+        await catch_str38.finish(MessageSegment.image(img_data))
     except TimeoutError as e:
         nonebot.logger.info(e)
         msg = '打开页面超时喵~可能是网络问题或是对面寄了'
@@ -2284,6 +2289,23 @@ async def common_get_return_json(url, headers=header1, timeout=60):
             async with session.get(url=url, headers=headers, timeout=timeout) as response:
                 result = await response.read()
                 ret = json.loads(result)
+    except:
+        return None
+    # nonebot.logger.info(ret)
+    return ret
+
+
+# 通用get请求返回数据流 
+async def common_get_return_stream(url, headers=header1, timeout=60, ssl_flag=True):
+    if not ssl_flag:
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+
+    try:
+        async with aiohttp.ClientSession(headers=headers) as session:
+            async with session.get(url=url, headers=headers, timeout=timeout) as response:
+                ret = await response.read()
     except:
         return None
     # nonebot.logger.info(ret)
