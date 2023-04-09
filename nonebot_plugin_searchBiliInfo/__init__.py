@@ -2304,7 +2304,7 @@ async def common_get_return_stream(url, headers=header1, timeout=60, ssl_flag=Tr
 
     try:
         async with aiohttp.ClientSession(headers=headers) as session:
-            async with session.get(url=url, headers=headers, timeout=timeout) as response:
+            async with session.get(url=url, headers=headers, timeout=timeout, ssl=ssl_context) as response:
                 ret = await response.read()
     except:
         return None
