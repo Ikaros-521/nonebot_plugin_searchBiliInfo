@@ -182,9 +182,13 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str.finish(Message(f'{msg}'), reply_message=True)
 
     try:
-        msg = '用户名：' + base_info_json['card']['name'] + '\nUID：' + str(base_info_json['card']['mid']) + \
-            '\n房间号：' + str(room_id) + '\n粉丝数：' + str(base_info_json['card']['fans']) + '\n舰团数：' + str(
-            guard_info_json['data']['info']['num'])
+        msg = '用户名：' + base_info_json['card']['name'] + \
+            '\nUID：' + str(base_info_json['card']['mid']) + \
+            '\n房间号：' + str(room_id) + \
+            '\n粉丝数：' + str(base_info_json['card']['fans']) + \
+            '\n舰团数：' + str(guard_info_json['data']['info']['num']) + \
+            '\n主页：' + 'https://space.bilibili.com/' + str(base_info_json['card']['mid']) + \
+            '\n直播间：' + 'https://live.bilibili.com/' + str(room_id)
     except:
         msg = "数据解析异常，请重试。（如果多次重试都失败，建议提issue待开发者修复）"
     await catch_str.finish(Message(f'{msg}'), reply_message=True)
