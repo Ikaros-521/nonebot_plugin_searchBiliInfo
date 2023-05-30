@@ -55,6 +55,7 @@ help_text = f"""
 /v宏观
 /dmk查用户 昵称关键词或uid
 /dmk查直播 昵称关键词或uid
+/dmk分析 昵称关键词或uid
 /blg查弹幕 昵称关键词或uid
 /blg查入场 昵称关键词或uid
 /blg查礼物 昵称关键词或uid
@@ -123,6 +124,7 @@ catch_str33 = on_command('VDD风云榜', aliases={"vdd风云榜", "vdd", "VDD"})
 catch_str34 = on_command('V宏观', aliases={"v宏观"})
 catch_str14 = on_command('dmk查用户', aliases={"DMK查用户", "danmakus查用户"})
 catch_str15 = on_command('dmk查直播', aliases={"DMK查直播", "danmakus查直播"})
+catch_str39 = on_command('dmk分析', aliases={"DMK分析", "danmakus分析"})
 catch_str16 = on_command('blg查弹幕', aliases={"BLG查弹幕", "biligank查弹幕"})
 catch_str17 = on_command('blg查入场', aliases={"BLG查入场", "biligank查入场"})
 catch_str18 = on_command('blg查礼物', aliases={"BLG查礼物", "biligank查礼物"})
@@ -1260,6 +1262,55 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
         await catch_str15.finish(Message(f'{msg}'), reply_message=True)
 
 
+# dmk分析
+@catch_str39.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    content = msg.extract_plain_text()
+
+    temp = await data_preprocess(content)
+    if 0 == temp["code"]:
+        content = temp["uid"]
+    else:
+        nonebot.logger.info(temp)
+        msg = '查询不到：' + content + ' 的相关信息。\nError code：' + str(temp["code"])
+        await catch_str39.finish(Message(f'{msg}'), reply_message=True)
+
+    await catch_str39.send("正在获取数据中，请耐心等待...", reply_message=True)
+
+    try:
+        async with get_new_page(viewport={"width": 1000, "height": 1200}) as page:
+            url = "https://danmakus.com/analyze/" + content + "?startTime=1669874804320&endTime=" + await get_current_timestamp_seconds(1)
+            # print(url)
+            await page.goto(
+                url,
+                timeout=2 * 60 * 1000,
+                wait_until="networkidle",
+            )
+            # 等待页面加载完成
+            # await page.wait_for_selector('.echarts')
+            await page.wait_for_selector('.n-collapse-item__header-main', timeout=60 * 1000)
+            # 删除小作文
+            click_js = 'document.getElementsByClassName("n-collapse-item__header-main")[1].click()'
+            # 执行 JavaScript 代码
+            result = await page.evaluate(click_js)
+            nonebot.logger.debug(result)
+            await asyncio.sleep(5)
+            temp_path = "./data/danmakus.com_analyze" + await get_current_timestamp_seconds() + ".png"
+            pic = await page.screenshot(full_page=True, path=temp_path)
+
+        await catch_str39.finish(MessageSegment.image(pic))
+    except TimeoutError as e:
+        nonebot.logger.info(e)
+        msg = '打开页面超时喵~可能是网络问题或是对面寄了'
+        await catch_str39.finish(Message(f'{msg}'), reply_message=True)
+    except FinishedException:
+        pass
+    except Exception as e:
+        nonebot.logger.info(e)
+        msg = '打开页面失败喵（看看后台日志吧）'
+        await catch_str39.finish(Message(f'{msg}'), reply_message=True)
+
+
 # blg查弹幕
 @catch_str16.handle()
 async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
@@ -2331,10 +2382,13 @@ async def filter_markdown(text):
     return re.sub(r"(.{20})", r"\1<br>", filtered_text, 0, re.DOTALL)
 
 
-# 获取时间戳的当前的秒
-async def get_current_timestamp_seconds():
+# 获取时间戳的当前的秒/毫秒 默认0 秒，1 毫秒
+async def get_current_timestamp_seconds(type=0):
     current_timestamp = int(time.time())
-    return str(current_timestamp % 60)
+    if type == 0:
+        return str(current_timestamp % 60)
+    else:
+        return str(int(current_timestamp * 1000))
 
 
 # 获取年月日（y-m-d）字符串，可以传入日期偏移值
