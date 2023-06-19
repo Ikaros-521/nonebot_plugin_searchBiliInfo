@@ -702,6 +702,10 @@ bug修复
 ### 1.7.7
 新增`dmk分析`功能，由danmakus分析用户观看弹幕等数据。  
 
+### 1.7.8
+修复lap查用户的使用（Laplace加了cf校验，危）  
+修复danmakus的接口失效问题。  
+
 </details>
 
 ## 致谢

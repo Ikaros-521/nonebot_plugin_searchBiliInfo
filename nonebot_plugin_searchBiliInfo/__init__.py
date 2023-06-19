@@ -236,7 +236,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     await catch_str1.send("正在获取数据中，请耐心等待...", reply_message=True)
 
-    url = 'https://danmakus.com/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
+    url = 'https://ukamnads.icu/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
             '&pagenum=' + page + '&pagesize=' + page_size
     info_json = await common_get_return_json(url)
 
@@ -327,7 +327,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     await catch_str11.send("正在获取数据中，请耐心等待...", reply_message=True)
 
-    url = 'https://danmakus.com/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
+    url = 'https://ukamnads.icu/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
             '&pagenum=' + page + '&pagesize=' + page_size
     info_json = await common_get_return_json(url)
 
@@ -399,7 +399,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     await catch_str.send("正在获取数据中，请耐心等待...", reply_message=True)
 
-    url = 'https://danmakus.com/api/search/user/channel?uid=' + content
+    url = 'https://ukamnads.icu/api/search/user/channel?uid=' + content
     user_info_json = await common_get_return_json(url)
 
     if user_info_json == None:
@@ -461,7 +461,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     await catch_str26.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     
-    url = 'https://danmakus.com/api/search/user/channel?uid=' + content
+    url = 'https://ukamnads.icu/api/search/user/channel?uid=' + content
     user_info_json = await common_get_return_json(url)
 
     if user_info_json == None:
@@ -534,7 +534,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     await catch_str3.send("正在获取数据中，请耐心等待...", reply_message=True)
 
-    url = 'https://danmakus.com/api/info/channel?cid=' + src_uid
+    url = 'https://ukamnads.icu/api/info/channel?cid=' + src_uid
     info_json = await common_get_return_json(url)
 
     if info_json == None:
@@ -625,7 +625,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     income_type = "1"
 
     if len(content) < 1 or len(content) > 3 or content[0] == "":
-        msg = '传参错误，命令格式【/查直播 用户uid或昵称 收益类型(默认1: 礼物，2: 上舰，3: SC) 倒叙第n场(从0开始)】'
+        msg = '传参错误，命令格式【/查收益 用户uid或昵称 收益类型(默认1: 礼物，2: 上舰，3: SC) 倒叙第n场(从0开始)】'
         await catch_str4.finish(Message(f'{msg}'), reply_message=True)
     else:
         src_uid = content[0]
@@ -669,7 +669,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     await catch_str4.send("正在获取数据中，请耐心等待...", reply_message=True)
 
-    url = 'https://danmakus.com/api/info/channel?cid=' + src_uid
+    url = 'https://ukamnads.icu/api/info/channel?cid=' + src_uid
     live_json = await common_get_return_json(url)
 
     try:
@@ -704,7 +704,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     # nonebot.logger.info(out_str)
 
     # 获取当场直播信息
-    url = 'https://danmakus.com/api/info/live?liveid=' + live_id + '&type=' + income_type + '&uid='
+    url = 'https://ukamnads.icu/api/info/live?liveid=' + live_id + '&type=' + income_type + '&uid='
     info_json = await common_get_return_json(url)
 
     if info_json == None:
@@ -1204,7 +1204,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     try:
         async with get_new_page(viewport={"width": 1040, "height": 2500}) as page:
             await page.goto(
-                "https://danmakus.com/user/" + content,
+                "https://ukamnads.icu/user/" + content,
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
@@ -1242,7 +1242,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     try:
         async with get_new_page(viewport={"width": 850, "height": 2000}) as page:
             await page.goto(
-                "https://danmakus.com/channel/" + content,
+                "https://ukamnads.icu/channel/" + content,
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
@@ -1279,7 +1279,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     try:
         async with get_new_page(viewport={"width": 1000, "height": 1200}) as page:
-            url = "https://danmakus.com/analyze/" + content + "?startTime=1669874804320&endTime=" + await get_current_timestamp_seconds(1)
+            url = "https://ukamnads.icu/analyze/" + content + "?startTime=1669874804320&endTime=" + await get_current_timestamp_seconds(1)
             # print(url)
             await page.goto(
                 url,
@@ -1586,19 +1586,20 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     await catch_str23.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     try:
-        async with get_new_page(viewport={"width": 758, "height": 300}) as page:
+        async with get_new_page(viewport={"width": 758, "height": 300}, \
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36') as page:
             await page.goto(
                 "https://laplace.live/user/" + content,
                 timeout=2 * 60 * 1000,
-                wait_until="networkidle",
+                wait_until="networkidle"
             )
             # 等待页面加载完成
-            await page.wait_for_selector('.jsx-5797876f0d745d6c')
+            await page.wait_for_selector('.info', timeout=60 * 1000)
             # 删除小作文
             click_js = 'let p_arr=document.getElementsByClassName("Home_xl__sAgvD")[0].getElementsByTagName("p");for(let i=0;i<(p_arr.length-1);i++){setTimeout(function(){p_arr[0].remove()},100)}'
             # 执行 JavaScript 代码
             result = await page.evaluate(click_js)
-            click_js = 'let details=document.getElementsByClassName("jsx-5797876f0d745d6c Home_scrollableContent__6y8XH Home_xl__sAgvD")[0].getElementsByTagName("details");' \
+            click_js = 'let details=document.getElementsByClassName("jsx-1561ee057cab7771 Home_scrollableContent__6y8XH Home_xl__sAgvD")[0].getElementsByTagName("details");' \
                 'let len=details.length;for(var i=0;i<len;i++){details[i].getElementsByTagName("summary")[0].click();};' \
                 'document.getElementsByClassName("player")[0].remove();'
             # 执行 JavaScript 代码
