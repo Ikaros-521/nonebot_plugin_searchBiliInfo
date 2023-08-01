@@ -236,7 +236,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     await catch_str1.send("正在获取数据中，请耐心等待...", reply_message=True)
 
-    url = 'https://ukamnads.icu/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
+    url = 'https://danmakus.com/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
             '&pagenum=' + page + '&pagesize=' + page_size
     info_json = await common_get_return_json(url)
 
@@ -327,7 +327,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     await catch_str11.send("正在获取数据中，请耐心等待...", reply_message=True)
 
-    url = 'https://ukamnads.icu/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
+    url = 'https://danmakus.com/api/search/user/detail?uid=' + src_uid + '&target=' + tgt_uid + \
             '&pagenum=' + page + '&pagesize=' + page_size
     info_json = await common_get_return_json(url)
 
@@ -399,7 +399,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     await catch_str.send("正在获取数据中，请耐心等待...", reply_message=True)
 
-    url = 'https://ukamnads.icu/api/search/user/channel?uid=' + content
+    url = 'https://danmakus.com/api/search/user/channel?uid=' + content
     user_info_json = await common_get_return_json(url)
 
     if user_info_json == None:
@@ -461,7 +461,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     await catch_str26.send("正在获取数据中，请耐心等待...", reply_message=True)
 
     
-    url = 'https://ukamnads.icu/api/search/user/channel?uid=' + content
+    url = 'https://danmakus.com/api/search/user/channel?uid=' + content
     user_info_json = await common_get_return_json(url)
 
     if user_info_json == None:
@@ -534,7 +534,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     await catch_str3.send("正在获取数据中，请耐心等待...", reply_message=True)
 
-    url = 'https://ukamnads.icu/api/info/channel?cid=' + src_uid
+    url = 'https://danmakus.com/api/info/channel?cid=' + src_uid
     info_json = await common_get_return_json(url)
 
     if info_json == None:
@@ -669,7 +669,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     await catch_str4.send("正在获取数据中，请耐心等待...", reply_message=True)
 
-    url = 'https://ukamnads.icu/api/info/channel?cid=' + src_uid
+    url = 'https://danmakus.com/api/info/channel?cid=' + src_uid
     live_json = await common_get_return_json(url)
 
     try:
@@ -704,7 +704,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     # nonebot.logger.info(out_str)
 
     # 获取当场直播信息
-    url = 'https://ukamnads.icu/api/info/live?liveid=' + live_id + '&type=' + income_type + '&uid='
+    url = 'https://danmakus.com/api/info/live?liveid=' + live_id + '&type=' + income_type + '&uid='
     info_json = await common_get_return_json(url)
 
     if info_json == None:
@@ -1204,7 +1204,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     try:
         async with get_new_page(viewport={"width": 1040, "height": 2500}) as page:
             await page.goto(
-                "https://ukamnads.icu/user/" + content,
+                "https://danmakus.com/user/" + content,
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
@@ -1242,7 +1242,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
     try:
         async with get_new_page(viewport={"width": 850, "height": 2000}) as page:
             await page.goto(
-                "https://ukamnads.icu/channel/" + content,
+                "https://danmakus.com/channel/" + content,
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
@@ -1279,7 +1279,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
 
     try:
         async with get_new_page(viewport={"width": 1000, "height": 1200}) as page:
-            url = "https://ukamnads.icu/analyze/" + content + "?startTime=1669874804320&endTime=" + await get_current_timestamp_seconds(1)
+            url = "https://danmakus.com/analyze/" + content + "?startTime=1669874804320&endTime=" + await get_current_timestamp_seconds(1)
             # print(url)
             await page.goto(
                 url,
@@ -1595,11 +1595,11 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             )
             # 等待页面加载完成
             await page.wait_for_selector('.info', timeout=60 * 1000)
-            # 删除小作文
-            click_js = 'let p_arr=document.getElementsByClassName("Home_xl__sAgvD")[0].getElementsByTagName("p");for(let i=0;i<(p_arr.length-1);i++){setTimeout(function(){p_arr[0].remove()},100)}'
-            # 执行 JavaScript 代码
-            result = await page.evaluate(click_js)
-            click_js = 'let details=document.getElementsByClassName("jsx-1561ee057cab7771 Home_scrollableContent__6y8XH Home_xl__sAgvD")[0].getElementsByTagName("details");' \
+            # # 删除小作文
+            # click_js = 'let p_arr=document.getElementsByClassName("Home_xl__sAgvD")[0].getElementsByTagName("p");for(let i=0;i<(p_arr.length-1);i++){setTimeout(function(){p_arr[0].remove()},100)}'
+            # # 执行 JavaScript 代码
+            # result = await page.evaluate(click_js)
+            click_js = 'let details=document.getElementsByTagName("details");' \
                 'let len=details.length;for(var i=0;i<len;i++){details[i].getElementsByTagName("summary")[0].click();};' \
                 'document.getElementsByClassName("player")[0].remove();'
             # 执行 JavaScript 代码
@@ -1607,7 +1607,7 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
             nonebot.logger.debug(result)
             # 修改长度已显示
             await page.wait_for_selector('.following-list')
-            click_js = 'let len=document.getElementsByClassName("jsx-5797876f0d745d6c following-list").length;for(var i=0;i<len;i++){document.getElementsByClassName("jsx-5797876f0d745d6c following-list")[i].style.maxHeight="2000px"}'
+            click_js = 'let len=document.getElementsByClassName("following-list").length;for(var i=0;i<len;i++){document.getElementsByClassName("following-list")[i].style.maxHeight="2000px"}'
             result = await page.evaluate(click_js)
             nonebot.logger.debug(result)
             await asyncio.sleep(3)
@@ -2095,7 +2095,8 @@ async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
                 timeout=2 * 60 * 1000,
                 wait_until="networkidle",
             )
-            await page.wait_for_selector('.jsx-a9b5b32e4de3b53c')
+            await page.wait_for_selector('.btn')
+            await page.wait_for_timeout(1)
             click_js = 'document.getElementById("' + radio_sort + '").click();document.getElementById("showVup").click()'
             # 执行 JavaScript 代码
             result = await page.evaluate(click_js)
