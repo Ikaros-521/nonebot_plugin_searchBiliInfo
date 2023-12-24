@@ -111,6 +111,7 @@ nonebot.logger.debug("cookie=" + header1["cookie"])
 
 # 所有的命令都在这哦，要改命令触发关键词的请自便
 catch_str = on_command("查", priority=2)
+catch_str0 = on_command("查帮助", priority=2)
 catch_str1 = on_command("查弹幕")
 catch_str11 = on_command("查弹幕2")
 catch_str2 = on_command("查观看")
@@ -152,6 +153,11 @@ catch_str28 = on_command('zero被关注', aliases={"ZERO被关注"})
 #catch_str37 = on_regex(r"(?P<option>斗虫|主播pk|主播PK) (?P<usernames>(?:[\u4e00-\u9fa5\w\d]{1,30} ){1,})(?:#(?P<start_offset>\d*) (?P<end_offset>\d*))?")
 catch_str37 = on_regex(r"(?P<option>斗虫|主播pk|主播PK) (?P<usernames>(?:[\u4e00-\u9fa5\w\d]{1,30}(?: )?){1,})(?:#(?P<start_offset>\d*) (?P<end_offset>\d*))?")
 catch_str38 = on_command('eh查直播', aliases={"诶嘿查直播", "eihei查直播"})
+
+# 查帮助
+@catch_str0.handle()
+async def _(bot: Bot, event: Event, msg: Message = CommandArg()):
+    await catch_str0.finish(Message(f'{help_text}'), reply_message=True)
 
 # 查
 @catch_str.handle()
