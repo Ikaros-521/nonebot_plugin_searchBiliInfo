@@ -8,8 +8,19 @@ from pathlib import Path
 import ssl
 
 from nonebot import require, on_command, on_regex
-from nonebot.adapters.onebot.v11 import Bot, Event
-from nonebot.adapters.onebot.v11 import Message, MessageSegment
+
+try:
+    # 尝试导入nonebot.adapters.onebot.v11
+    from nonebot.adapters.onebot.v11 import Bot, Event
+    from nonebot.adapters.onebot.v11 import Message, MessageSegment
+    nonebot.logger.debug("Imported OneBot v11 adapter.")
+except ImportError:
+    # 如果导入失败，则尝试导入nonebot.adapters.red
+    from nonebot.adapters.red import Bot
+    from nonebot.adapters.red.event import Event
+    from nonebot.adapters.red.message import Message, MessageSegment
+    nonebot.logger.debug("Imported Red adapter.")
+
 from nonebot.typing import T_State
 from nonebot.params import CommandArg
 from nonebot.exception import FinishedException
