@@ -33,7 +33,9 @@ _✨ NoneBot b站用户信息查询插件 ✨_
 
 适用于nonebot2 v11/red 的b站用户信息查询插件【粉丝、舰团信息；直播收益数据；直播观看信息；关键词搜昵称、UID；主播营收榜单；查成分；查牌子等】  
 （ps：微调源码可以兼容其他版本）   
-调用的相关API源自b站官方接口、danmakus.com和vtbs.fun
+调用的相关API源自b站官方接口、danmakus.com和vtbs.fun  
+
+本项目部分功能已经失效，多是第三方接口挂了，也懒得修了，不能用的功能就无视吧。  
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
