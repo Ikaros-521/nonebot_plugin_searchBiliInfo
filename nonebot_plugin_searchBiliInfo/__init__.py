@@ -89,7 +89,9 @@ help_text = f"""
 __plugin_meta__ = PluginMetadata(
     name = 'b站用户信息查询',
     description = '适用于nonebot2 v11的b站用户信息查询插件【粉丝、舰团信息；直播收益数据；直播观看信息；关键词搜昵称、UID等；主播营收榜单】',
-    usage = help_text
+    usage = help_text,
+    type = "application",
+    homepage = "https://github.com/Ikaros-521/nonebot_plugin_searchBiliInfo",
 )
 
 # 请求头 需要在env配置cookie
